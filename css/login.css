@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+body, html {
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.left-side {
+  flex: 1;
+  background: url('../img/fundoinicio.webp') no-repeat center center;
+  background-size: cover;
+}
+
+.right-side {
+  flex: 1;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-container {
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.logo {
+  width: 60px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin-bottom: 30px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  padding-left: 20px;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background-color: #000;
+  color: white;
+  border-radius: 25px;
+  font-weight: bold;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.divider {
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.google-btn img {
+  width: 20px;
+}
+
+.login-link {
+  font-size: 0.9em;
+  margin: 10px 0;
+}
