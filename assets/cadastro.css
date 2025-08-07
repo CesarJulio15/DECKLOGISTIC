@@ -16,7 +16,7 @@ body, html {
 
 .left-side {
   flex: 1;
-  background: url('../img/fundoLogin.webp') no-repeat center center;
+  background: url('../img/fundoCadastro.webp') no-repeat center center;
   background-size: cover;
 }
 
