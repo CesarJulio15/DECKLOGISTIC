@@ -26,7 +26,7 @@ Este é um sistema completo para gerenciamento de estoque com integração finan
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seuusuario/seurepositorio.git
+   git clone https://github.com/CesarJulio15/DECKLOGISTIC.git
    ```
 2. Importe o arquivo `banco.sql` no seu MySQL.
 3. Configure o arquivo `conexao.php` com os dados do seu banco.
@@ -69,7 +69,7 @@ This is a complete system for inventory and financial management. It allows prod
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/youruser/yourrepo.git
+   git clone https://github.com/CesarJulio15/DECKLOGISTIC.git
    ```
 2. Import `banco.sql` into your MySQL database.
 3. Configure the `conexao.php` file with your database credentials.
