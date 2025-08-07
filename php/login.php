@@ -15,10 +15,11 @@
       <div class="form-container">
         <img src="logo.png" alt="Logo" class="logo">
         <h1>Bem-Vindo!</h1>
-        <form action="processa_login.php" method="POST">
+        <form action="login2etapa.php" method="POST">
           <input type="text" name="empresa" placeholder="Nome da Empresa" required>
           <input type="email" name="email" placeholder="Endereço de e-mail" required>
           <input type="password" name="senha" placeholder="Insira sua Senha" required>
+
           <div class="login-link">
             Já é registrado? <a href="#">Login</a>
           </div>
