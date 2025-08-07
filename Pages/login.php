@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | DeckLogistic</title>
   <link rel="stylesheet" href="../css/login.css">
+  <link rel="icon" href="../img/logoDecklogistic.webp" type="image/x-icon" />
 </head>
 <body>
   <div class="container">
@@ -13,7 +14,7 @@
     </div>
     <div class="right-side">
       <div class="form-container">
-        <img src="logo.png" alt="Logo" class="logo">
+        <img src="../img/logoDecklogistic.webp" alt="Logo" class="logo">
         <h1>Bem-Vindo!</h1>
         <form action="login2etapa.php" method="POST">
           <input type="text" name="empresa" placeholder="Nome da Empresa" required>
