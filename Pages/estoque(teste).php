@@ -2,17 +2,20 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
+  
   <title>Estoque - Decklogistic</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      background: #fff;
-      color: #111;
-    }
+  body {
+  margin-left: 300px; /* ou a largura da sua sidebar */
+  margin-top: 30px;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  color: #111;
+}
     h1 {
       margin-bottom: 5px;
     }
+    
     .total-estoque {
       border: 1px solid #333;
       display: inline-block;
@@ -92,9 +95,11 @@
 
 </head>
 <body>
-
+  <div class="sidebar">
+    <?php include '../partials/sidebar.php'; ?>
+  </div>
   <h1>Estoque</h1>
-  <div class="total-estoque">Total em estoque: 999</div>
+  <div class="total-estoque">Total em estoque: <!-- valor dinâmico aqui --></div>
   <a href="#" class="ver-mais">ver mais</a>
 
   <div class="tables-container">
@@ -108,7 +113,9 @@
             <th>Data de reabastecimento</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+          <!-- linhas dinâmicas aqui -->
+        </tbody>
       </table>
       <a href="#" class="link-small">ver mais</a>
     </div>
@@ -123,7 +130,9 @@
             <th>Data de validade</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+          <!-- linhas dinâmicas aqui -->
+        </tbody>
       </table>
       <a href="#" class="link-small">ver mais</a>
     </div>
@@ -147,134 +156,47 @@
   </div>
 
 <script>
-  // Dados simulados para tabelas e gráficos
-  const dadosReabastecidos = [
-    { lote: 'L001', nome: 'Produto A', data: '2025-07-01' },
-    { lote: 'L002', nome: 'Produto B', data: '2025-07-03' },
-    { lote: 'L003', nome: 'Produto C', data: '2025-07-05' },
-    { lote: 'L004', nome: 'Produto D', data: '2025-07-07' },
-  ];
+  // Apenas inicializar gráficos vazios
 
-  const dadosVencidos = [
-    { lote: 'L005', nome: 'Produto X', data: '2025-06-30' },
-    { lote: 'L006', nome: 'Produto Y', data: '2025-07-02' },
-    { lote: 'L007', nome: 'Produto Z', data: '2025-07-04' },
-  ];
-
-  const produtosFaltaExcesso = {
-    labels: ['Produto A', 'Produto B'],
-    datasets: [{
-      label: 'Produtos em falta',
-      backgroundColor: 'blue',
-      data: [12, 0],
-    },{
-      label: 'Produtos em excesso',
-      backgroundColor: 'red',
-      data: [0, 6],
-    }]
-  };
-
-  const produtosEstoqueParado = {
-    labels: ['Produto A', 'Produto B'],
-    datasets: [{
-      label: 'Estoque parado > 12 dias',
-      backgroundColor: ['green', 'yellow'],
-      data: [15, 7],
-    }]
-  };
-
-  const entradaSaida = {
-    labels: ['20/03/2025', '23/03/2025', '27/03/2025', '29/03/2025', '31/03/2025', '03/04/2025', '05/04/2025'],
-    datasets: [{
-      label: 'Entrada',
-      borderColor: 'blue',
-      backgroundColor: 'transparent',
-      data: [10, 12, 11, 9, 8, 15, 18],
-      tension: 0.3,
-      fill: false,
-      pointRadius: 5,
-      pointHoverRadius: 7,
-      borderWidth: 2,
-    },{
-      label: 'Saída',
-      borderColor: 'red',
-      backgroundColor: 'transparent',
-      data: [3, 5, 7, 10, 9, 8, 10],
-      tension: 0.3,
-      fill: false,
-      pointRadius: 5,
-      pointHoverRadius: 7,
-      borderWidth: 2,
-    }]
-  };
-
-  // Preencher as tabelas
-  function preencherTabela(tabelaId, dados, colDataKey) {
-    const tbody = document.querySelector(`#${tabelaId} tbody`);
-    tbody.innerHTML = '';
-    dados.forEach(item => {
-      const tr = document.createElement('tr');
-      for (const key in item) {
-        if (key !== colDataKey) {
-          const td = document.createElement('td');
-          td.textContent = item[key];
-          tr.appendChild(td);
-        }
-      }
-      // Adiciona a coluna da data no final
-      const tdData = document.createElement('td');
-      tdData.textContent = item[colDataKey];
-      tr.appendChild(tdData);
-      tbody.appendChild(tr);
-    });
-  }
-
-  preencherTabela('tabelaReabastecidos', dadosReabastecidos, 'data');
-  preencherTabela('tabelaVencidos', dadosVencidos, 'data');
-
-  // Criar gráficos com Chart.js
   const ctxFaltaExcesso = document.getElementById('graficoFaltaExcesso').getContext('2d');
   const graficoFaltaExcesso = new Chart(ctxFaltaExcesso, {
     type: 'bar',
-    data: produtosFaltaExcesso,
+    data: {
+      labels: [],
+      datasets: []
+    },
     options: {
       responsive: true,
-      plugins: {
-        legend: { position: 'top' }
-      },
-      scales: {
-        y: { beginAtZero: true }
-      }
+      plugins: { legend: { position: 'top' } },
+      scales: { y: { beginAtZero: true } }
     }
   });
 
   const ctxEstoqueParado = document.getElementById('graficoEstoqueParado').getContext('2d');
   const graficoEstoqueParado = new Chart(ctxEstoqueParado, {
     type: 'bar',
-    data: produtosEstoqueParado,
+    data: {
+      labels: [],
+      datasets: []
+    },
     options: {
       responsive: true,
-      plugins: {
-        legend: { position: 'top' }
-      },
-      scales: {
-        y: { beginAtZero: true }
-      }
+      plugins: { legend: { position: 'top' } },
+      scales: { y: { beginAtZero: true } }
     }
   });
 
   const ctxEntradaSaida = document.getElementById('graficoEntradaSaida').getContext('2d');
   const graficoEntradaSaida = new Chart(ctxEntradaSaida, {
     type: 'line',
-    data: entradaSaida,
+    data: {
+      labels: [],
+      datasets: []
+    },
     options: {
       responsive: true,
-      plugins: {
-        legend: { position: 'top' }
-      },
-      scales: {
-        y: { beginAtZero: true }
-      }
+      plugins: { legend: { position: 'top' } },
+      scales: { y: { beginAtZero: true } }
     }
   });
 
