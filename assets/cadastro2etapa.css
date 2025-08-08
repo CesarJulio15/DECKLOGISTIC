@@ -1,0 +1,76 @@
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    body {
+      background-color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+    .left-side {
+      flex: 1;
+      background: url('../img/mesacadastro.webp') no-repeat center center;
+      background-size: cover;
+    }
+    .container {
+      flex: 1;
+      max-width: 800px;
+      padding: 100px 30px 30px 30px;
+      background-color: #fff;
+    }
+    h1 {
+      padding-left: 3px;
+      text-align: center;
+      margin-bottom: 150px;
+    }
+    form {
+      max-width: 1100px;
+      margin: auto;
+    }
+    .form-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: nowrap;
+    }
+    .form-group input, .form-group select {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px 20px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+    }
+    .form-group select {
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="gray" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 15px;
+      padding-right: 40px;
+    }
+    .form-group input[type="checkbox"] {
+      flex: 0;
+      margin-right: 5px;
+    }
+    button {
+      background-color: #000;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    small {
+      font-size: 0.8em;
+      margin-left: 5px;
+    }
+  

@@ -20,6 +20,7 @@
           <input type="text" name="empresa" placeholder="Nome da Empresa" required>
           <input type="email" name="email" placeholder="Endereço de e-mail" required>
           <input type="password" name="senha" placeholder="Insira sua Senha" required>
+            <input type="password" name="senha" placeholder="Repita sua senha" required>
 
           <div class="login-link">
             Já é registrado? <a href="#">Login</a>
