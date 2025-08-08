@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro | DeckLogistic</title>
-  <link rel="stylesheet" href="../assets/cadastro.css">
+  <link rel="stylesheet" href="../assets/login.css">
   <link rel="icon" href="../img/logoDecklogistic.webp" type="image/x-icon" />
 </head>
 <body>
@@ -12,24 +12,26 @@
     <div class="left-side">
       
     </div>
-    <div class="right-side">
-      <div class="form-container">
-        <img src="../img/logoDecklogistic.webp" alt="Logo" class="logo">
-        <h1>Olá Novamente!</h1>
-        <form action="processa_login.php" method="POST">
-          <input type="email" name="email" placeholder="Endereço de e-mail" required>
-          <input type="password" name="senha" placeholder="Insira sua Senha" required>
-          <div class="login-link">
-            Ainda não tem uma conta para sua empresa? <a href="../pages/cadastro.php">Cadastrar</a>
-          </div>
-          <button type="submit" class="btn">Continuar</button>
-        </form>
-        <div class="divider">Ou</div>
-        <button class="google-btn">
-          <img src="../img/google.webp" alt="Google"> Continuar com o Google
-        </button>
+<div class="right-side">
+  <img src="../img/logoDecklogistic.webp" alt="Logo" class="logo">
+  <div class="form-container">
+    <h1>Olá Novamente!</h1>
+    <form action="processa_login.php" method="POST">
+      <input type="email" name="email" placeholder="Endereço de e-mail" required>
+      <input type="password" name="senha" placeholder="Insira sua Senha" required>
+      <div class="login-link">
+        Ainda não tem uma conta para sua empresa? <a href="../pages/cadastro.php">Cadastrar</a>
       </div>
-    </div>
+      <button type="submit" class="btn">Continuar</button>
+    </form>
+    <div class="divider">Ou</div>
+    <button class="google-btn">
+      <img src="../img/google.webp" alt="Google"> Continuar com o Google
+    </button>
+  </div>
+</div>
+
+
   </div>
 </body>
 </html>
