@@ -16,12 +16,11 @@
       <div class="form-container">
         <img src="../img/logoDecklogistic.webp" alt="Logo" class="logo">
         <h1>Bem-Vindo!</h1>
-        <form action="login2etapa.php" method="POST">
-          <input type="text" name="empresa" placeholder="Nome da Empresa" required>
-          <input type="email" name="email" placeholder="Endereço de e-mail" required>
-          <input type="password" name="senha" placeholder="Insira sua Senha" required>
-            <input type="password" name="senha" placeholder="Repita sua senha" required>
-
+          <form action="cadastroEmpresa.php" method="POST">
+            <input type="text" name="nome" placeholder="Nome da Empresa" required>
+              <input type="email" name="email" placeholder="Endereço de e-mail" required>
+              <input type="password" name="senha" placeholder="Insira sua Senha" required>
+              <input type="password" name="senha2" placeholder="Repita sua senha" required>
           <div class="login-link">
             Já é registrado? <a href="#">Login</a>
           </div>
