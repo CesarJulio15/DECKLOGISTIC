@@ -26,6 +26,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative; /* permite posicionamento absoluto interno */
 }
 
 .form-container {
@@ -35,8 +36,10 @@ body, html {
 }
 
 .logo {
-  width: 60px;
-  margin-bottom: 20px;
+  width: 100px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 
 h1 {

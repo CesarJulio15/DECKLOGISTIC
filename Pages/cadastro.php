@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | DeckLogistic</title>
-  <link rel="stylesheet" href="../assets/login.css">
+  <link rel="stylesheet" href="../assets/cadastro.css">
   <link rel="icon" href="../img/logoDecklogistic.webp" type="image/x-icon" />
 </head>
 <body>
   <div class="container">
     <div class="left-side">
-      <!-- Aqui você insere sua imagem no CSS -->
+      
     </div>
     <div class="right-side">
       <div class="form-container">
