@@ -1,3 +1,5 @@
+-- decklog_db
+
 CREATE TABLE lojas (
   id INT PRIMARY KEY AUTO_INCREMENT,
   nome VARCHAR(100), -- nome fantasia
