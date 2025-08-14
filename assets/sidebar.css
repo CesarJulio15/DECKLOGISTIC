@@ -32,12 +32,11 @@ body {
 
 .logo-area img {
   width: 100%;
-  height: auto; /* Ajusta automaticamente a altura mantendo a proporção */
-  object-fit: cover; /* Preenche todo o espaço disponível */
-  display: block; /* Remove espaços indesejados abaixo da imagem */
-  border-radius: 0; /* Remove cantos arredondados */
+  height: auto; 
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
 }
-
 
 /* Navegação */
 .nav-section {
@@ -70,6 +69,8 @@ body {
   text-decoration: none;
   font-size: 15px;
   transition: background 0.2s;
+  box-shadow: none; /* remove qualquer sombra */
+  outline: none;    /* remove outline do navegador */
 }
 
 .nav-list li a span {
@@ -88,8 +89,10 @@ body {
 }
 
 .nav-list li.active a {
-  background-color: #444;
+  background-color: #555; /* cinza destacando página atual */
   border-radius: 4px;
+  color: #fff;
+  box-shadow: none; /* garante que não haja sombra */
 }
 
 /* Linha divisória */
