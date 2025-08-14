@@ -1,0 +1,52 @@
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f5f7fa;
+  }
+
+  .content {
+    display: flex;
+  }
+
+  .dashboard {
+    margin-left: 270px; /* espaço para sidebar */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    width: calc(100% - 270px);
+  }
+
+  .card {
+    background: linear-gradient(145deg, #ffffff, #f0f3f8);
+    padding: 25px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  }
+
+  .card h3 {
+    font-size: 1rem;
+    color: #374151;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  /* cores por tipo de card */
+  #lucroBruto { color: #10b981; }
+  #lucroLiquido { color: #3b82f6; }
+  #margemLucro { color: #f59e0b; }
