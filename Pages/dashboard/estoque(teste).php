@@ -21,7 +21,7 @@ while ($row = mysqli_fetch_assoc($resGrafico1)) {
     $dados1[]  = (int) $row['quantidade_estoque'];
 }
 
-// Produtos parados há mais de 12 dias (usando movimentacoes_estoque)
+// Produtos parados há mais de 12 dias
 $sqlGraficoParado = "
 SELECT p.nome, DATEDIFF(CURDATE(), m.ultima_movimentacao) AS dias
 FROM produtos p
@@ -40,6 +40,31 @@ while ($row = mysqli_fetch_assoc($resGrafico2)) {
     $labels2[] = $row['nome'];
     $dados2[]  = (int) $row['dias'];
 }
+
+// Dados de entrada/saída por produto
+$sqlEntradaSaida = "
+SELECT p.nome, m.data_movimentacao, SUM(m.quantidade) AS total
+FROM produtos p
+LEFT JOIN movimentacoes_estoque m ON p.id = m.produto_id
+GROUP BY p.nome, m.data_movimentacao
+ORDER BY m.data_movimentacao ASC
+";
+$resGrafico3 = mysqli_query($conn, $sqlEntradaSaida);
+
+$labels3 = [];
+$entrada = [];
+$saida = [];
+
+while ($row = mysqli_fetch_assoc($resGrafico3)) {
+    $labels3[] = date('d/m/Y', strtotime($row['data_movimentacao']));
+    if ($row['total'] >= 0) {
+        $entrada[] = (int)$row['total'];
+        $saida[] = 0;
+    } else {
+        $entrada[] = 0;
+        $saida[] = abs((int)$row['total']);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +78,7 @@ while ($row = mysqli_fetch_assoc($resGrafico2)) {
 <h1>Estoque</h1>
 
 <div class="tables-container">
-  <!-- Tabela Reabastecidos -->
+   <h2>Produtos reabastecidos recentemente</h2>
   <table>
     <thead>
       <tr><th>Lote</th><th>Nome</th><th>Data de Reabastecimento</th></tr>
@@ -68,13 +93,26 @@ while ($row = mysqli_fetch_assoc($resGrafico2)) {
       <?php endwhile; ?>
     </tbody>
   </table>
+</div>
 
-  <!-- Gráficos -->
-  <canvas id="graficoFaltaExcesso" width="1200" height="600"></canvas>
-  <canvas id="graficoEstoqueParado" width="1200" height="600"></canvas>
+<!-- Gráficos -->
+<div class="charts-container">
+    <div>
+        <h4>Produtos em falta/produtos em excesso</h4>
+        <canvas id="graficoFaltaExcesso"></canvas>
+    </div>
+    <div>
+        <h4>Produtos com estoque parado</h4>
+        <canvas id="graficoEstoqueParado"></canvas>
+    </div>
+    <div>
+        <h4>Entrada e saída de produtos</h4>
+        <canvas id="graficoEntradaSaida"></canvas>
+    </div>
 </div>
 
 <script>
+// Gráfico 1
 const grafico1 = new Chart(document.getElementById('graficoFaltaExcesso'), {
     type: 'bar',
     data: {
@@ -92,6 +130,7 @@ const grafico1 = new Chart(document.getElementById('graficoFaltaExcesso'), {
     }
 });
 
+// Gráfico 2
 const grafico2 = new Chart(document.getElementById('graficoEstoqueParado'), {
     type: 'bar',
     data: {
@@ -101,6 +140,35 @@ const grafico2 = new Chart(document.getElementById('graficoEstoqueParado'), {
             data: <?= json_encode($dados2) ?>,
             backgroundColor: 'rgba(255, 99, 132, 0.6)'
         }]
+    },
+    options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: true } }
+    }
+});
+
+// Gráfico 3 - Entrada/Saída
+const grafico3 = new Chart(document.getElementById('graficoEntradaSaida'), {
+    type: 'line',
+    data: {
+        labels: <?= json_encode($labels3) ?>,
+        datasets: [
+            {
+                label: 'Entrada',
+                data: <?= json_encode($entrada) ?>,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: true
+            },
+            {
+                label: 'Saída',
+                data: <?= json_encode($saida) ?>,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: true
+            }
+        ]
     },
     options: {
         responsive: false,
