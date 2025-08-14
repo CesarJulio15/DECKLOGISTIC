@@ -1,5 +1,8 @@
-<?php include '../../../conexao.php'; ?>
-
+<?php 
+// Incluir sidebar e conexão com caminhos corretos
+include __DIR__ . '/../../../partials/sidebar.php';
+include __DIR__ . '/../../../conexao.php'; 
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -7,9 +10,7 @@
   <title>Finanças - Decklogistic</title>
 </head>
 <body>
-  <div class="sidebar">
-        <?php include '../../../partials/sidebar.php'; ?>
-  </div>
+
   
 </body>
 </html>
