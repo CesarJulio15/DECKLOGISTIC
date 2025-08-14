@@ -2,10 +2,9 @@
 require_once 'config.php';
 session_start(); // inicia a sessão
 
-// Verifica se o usuário está logado
 if (!isset($_SESSION['user_id'])) {
-    header('Location: pages/auth/lojas/cadastro.php'); // redireciona para a página de login
-    exit; // importante, para parar a execução
+    header('Location: pages/auth/lojas/cadastro.php'); 
+    exit; 
 }
 ?>
 
