@@ -15,7 +15,7 @@ body, html {
 }
 
 .left-side {
-  flex: 1;
+  flex: 1.7;
   background: url('../img/fundoCadastro.webp') no-repeat center center;
   background-size: cover;
 }
