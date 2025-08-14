@@ -1,0 +1,103 @@
+.pagina {
+  display: flex;
+}
+
+a h3 {
+  color: #3399ff; /* azul claro */
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+.conteudo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px; /* espaço vertical entre os elementos */
+  margin-top: 200px; /* espaço do topo */
+}
+
+/* Ícone + loader alinhados verticalmente */
+.confirmar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px; /* espaço entre ícone e loader */
+}
+
+/* Loader */
+.loader-tres-pontinhos {
+  outline: 1px solid transparent;
+  font-size: 0px;
+  padding: 0px;
+  display: inline-block;
+}
+
+.loader-tres-pontinhos span {
+  background: #1a1b1b;
+  border-radius: 100%;
+  vertical-align: middle;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin: 2px 2px;
+  -webkit-animation: loader-tres-pontinhos 0.8s linear infinite alternate;
+  animation: loader-tres-pontinhos 0.8s linear infinite alternate;
+}
+
+.loader-tres-pontinhos span:nth-child(1) {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+
+.loader-tres-pontinhos span:nth-child(2) {
+  -webkit-animation-delay: -0.53333s;
+  animation-delay: -0.53333s;
+}
+
+.loader-tres-pontinhos span:nth-child(3) {
+  -webkit-animation-delay: -0.26666s;
+  animation-delay: -0.26666s;
+}
+
+@keyframes loader-tres-pontinhos {
+  from { transform: scale(0, 0); }
+  to { transform: scale(1, 1); }
+}
+
+@-webkit-keyframes loader-tres-pontinhos {
+  from { -webkit-transform: scale(0, 0); }
+  to { -webkit-transform: scale(1, 1); }
+}
+
+/* Caixa de código */
+.code-container {
+  max-width: 400px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px 30px;
+  border: 1px solid #000;
+  border-radius: 50px;
+  background: #fff;
+}
+
+.digit-input {
+  width: 35px;
+  font-size: 24px;
+  text-align: center;
+  border: none;
+  border-bottom: 2px solid #000;
+  outline: none;
+  background: transparent;
+}
+
+.digit-input::-webkit-outer-spin-button,
+.digit-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
