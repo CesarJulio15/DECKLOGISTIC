@@ -1,13 +1,16 @@
-<?php include '../partials/sidebar.php'; ?>
-<?php include '../conexao.php'; ?>
+<?php 
+// Incluir sidebar e conexão com caminhos corretos
+include __DIR__ . '/../../partials/sidebar.php'; 
+include __DIR__ . '/../../conexao.php'; 
+?>
+<link rel="stylesheet" href="../../assets/estoque.css">
 
 <?php
 // Buscar produtos reabastecidos
 $sqlReabastecidos = "SELECT lote, nome, data_reabastecimento FROM produtos ORDER BY data_reabastecimento DESC LIMIT 10";
 $resReab = mysqli_query($conn, $sqlReabastecidos);
 
-
-// Buscar dados para gráficos
+// Buscar dados para gráfico de quantidade em estoque
 $sqlGraficoFaltaExcesso = "SELECT nome, quantidade_estoque FROM produtos";
 $resGrafico1 = mysqli_query($conn, $sqlGraficoFaltaExcesso);
 
@@ -18,8 +21,17 @@ while ($row = mysqli_fetch_assoc($resGrafico1)) {
     $dados1[]  = (int) $row['quantidade_estoque'];
 }
 
-// Produtos parados há mais de 12 dias
-$sqlGraficoParado = "SELECT nome, DATEDIFF(CURDATE(), ultima_movimentacao) AS dias FROM produtos WHERE DATEDIFF(CURDATE(), ultima_movimentacao) > 12";
+// Produtos parados há mais de 12 dias (usando movimentacoes_estoque)
+$sqlGraficoParado = "
+SELECT p.nome, DATEDIFF(CURDATE(), m.ultima_movimentacao) AS dias
+FROM produtos p
+LEFT JOIN (
+    SELECT produto_id, MAX(data_movimentacao) AS ultima_movimentacao
+    FROM movimentacoes_estoque
+    GROUP BY produto_id
+) m ON p.id = m.produto_id
+WHERE DATEDIFF(CURDATE(), m.ultima_movimentacao) > 12
+";
 $resGrafico2 = mysqli_query($conn, $sqlGraficoParado);
 
 $labels2 = [];
@@ -38,12 +50,7 @@ while ($row = mysqli_fetch_assoc($resGrafico2)) {
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="sidebar">
-    <?php include '../../partials/sidebar.php'; ?>
-  </div>
-  <h1>Estoque</h1>
-  <div class="total-estoque">Total em estoque: <!-- valor dinâmico aqui --></div>
-  <a href="#" class="ver-mais">ver mais</a>
+<h1>Estoque</h1>
 
 <div class="tables-container">
   <!-- Tabela Reabastecidos -->
@@ -62,10 +69,10 @@ while ($row = mysqli_fetch_assoc($resGrafico2)) {
     </tbody>
   </table>
 
-
-<!-- Gráficos -->
-<canvas id="graficoFaltaExcesso"></canvas>
-<canvas id="graficoEstoqueParado"></canvas>
+  <!-- Gráficos -->
+  <canvas id="graficoFaltaExcesso" width="1200" height="600"></canvas>
+  <canvas id="graficoEstoqueParado" width="1200" height="600"></canvas>
+</div>
 
 <script>
 const grafico1 = new Chart(document.getElementById('graficoFaltaExcesso'), {
@@ -77,6 +84,11 @@ const grafico1 = new Chart(document.getElementById('graficoFaltaExcesso'), {
             data: <?= json_encode($dados1) ?>,
             backgroundColor: 'rgba(54, 162, 235, 0.6)'
         }]
+    },
+    options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: true } }
     }
 });
 
@@ -89,6 +101,11 @@ const grafico2 = new Chart(document.getElementById('graficoEstoqueParado'), {
             data: <?= json_encode($dados2) ?>,
             backgroundColor: 'rgba(255, 99, 132, 0.6)'
         }]
+    },
+    options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: true } }
     }
 });
 </script>
