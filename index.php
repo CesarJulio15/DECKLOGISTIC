@@ -1,5 +1,11 @@
 <?php
 require_once 'config.php';
+session_start(); // inicia a sessão
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: pages/auth/lojas/cadastro.php'); 
+    exit; 
+}
 ?>
 
 <!DOCTYPE html>

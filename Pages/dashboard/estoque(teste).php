@@ -1,12 +1,58 @@
-<link rel="stylesheet" href="../../assets/estoque.css">
-
 <?php
-require_once '../../conexao.php'; // aqui o $conn deve ser mysqli_connect(...)
+// Ativa exibição de erros
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$sqlReabastecidos = "SELECT lote, nome, data_reabastecimento FROM produtos ORDER BY data_reabastecimento DESC LIMIT 10";
+// Conexão com banco
+require_once '../../conexao.php';
+
+// ------------------------
+// Total de estoque
+// ------------------------
+$sqlTotalEstoque = "SELECT SUM(quantidade_estoque) AS total FROM produtos";
+$resTotal = mysqli_query($conn, $sqlTotalEstoque);
+$totalEstoque = 0;
+if ($row = mysqli_fetch_assoc($resTotal)) {
+    $totalEstoque = (int)$row['total'];
+}
+
+// ------------------------
+// Filtro backend
+// ------------------------
+$filtro = $_GET['filtro'] ?? '';
+$orderBy = "ORDER BY data_reabastecimento DESC";
+
+switch ($filtro) {
+    case 'preco_asc':
+        $orderBy = "ORDER BY preco_unitario ASC";
+        break;
+    case 'preco_desc':
+        $orderBy = "ORDER BY preco_unitario DESC";
+        break;
+    case 'quantidade_asc':
+        $orderBy = "ORDER BY quantidade_estoque ASC";
+        break;
+    case 'quantidade_desc':
+        $orderBy = "ORDER BY quantidade_estoque DESC";
+        break;
+    case 'data_recente':
+        $orderBy = "ORDER BY data_reabastecimento DESC";
+        break;
+    case 'data_antiga':
+        $orderBy = "ORDER BY data_reabastecimento ASC";
+        break;
+}
+
+// ------------------------
+// Produtos reabastecidos recentemente
+// ------------------------
+$sqlReabastecidos = "SELECT lote, nome, data_reabastecimento FROM produtos $orderBy LIMIT 10";
 $resReab = mysqli_query($conn, $sqlReabastecidos);
 
-// Buscar dados para gráfico de quantidade em estoque
+// ------------------------
+// Gráfico: Quantidade em estoque
+// ------------------------
 $sqlGraficoFaltaExcesso = "SELECT nome, quantidade_estoque FROM produtos";
 $resGrafico1 = mysqli_query($conn, $sqlGraficoFaltaExcesso);
 
@@ -14,10 +60,12 @@ $labels1 = [];
 $dados1  = [];
 while ($row = mysqli_fetch_assoc($resGrafico1)) {
     $labels1[] = $row['nome'];
-    $dados1[]  = (int) $row['quantidade_estoque'];
+    $dados1[]  = (int)$row['quantidade_estoque'];
 }
 
-// Produtos parados há mais de 12 dias
+// ------------------------
+// Gráfico: Produtos parados há mais de 12 dias
+// ------------------------
 $sqlGraficoParado = "
 SELECT p.nome, DATEDIFF(CURDATE(), m.ultima_movimentacao) AS dias
 FROM produtos p
@@ -34,10 +82,12 @@ $labels2 = [];
 $dados2  = [];
 while ($row = mysqli_fetch_assoc($resGrafico2)) {
     $labels2[] = $row['nome'];
-    $dados2[]  = (int) $row['dias'];
+    $dados2[]  = (int)$row['dias'];
 }
 
-// Dados de entrada/saída por produto
+// ------------------------
+// Gráfico: Entrada/Saída de produtos
+// ------------------------
 $sqlEntradaSaida = "
 SELECT p.nome, m.data_movimentacao, SUM(m.quantidade) AS total
 FROM produtos p
@@ -50,7 +100,6 @@ $resGrafico3 = mysqli_query($conn, $sqlEntradaSaida);
 $labels3 = [];
 $entrada = [];
 $saida = [];
-
 while ($row = mysqli_fetch_assoc($resGrafico3)) {
     $labels3[] = date('d/m/Y', strtotime($row['data_movimentacao']));
     if ($row['total'] >= 0) {
@@ -62,33 +111,96 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <title>Estoque - Decklogistic</title>
+  <link rel="stylesheet" href="../../assets/estoque.css">
+  <link rel="stylesheet" href="../../assets/sidebar.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<div class="sidebar">
+  <div class="logo-area">
+    <img src="../../img/logoDecklogistic.webp" alt="Logo">
+  </div>
+  <nav class="nav-section">
+    <div class="nav-menus">
+      <ul class="nav-list top-section">
+        <li><a href="/Pages/financeiro.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+        <li class="active"><a href="/Pages/estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+      </ul>
+      <hr>
+      <ul class="nav-list middle-section">
+        <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+        <li><a href="/Pages/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+        <li><a href="/Pages/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+      </ul>
+    </div>
+    <div class="bottom-links">
+      <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+      <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+    </div>
+  </nav>
+</div>
+
 <h1>Estoque</h1>
+<div class="total-estoque">
+    <h3>Itens:</h3>
+    <span><?= $totalEstoque ?></span>
+</div>
+
+<a href="" class="ver-mais">ver mais</a>
 
 <div class="tables-container">
    <h2>Produtos reabastecidos recentemente</h2>
+   <div class="filtro-btn">
+       <button id="btnFiltro">
+           <img src="../../img/filtro.svg" alt="Filtro" class="icone-filtro">
+       </button>
+       <select id="selectFiltro" onchange="aplicarFiltro(this.value)">
+           <option value="">Selecione...</option>
+           <option value="preco_asc">Preço (menor primeiro)</option>
+           <option value="preco_desc">Preço (maior primeiro)</option>
+           <option value="quantidade_asc">Quantidade (menor primeiro)</option>
+           <option value="quantidade_desc">Quantidade (maior primeiro)</option>
+           <option value="data_recente">Data de reabastecimento (mais recente)</option>
+           <option value="data_antiga">Data de reabastecimento (mais antiga)</option>
+       </select>
+   </div>
+
+   <script>
+   function aplicarFiltro(valor) {
+       if (!valor) return;
+       const url = new URL(window.location.href);
+       url.searchParams.set('filtro', valor);
+       window.location.href = url.toString();
+   }
+   </script>
+
   <table>
-    <thead>
-      <tr><th>Lote</th><th>Nome</th><th>Data de Reabastecimento</th></tr>
-    </thead>
-    <tbody>
-      <?php while($row = mysqli_fetch_assoc($resReab)): ?>
-        <tr>
-          <td><?= $row['lote'] ?></td>
-          <td><?= $row['nome'] ?></td>
-          <td><?= date('d/m/Y', strtotime($row['data_reabastecimento'])) ?></td>
-        </tr>
-      <?php endwhile; ?>
-    </tbody>
-  </table>
+  <thead>
+    <tr>
+      <th>Lote</th>
+      <th>Nome</th>
+      <th>Data de Reabastecimento</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php while($row = mysqli_fetch_assoc($resReab)): ?>
+      <tr>
+        <td><?= $row['lote'] ?></td>
+        <td><?= $row['nome'] ?></td>
+        <td>
+          <?= $row['data_reabastecimento'] 
+              ? date('d/m/Y', strtotime($row['data_reabastecimento'])) 
+              : '-' ?>
+        </td>
+      </tr>
+    <?php endwhile; ?>
+  </tbody>
+</table>
 </div>
 
 <!-- Gráficos -->
@@ -109,68 +221,27 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
 
 <script>
 // Gráfico 1
-const grafico1 = new Chart(document.getElementById('graficoFaltaExcesso'), {
+new Chart(document.getElementById('graficoFaltaExcesso'), {
     type: 'bar',
-    data: {
-        labels: <?= json_encode($labels1) ?>,
-        datasets: [{
-            label: 'Quantidade em estoque',
-            data: <?= json_encode($dados1) ?>,
-            backgroundColor: 'rgba(54, 162, 235, 0.6)'
-        }]
-    },
-    options: {
-        responsive: false,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: true } }
-    }
+    data: { labels: <?= json_encode($labels1) ?>, datasets: [{ label: 'Quantidade em estoque', data: <?= json_encode($dados1) ?>, backgroundColor: 'rgba(54, 162, 235, 0.6)' }] },
+    options: { responsive: false, maintainAspectRatio: false }
 });
 
 // Gráfico 2
-const grafico2 = new Chart(document.getElementById('graficoEstoqueParado'), {
+new Chart(document.getElementById('graficoEstoqueParado'), {
     type: 'bar',
-    data: {
-        labels: <?= json_encode($labels2) ?>,
-        datasets: [{
-            label: 'Dias parado',
-            data: <?= json_encode($dados2) ?>,
-            backgroundColor: 'rgba(255, 99, 132, 0.6)'
-        }]
-    },
-    options: {
-        responsive: false,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: true } }
-    }
+    data: { labels: <?= json_encode($labels2) ?>, datasets: [{ label: 'Dias parado', data: <?= json_encode($dados2) ?>, backgroundColor: 'rgba(255, 99, 132, 0.6)' }] },
+    options: { responsive: false, maintainAspectRatio: false }
 });
 
 // Gráfico 3 - Entrada/Saída
-const grafico3 = new Chart(document.getElementById('graficoEntradaSaida'), {
+new Chart(document.getElementById('graficoEntradaSaida'), {
     type: 'line',
-    data: {
-        labels: <?= json_encode($labels3) ?>,
-        datasets: [
-            {
-                label: 'Entrada',
-                data: <?= json_encode($entrada) ?>,
-                borderColor: 'rgba(54, 162, 235, 1)',
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                fill: true
-            },
-            {
-                label: 'Saída',
-                data: <?= json_encode($saida) ?>,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                fill: true
-            }
-        ]
-    },
-    options: {
-        responsive: false,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: true } }
-    }
+    data: { labels: <?= json_encode($labels3) ?>, datasets: [
+        { label: 'Entrada', data: <?= json_encode($entrada) ?>, borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)', fill: true },
+        { label: 'Saída', data: <?= json_encode($saida) ?>, borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)', fill: true }
+    ]},
+    options: { responsive: false, maintainAspectRatio: false }
 });
 </script>
 </body>
