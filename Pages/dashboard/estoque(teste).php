@@ -96,7 +96,7 @@
 </head>
 <body>
   <div class="sidebar">
-    <?php include '../partials/sidebar.php'; ?>
+    <?php include '../../partials/sidebar.php'; ?>
   </div>
   <h1>Estoque</h1>
   <div class="total-estoque">Total em estoque: <!-- valor dinâmico aqui --></div>

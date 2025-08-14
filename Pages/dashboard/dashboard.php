@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<?php include '../partials/sidebar.php'; ?>
+<?php include '../../partials/sidebar.php'; ?>
 
 
 </body>
