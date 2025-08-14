@@ -53,7 +53,7 @@
           </div>
 
           <button type="submit" class="btn">Prosseguir</button>
-          <button type="submit" onclick="location.href='cadastro.php'" class="btn">Voltar</button>
+          <button type="submit" onclick="location.href='../lojas/cadastro.php'" class="btn">Voltar</button>
         
         </form>
       </div>
