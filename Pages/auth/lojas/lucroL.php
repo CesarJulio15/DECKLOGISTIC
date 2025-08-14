@@ -45,7 +45,7 @@
                         <span>▲</span> <b>34%</b>
                     </div>
                 </div>
-                <div class="titulo">Lucro Líquido por mês</div>
+                <div class="titulo">Lucro Líquido</div>
                 <canvas id="grafico"></canvas>
             </div>
         </div>
@@ -54,40 +54,46 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const ctx = document.getElementById('grafico').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['23/03/2025','23/03/2025','23/03/2025','23/03/2025','23/03/2025','23/03/2025','23/03/2025','23/03/2025','23/03/2025','23/03/2025'],
-                datasets: [
-                    {
-                        label: 'Lucro Líquido',
-                        data: [18, 17, 13, 13, 17, 13, 17, 15, 14, 0],
-                        backgroundColor: 'rgba(54, 162, 235, 0.8)'
+        async function carregarGrafico() {
+            try {
+                const response = await fetch("../auth/lojas/lucroL_api.php?loja_id=1&periodo=mes");
+                const data = await response.json();
+
+                // Cria arrays de labels e valores
+                const labels = data.map(item => item.mes);
+                const valores = data.map(item => item.lucro_liquido);
+
+                const ctx = document.getElementById('grafico').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Lucro Líquido',
+                            data: valores,
+                            borderColor: 'rgba(54, 162, 235, 0.8)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3
+                        }]
                     },
-                    {
-                        label: 'Proventos',
-                        data: [9, 8, 10, 5, 10, 9, 11, 8, 7, 0],
-                        backgroundColor: 'rgba(75, 192, 75, 0.8)'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 22
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
+                });
+            } catch (error) {
+                console.error("Erro ao carregar gráfico:", error);
             }
-        });
+        }
+
+        carregarGrafico();
     </script>
 </body>
 </html>
