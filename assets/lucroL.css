@@ -1,0 +1,64 @@
+body {
+    margin: 0;
+    background: #999999;
+    font-family: Arial, sans-serif;
+}
+
+.top-bar {
+    font-size: 14px;
+    color: white;
+    background: #888;
+    padding: 5px 10px;
+}
+
+.pagina {
+    display: flex;
+    height: calc(100vh - 25px); /* Ajuste para compensar a top-bar */
+}
+
+.conteudo {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.grafico-container {
+    background: white;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-grafico {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.indicador {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    color: green;
+}
+
+.indicador span {
+    margin-right: 5px;
+}
+
+.titulo {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    flex: 0;
+}
+
+canvas {
+    flex: 1;
+}
