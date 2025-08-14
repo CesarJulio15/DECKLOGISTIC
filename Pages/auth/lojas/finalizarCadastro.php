@@ -1,5 +1,5 @@
 <?php
-require_once '../../conexao.php';
+require_once '../../../conexao.php';
 
 function limpar($conn, $valor) {
     return mysqli_real_escape_string($conn, trim($valor));
@@ -60,7 +60,7 @@ $sql = "UPDATE lojas SET
 WHERE id = $loja_id";
 
 if (mysqli_query($conn, $sql)) {
-    header("Location: ../../index.php");
+    header("Location: ../../../index.php");
     exit();
 } else {
     echo "Erro: " . mysqli_error($conn);

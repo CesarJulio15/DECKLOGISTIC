@@ -13,7 +13,7 @@ body {
 
 .pagina {
     display: flex;
-    height: calc(100vh - 25px); /* Ajuste para compensar a top-bar */
+    height: calc(100vh - 25px);
 }
 
 .conteudo {
@@ -29,9 +29,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    justify-content: center;
-    align-items: center;
+    padding: 20px;
 }
 
 .header-grafico {
@@ -56,7 +54,7 @@ body {
     text-align: center;
     font-size: 22px;
     font-weight: bold;
-    flex: 0;
+    margin-bottom: 20px;
 }
 
 canvas {
