@@ -101,7 +101,9 @@ $labels3 = [];
 $entrada = [];
 $saida = [];
 while ($row = mysqli_fetch_assoc($resGrafico3)) {
-    $labels3[] = date('d/m/Y', strtotime($row['data_movimentacao']));
+    $data = $row['data_movimentacao'] ?? null;
+    $labels3[] = ($data && strtotime($data) !== false) ? date('d/m/Y', strtotime($data)) : '-';
+    
     if ($row['total'] >= 0) {
         $entrada[] = (int)$row['total'];
         $saida[] = 0;
@@ -179,7 +181,7 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
    }
    </script>
 
-  <table>
+<table>
   <thead>
     <tr>
       <th>Lote</th>
@@ -193,14 +195,19 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
         <td><?= $row['lote'] ?></td>
         <td><?= $row['nome'] ?></td>
         <td>
-          <?= $row['data_reabastecimento'] 
-              ? date('d/m/Y', strtotime($row['data_reabastecimento'])) 
-              : '-' ?>
+          <?php 
+            if (!empty($row['data_reabastecimento'])) {
+                echo date('d/m/Y', strtotime($row['data_reabastecimento']));
+            } else {
+                echo '-';
+            }
+          ?>
         </td>
       </tr>
     <?php endwhile; ?>
   </tbody>
 </table>
+
 </div>
 
 <!-- Gráficos -->
