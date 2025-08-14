@@ -1,4 +1,5 @@
-<?php require_once __DIR__ . '/../config.php'; ?>
+<?php require_once '../config.php'; ?>
+
 <aside class="sidebar">
 <link rel="stylesheet" href="<?= ASSETS_PATH ?>/sidebar.css">
 
