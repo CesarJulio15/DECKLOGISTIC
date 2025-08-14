@@ -1,5 +1,5 @@
 <?php
-require_once '../../conexao.php'; // aqui o $conn deve ser mysqli_connect(...)
+require_once '../../../conexao.php'; // aqui o $conn deve ser mysqli_connect(...)
 
 $nome  = mysqli_real_escape_string($conn, $_POST['nome']);
 $email = mysqli_real_escape_string($conn, $_POST['email']);
