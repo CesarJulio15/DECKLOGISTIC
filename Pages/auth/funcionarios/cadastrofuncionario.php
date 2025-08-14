@@ -2,8 +2,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | DeckLogistic</title>
-  <link rel="stylesheet" href="../../assets/cadastrofuncionario.css">
-  <link rel="icon" href="../img/logoDecklogistic.webp" type="image/x-icon" />
+  <link rel="stylesheet" href="../../../assets/cadastrofuncionario.css">
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
@@ -28,7 +28,7 @@
     <div class="left-side"></div>
     <div class="right-side">
       <div class="form-container">
-        <img src="../../img/logoDecklogistic.webp" alt="Logo" class="logo">
+        <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
         <h1>Cadastre um funcionário</h1>
         <form action="login2etapa.php" method="POST">
           
@@ -53,7 +53,7 @@
           </div>
 
           <button type="submit" class="btn">Prosseguir</button>
-          <button type="submit" onclick="location.href='cadastro.php'" class="btn">Voltar</button>
+          <button type="submit" onclick="location.href='../lojas/cadastro.php'" class="btn">Voltar</button>
         
         </form>
       </div>

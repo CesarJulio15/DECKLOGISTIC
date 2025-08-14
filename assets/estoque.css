@@ -1,0 +1,35 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    color: #111;
+    margin: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.tables-container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.tables-container table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 14px;
+}
+
+.tables-container th, .tables-container td {
+    border: 1px solid #ddd;
+    padding: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tables-container th {
+    background-color: #f2f2f2;
+}

@@ -14,7 +14,7 @@
     </div>
     <div class="right-side">
       <div class="form-container">
-        <img src="../../img/logoDecklogistic.webp" alt="Logo" class="logo">
+        <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
         <h1>Bem-Vindo!</h1>
           <form action="cadastroEmpresa.php" method="POST">
             <input type="text" name="nome" placeholder="Nome da Empresa" required>
@@ -28,7 +28,7 @@
         </form>
         <div class="divider">Ou</div>
         <button class="google-btn">
-          <img src="../../img/google.webp" alt="Google"> Continuar com o Google
+          <img src="../../../img/google.webp" alt="Google"> Continuar com o Google
         </button>
       </div>
     </div>
