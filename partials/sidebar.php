@@ -1,4 +1,3 @@
-
 <div class="sidebar">
 <link rel="stylesheet" href="../assets/sidebar.css">
 

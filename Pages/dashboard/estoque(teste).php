@@ -1,12 +1,8 @@
-<?php 
-// Incluir sidebar e conexão com caminhos corretos
-include __DIR__ . '/../../partials/sidebar.php'; 
-include __DIR__ . '/../../conexao.php'; 
-?>
 <link rel="stylesheet" href="../../assets/estoque.css">
 
 <?php
-// Buscar produtos reabastecidos
+require_once '../../conexao.php'; // aqui o $conn deve ser mysqli_connect(...)
+
 $sqlReabastecidos = "SELECT lote, nome, data_reabastecimento FROM produtos ORDER BY data_reabastecimento DESC LIMIT 10";
 $resReab = mysqli_query($conn, $sqlReabastecidos);
 
