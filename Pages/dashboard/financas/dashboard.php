@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Finanças - Decklogistic</title>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
 
@@ -17,8 +18,8 @@
   <nav class="nav-section">
     <div class="nav-menus">
       <ul class="nav-list top-section">
-        <li><a href="/Pages/financeiro.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-        <li class="active"><a href="/Pages/estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+        <li class="active"><a href="/Pages/financeiro.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+        <li ><a href="/Pages/estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
       </ul>
 
       <hr>

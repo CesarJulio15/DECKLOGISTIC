@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redefinir Senha</title>
-   <link rel="stylesheet" href="../../assets/redefinirSenha.css">
+    <title>Confirmar Email</title>
+   <link rel="stylesheet" href="../../assets/confirmarEmail.css">
 </head>
 <body>
 
@@ -41,17 +41,13 @@
   <div class="content">
     <div class="reset-card">
       <h1>Redefinição de senha</h1>
-      <p>Insira sua nova senha abaixo para redefinir o acesso à sua conta.</p>
+      <p>Informe um email e enviaremos um código para a recuperação da sua senha.</p>
       <form action="/processa_redefinicao.php" method="POST">
         <div class="form-group">
-          <label for="novaSenha">Nova Senha</label>
-          <input type="password" id="novaSenha" name="novaSenha" required>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
         </div>
-        <div class="form-group">
-          <label for="confirmaSenha">Confirmar Nova Senha</label>
-          <input type="password" id="confirmaSenha" name="confirmaSenha" required>
-        </div>
-        <button type="submit" class="btn-submit">Redefinir</button>
+        <button type="submit" class="btn-submit">Enviar código de recuperação</button>
       </form>
     </div>
   </div>
