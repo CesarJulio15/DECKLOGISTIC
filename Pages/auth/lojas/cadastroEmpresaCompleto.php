@@ -86,8 +86,8 @@
       <label style="display: inline-flex; align-items: center;">
     <input type="checkbox" required style="margin-right: 10px;">
     Eu li e concordo com os 
-    <a href="../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline;">
-        Termos de Uso
+    <a href=" ../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline;">
+      Termos de Uso
     </a>
 </label>
 
