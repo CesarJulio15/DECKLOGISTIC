@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+}
+.main {
+    flex: 1;
+    padding: 30px;
+}
+h1 { margin-bottom: 20px; }
+input[type="text"], input[type="color"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.search {
+    padding: 8px;
+    margin: 15px 0;
+    width: 800px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 60px);
+    gap: 15px;
+    max-width: 400px;
+    margin-top: 10px;
+}
+.icon-item {
+    text-align: center;
+    font-size: 28px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px;
+    transition: 0.2s;
+}
+.icon-item:hover {
+    background: #f0f0f0;
+}
+.icon-item.selected {
+    border-color: #000;
+    background: #e0e0e0;
+}
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor: pointer;
+}
