@@ -84,9 +84,13 @@
       </div>
 
       <label style="display: inline-flex; align-items: center;">
-        <input type="checkbox" required style="margin-right: 10px;"> Eu li e concordo com os termos de uso
-      </label>
-      <div>Termos de uso</div>
+    <input type="checkbox" required style="margin-right: 10px;">
+    Eu li e concordo com os 
+    <a href="../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline;">
+        Termos de Uso
+    </a>
+</label>
+
 
       <div class="form-group" style="display: flex; gap: 10px; margin-top: 30px;">
         <button type="button" onclick="location.href='cadastro.php'">Voltar</button>
@@ -96,6 +100,7 @@
       <input type="hidden" name="id" value="<?= htmlspecialchars($_GET['id'] ?? '') ?>">
 
     </form>
+
   </div>
 </body>
 </html>
