@@ -13,6 +13,7 @@ require_once '../../conexao.php';
 $sqlTotalEstoque = "SELECT SUM(quantidade_estoque) AS total FROM produtos";
 $resTotal = mysqli_query($conn, $sqlTotalEstoque);
 $totalEstoque = 0;
+
 if ($row = mysqli_fetch_assoc($resTotal)) {
     $totalEstoque = (int)$row['total'];
 }
@@ -120,7 +121,7 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
   <title>Estoque - Decklogistic</title>
   <link rel="stylesheet" href="../../assets/estoque.css">
   <link rel="stylesheet" href="../../assets/sidebar.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
 <div class="sidebar">
@@ -214,42 +215,56 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
 <div class="charts-container">
     <div>
         <h4>Produtos em falta/produtos em excesso</h4>
-        <canvas id="graficoFaltaExcesso"></canvas>
+        <div id="graficoFaltaExcesso"></div>
     </div>
     <div>
         <h4>Produtos com estoque parado</h4>
-        <canvas id="graficoEstoqueParado"></canvas>
+        <div id="graficoEstoqueParado"></div>
     </div>
     <div>
         <h4>Entrada e saída de produtos</h4>
-        <canvas id="graficoEntradaSaida"></canvas>
+         <a href="" class="visu">Visualizar comparativo</a>
+        <div id="graficoEntradaSaida"></div>
+       
     </div>
 </div>
 
 <script>
-// Gráfico 1
-new Chart(document.getElementById('graficoFaltaExcesso'), {
-    type: 'bar',
-    data: { labels: <?= json_encode($labels1) ?>, datasets: [{ label: 'Quantidade em estoque', data: <?= json_encode($dados1) ?>, backgroundColor: 'rgba(54, 162, 235, 0.6)' }] },
-    options: { responsive: false, maintainAspectRatio: false }
-});
+// Dados vindos do PHP
+const labels1 = <?= json_encode($labels1) ?>;
+const dados1  = <?= json_encode($dados1) ?>;
+const labels2 = <?= json_encode($labels2) ?>;
+const dados2  = <?= json_encode($dados2) ?>;
+const labels3 = <?= json_encode($labels3) ?>;
+const entrada = <?= json_encode($entrada) ?>;
+const saida   = <?= json_encode($saida) ?>;
 
-// Gráfico 2
-new Chart(document.getElementById('graficoEstoqueParado'), {
-    type: 'bar',
-    data: { labels: <?= json_encode($labels2) ?>, datasets: [{ label: 'Dias parado', data: <?= json_encode($dados2) ?>, backgroundColor: 'rgba(255, 99, 132, 0.6)' }] },
-    options: { responsive: false, maintainAspectRatio: false }
-});
+// Gráfico 1 - Falta/Excesso
+new ApexCharts(document.querySelector("#graficoFaltaExcesso"), {
+    chart: { type: 'bar', height: 350 },
+    series: [{ name: 'Quantidade em estoque', data: dados1 }],
+    xaxis: { categories: labels1 }
+}).render();
+
+// Gráfico 2 - Estoque parado
+new ApexCharts(document.querySelector("#graficoEstoqueParado"), {
+    chart: { type: 'bar', height: 350 },
+    series: [{ name: 'Dias parado', data: dados2 }],
+    xaxis: { categories: labels2 }
+}).render();
 
 // Gráfico 3 - Entrada/Saída
-new Chart(document.getElementById('graficoEntradaSaida'), {
-    type: 'line',
-    data: { labels: <?= json_encode($labels3) ?>, datasets: [
-        { label: 'Entrada', data: <?= json_encode($entrada) ?>, borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)', fill: true },
-        { label: 'Saída', data: <?= json_encode($saida) ?>, borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)', fill: true }
-    ]},
-    options: { responsive: false, maintainAspectRatio: false }
-});
+new ApexCharts(document.querySelector("#graficoEntradaSaida"), {
+    chart: { type: 'line', height: 350 },
+    series: [
+        { name: 'Entrada', data: entrada },
+        { name: 'Saída', data: saida }
+    ],
+    xaxis: { categories: labels3 }
+}).render();
 </script>
 </body>
 </html>
+
+
+
