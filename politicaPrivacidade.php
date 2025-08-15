@@ -7,11 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Política de Privacidade</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
-        .container { background: #fff; padding: 30px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 2px 8px #ddd; }
-        h1 { color: #333; }
-    </style>
+ <link rel="stylesheet" href="assets/politicaPrivacidade.css">
 </head>
 <body>
     <div class="container">
@@ -47,6 +43,9 @@
         <p>
             Em caso de dúvidas sobre esta Política de Privacidade, entre em contato pelo e-mail: contato@decklogistic.com.br
         </p>
+
+        <button type="button" class="btn-fechar" onclick="window.history.back()">Fechar</button>
+
     </div>
 </body>
 </html>

@@ -1,0 +1,71 @@
+/* Estilo geral da página */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Container central */
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos */
+h1 {
+    font-size: 28px;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 20px;
+    color: #444;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+/* Parágrafos */
+p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* Botão fechar */
+.btn-fechar {
+    display: inline-block;
+    margin-top: 25px;
+    background-color: #333; /* preto suave */
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-fechar:hover {
+    background-color: #555; /* cinza no hover */
+}
+
+.btn-fechar:active {
+    transform: scale(0.97); /* efeito de clique */
+}
+
+.btn-fechar {
+    background-color: #333; /* preto suave */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}

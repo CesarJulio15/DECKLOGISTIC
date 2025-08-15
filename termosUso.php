@@ -6,14 +6,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Termos de Uso - Deck Logistic</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; color: #222; }
-        .container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px #ddd; }
-        h1 { color: #0F0F0F; }
-        h2 { color: #0F0F0F; }
-        ul { margin-left: 20px; }
-    </style>
+    <title>Termos de Uso - DeckLogistic</title>
+    <link rel="stylesheet" href="assets/termosUso.css">
 </head>
 <body>
 <div class="container">
@@ -49,6 +43,11 @@
     <p>Em caso de dúvidas, entre em contato pelo e-mail: suporte@decklogistic.com.br</p>
 
     <p><strong>Última atualização:</strong> <?php echo date('d/m/Y'); ?></p>
+
+<button type="button" class="btn-fechar" onclick="window.close()">Fechar</button>
+
+
+
 </div>
 </body>
 </html>
