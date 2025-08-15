@@ -38,6 +38,40 @@ if ($entradas > 0) {
     <title>Dashboard - Decklogistic</title>
 </head>
 <body>
+    <style>
+    /* Conteúdo principal */
+.dashboard {
+    margin-left: 0; /* remove o espaço da esquerda */
+    padding: 20px;  /* padding interno para não colar na borda */
+}
+
+/* Container de cards */
+.cards-container {
+    display: flex;
+    gap: 20px;
+    margin-left: 0; /* garante que os cards fiquem alinhados à esquerda */
+}
+
+/* Cards individuais */
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1;
+}
+
+/* Gráfico */
+#grafico {
+    margin-top: 30px;
+    margin-left: 0; /* alinha à esquerda */
+}
+
+/* Se quiser ajustar h1 e outros títulos */
+.dashboard h1 {
+    margin-left: 0;
+}
+    </style>
 
 <!-- Sidebar completa -->
 <aside class="sidebar">
@@ -48,8 +82,8 @@ if ($entradas > 0) {
     <nav class="nav-section">
         <div class="nav-menus">
             <ul class="nav-list top-section">
-                <li><a href="/Pages/financeiro.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-                <li class="active"><a href="/Pages/estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+             <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+             <li class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
             </ul>
 
             <hr>
@@ -58,6 +92,7 @@ if ($entradas > 0) {
                 <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
                 <li><a href="/Pages/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
                 <li><a href="/Pages/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+    <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
             </ul>
         </div>
 
