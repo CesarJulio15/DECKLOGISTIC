@@ -1,5 +1,10 @@
 <?php
-// Inclui conexão
+// Exibe erros para debug
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Conexão com o banco
 include __DIR__ . '/../../conexao.php';
 
 $msg = '';
@@ -16,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$loja_id || !$nome || !$preco_unitario || !$data_reabastecimento) {
         $msg = 'Campos obrigatórios faltando.';
     } else {
+        // Inserir produto
         $stmt = $conn->prepare("
             INSERT INTO produtos 
             (loja_id, nome, descricao, preco_unitario, quantidade_estoque, lote, data_reabastecimento)
@@ -24,6 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("issdiss", $loja_id, $nome, $descricao, $preco_unitario, $quantidade_estoque, $lote, $data_reabastecimento);
 
         if ($stmt->execute()) {
+            $produto_id = $stmt->insert_id;
+
+            // Inserir movimentação inicial
+            if($quantidade_estoque > 0){
+                $stmtMov = $conn->prepare("
+                    INSERT INTO movimentacoes_estoque
+                    (produto_id, tipo, quantidade, motivo, data_movimentacao)
+                    VALUES (?, 'entrada', ?, 'Reabastecimento inicial', ?)
+                ");
+                $stmtMov->bind_param("iis", $produto_id, $quantidade_estoque, $data_reabastecimento);
+                $stmtMov->execute();
+                $stmtMov->close();
+            }
+
             $msg = 'Produto adicionado com sucesso!';
         } else {
             $msg = 'Erro ao adicionar produto: ' . $stmt->error;
@@ -31,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->close();
     }
+
     $conn->close();
 }
 ?>
@@ -45,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     form { max-width: 400px; margin:auto; display:flex; flex-direction:column; gap:10px; }
     input, textarea, button { padding:8px; font-size:14px; }
     button { cursor:pointer; background:#007BFF; color:#fff; border:none; }
-    .msg { margin-top:10px; color: green; }
+    .msg { margin-top:10px; font-weight:bold; }
 </style>
 </head>
 <body>
@@ -53,10 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <h2>Adicionar Produto</h2>
 
 <?php if($msg): ?>
-    <div class="msg"><?= htmlspecialchars($msg) ?></div>
+    <div class="msg"><?= $msg ?></div>
 <?php endif; ?>
 
-<form method="post" action="">
+<form method="POST">
     <input type="number" name="loja_id" placeholder="ID da Loja" required>
     <input type="text" name="nome" placeholder="Nome do Produto" required>
     <textarea name="descricao" placeholder="Descrição"></textarea>
