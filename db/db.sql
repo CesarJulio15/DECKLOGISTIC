@@ -4,7 +4,7 @@ USE decklog_db;
 CREATE TABLE lojas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cod_estabelecimento VARCHAR(50),
-    cnpj VARCHAR(20) UNIQUE NOT NULL,
+    cnpj VARCHAR(20) UNIQUE,
     razao_social VARCHAR(255),
     nome VARCHAR(255),
     inscricao_estadual VARCHAR(50),
