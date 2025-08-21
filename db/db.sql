@@ -1,117 +1,125 @@
+CREATE DATABASE IF NOT EXISTS decklog_db;
+USE decklog_db;
 
-
+-- Tabela lojas
 CREATE TABLE lojas (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  nome VARCHAR(100), -- nome fantasia
-  razao_social VARCHAR(100),
-  email VARCHAR(100) UNIQUE,
-  telefone VARCHAR(20),
-  senha_hash VARCHAR(255),
-
-  cep VARCHAR(20),
-  endereco VARCHAR(120),
-  numero INT,
-  complemento VARCHAR(50),
-  bairro VARCHAR(60),
-  municipio VARCHAR(60),
-  uf CHAR(2),
-  pais VARCHAR(50),
-
-  regime_federal VARCHAR(50),
-  cnpj VARCHAR(32),
-  cnae VARCHAR(20),
-
-  regime_estadual VARCHAR(50),
-  nir VARCHAR(20),
-  centralizacao_escrituracao VARCHAR(5), -- 'Sim' ou 'Não'
-  inscricao_estadual VARCHAR(30),
-
-  data_nirc DATE,
-  area_construida_m2 INT,
-  cod_estabelecimento VARCHAR(50),
-
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cod_estabelecimento VARCHAR(50),
+    cnpj VARCHAR(20) UNIQUE NOT NULL,
+    razao_social VARCHAR(255),
+    nome VARCHAR(255),
+    inscricao_estadual VARCHAR(50),
+    endereco VARCHAR(255),
+    numero VARCHAR(20),
+    complemento VARCHAR(100),
+    bairro VARCHAR(100),
+    municipio VARCHAR(100),
+    uf CHAR(2),
+    cep VARCHAR(15),
+    pais VARCHAR(50),
+    telefone VARCHAR(20),
+    email VARCHAR(100),
+    senha_hash VARCHAR(255),
+    cnae VARCHAR(20),
+    nir VARCHAR(50),
+    data_nirc DATE,
+    regime_estadual VARCHAR(50),
+    regime_federal VARCHAR(50),
+    centralizacao_escrituracao BOOLEAN,
+    area_construida_m2 DECIMAL(10,2),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabela usuarios
 CREATE TABLE usuarios (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  loja_id INT,
-  nome VARCHAR(100),
-  email VARCHAR(100) UNIQUE,
-  senha_hash VARCHAR(255),
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (loja_id) REFERENCES lojas(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    loja_id INT,
+    nome VARCHAR(255),
+    email VARCHAR(100) UNIQUE,
+    senha_hash VARCHAR(255),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id)
 );
 
+-- Tabela produtos
 CREATE TABLE produtos (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  loja_id INT,
-  nome VARCHAR(100),
-  descricao TEXT,
-  preco_unitario DECIMAL(10,2),
-  quantidade_estoque INT DEFAULT 0,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (loja_id) REFERENCES lojas(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    loja_id INT,
+    nome VARCHAR(255),
+    descricao TEXT,
+    lote VARCHAR(50),
+    quantidade_estoque INT,
+    preco_unitario DECIMAL(10,2),
+    data_reabastecimento DATE,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id)
 );
 
+-- Tabela tags
 CREATE TABLE tags (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  loja_id INT,
-  nome VARCHAR(50),
-  cor VARCHAR(10),
-  icone VARCHAR(50),
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (loja_id) REFERENCES lojas(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    loja_id INT,
+    nome VARCHAR(100),
+    cor VARCHAR(20),
+    icone VARCHAR(100),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id)
 );
 
+-- Relacionamento produto_tag (N:N)
 CREATE TABLE produto_tag (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  produto_id INT,
-  tag_id INT,
-  FOREIGN KEY (produto_id) REFERENCES produtos(id),
-  FOREIGN KEY (tag_id) REFERENCES tags(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    produto_id INT,
+    tag_id INT,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id),
+    FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
-CREATE TABLE transacoes_financeiras (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  loja_id INT,
-  tipo VARCHAR(10),
-  categoria VARCHAR(100),
-  descricao TEXT,
-  valor DECIMAL(10,2),
-  data_transacao DATE,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (loja_id) REFERENCES lojas(id)
-);
-
-CREATE TABLE movimentacoes_estoque (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  produto_id INT,
-  tipo VARCHAR(10),
-  quantidade INT,
-  motivo TEXT,
-  data_movimentacao DATE,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (produto_id) REFERENCES produtos(id)
-);
-
+-- Tabela vendas
 CREATE TABLE vendas (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  loja_id INT,
-  data_venda DATE,
-  valor_total DECIMAL(10,2),
-  custo_total DECIMAL(10,2),
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (loja_id) REFERENCES lojas(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    loja_id INT,
+    data_venda DATE,
+    valor_total DECIMAL(12,2),
+    custo_total DECIMAL(12,2),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id)
 );
 
+-- Itens da venda
 CREATE TABLE itens_venda (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  produto_id INT,
-  venda_id INT,
-  quantidade INT,
-  preco_unitario DECIMAL(10,2),
-  custo_unitario DECIMAL(10,2),
-  FOREIGN KEY (produto_id) REFERENCES produtos(id),
-  FOREIGN KEY (venda_id) REFERENCES vendas(id)
-); 
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    venda_id INT,
+    produto_id INT,
+    quantidade INT,
+    preco_unitario DECIMAL(10,2),
+    custo_unitario DECIMAL(10,2),
+    data_venda DATE,
+    FOREIGN KEY (venda_id) REFERENCES vendas(id),
+    FOREIGN KEY (produto_id) REFERENCES produtos(id)
+);
+
+-- Movimentações de estoque
+CREATE TABLE movimentacoes_estoque (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    produto_id INT,
+    quantidade INT,
+    tipo ENUM('entrada','saida'),
+    motivo VARCHAR(255),
+    data_movimentacao DATE,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id)
+);
+
+-- Transações financeiras
+CREATE TABLE transacoes_financeiras (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    loja_id INT,
+    categoria VARCHAR(100),
+    descricao VARCHAR(255),
+    tipo ENUM('entrada','saida'),
+    valor DECIMAL(12,2),
+    data_transacao DATE,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id)
+);

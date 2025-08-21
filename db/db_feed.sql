@@ -7,15 +7,15 @@ INSERT INTO lojas (
   data_nirc, area_construida_m2, cod_estabelecimento
 ) VALUES
 ('TechStore', 'Tech Store Comércio e Tecnologia LTDA', 'contato@techstore.com', '(11) 99999-0001', 'hash123',
-'01000-000', 'Av. Paulista', 1000, 'Sala 101', 'Bela Vista', 'São Paulo', 'SP', 'Brasil',
+'01000-000', 'Av. Paulista', '1000', 'Sala 101', 'Bela Vista', 'São Paulo', 'SP', 'Brasil',
 'Simples Nacional', '12.345.678/0001-99', '47.51-2-00',
-'Normal', '12345678', 'Sim', '987654321',
+'Normal', '12345678', TRUE, '987654321',
 '2020-05-20', 300, 'TS-001'),
 
 ('EcoMarket', 'Eco Market Produtos Naturais LTDA', 'suporte@ecomarket.com', '(21) 88888-0002', 'hash456',
-'20000-000', 'Rua das Árvores', 200, '', 'Centro', 'Rio de Janeiro', 'RJ', 'Brasil',
+'20000-000', 'Rua das Árvores', '200', '', 'Centro', 'Rio de Janeiro', 'RJ', 'Brasil',
 'Lucro Presumido', '98.765.432/0001-11', '47.29-6-01',
-'Isento', '98765432', 'Não', '123456789',
+'Isento', '98765432', FALSE, '123456789',
 '2019-10-10', 150, 'EM-001');
 
 -- USUÁRIOS
@@ -36,12 +36,12 @@ INSERT INTO produtos (loja_id, nome, descricao, preco_unitario, quantidade_estoq
 
 -- TAGS
 INSERT INTO tags (loja_id, nome, cor, icone) VALUES
-(1, 'Promoção', '#FF0000', '🔥'),
-(1, 'Novo', '#00FF00', '🆕'),
-(2, 'Orgânico', '#006400', '🌱'),
-(2, 'Importado', '#0000FF', '✈️');
+(1, 'Promoção', '#FF0000', 'AP'),
+(1, 'Novo', '#00FF00', 'AP'),
+(2, 'Orgânico', '#006400', 'AP'),
+(2, 'Importado', '#0000FF', 'AP');
 
--- PRODUTO_TAG (Relacionando produtos às tags)
+-- PRODUTO_TAG
 INSERT INTO produto_tag (produto_id, tag_id) VALUES
 (1, 1), -- Mouse Gamer → Promoção
 (2, 2), -- Teclado Mecânico → Novo
@@ -60,16 +60,16 @@ INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_mo
 -- VENDAS
 INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total) VALUES
 (1, CURDATE(), 370.00, 200.00),  -- Venda TechStore
-(2, CURDATE(), 61.00, 30.00);   -- Venda EcoMarket
+(2, CURDATE(), 61.00, 30.00);    -- Venda EcoMarket
 
 -- ITENS_VENDA
-INSERT INTO itens_venda (produto_id, venda_id, quantidade, preco_unitario, custo_unitario) VALUES
-(1, 1, 2, 120.00, 50.00),   -- Mouse
-(2, 1, 1, 250.00, 100.00),  -- Teclado
-(4, 2, 2, 25.00, 10.00),    -- Granola
-(6, 2, 1, 11.00, 10.00);    -- Sabonete
+INSERT INTO itens_venda (produto_id, venda_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES
+(1, 1, 2, 120.00, 50.00, CURDATE()),   -- Mouse
+(2, 1, 1, 250.00, 100.00, CURDATE()),  -- Teclado
+(4, 2, 2, 25.00, 10.00, CURDATE()),    -- Granola
+(6, 2, 1, 9.50, 10.00, CURDATE());     -- Sabonete
 
--- MOVIMENTAÇÃO DE ESTOQUE AUTOMÁTICA PÓS-VENDA
+-- MOVIMENTAÇÃO DE ESTOQUE PÓS-VENDA
 INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES
 (1, 'saida', 2, 'Venda #1', CURDATE()),
 (2, 'saida', 1, 'Venda #1', CURDATE()),
