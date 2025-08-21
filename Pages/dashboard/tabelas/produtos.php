@@ -6,7 +6,17 @@ $result = mysqli_query($conn, $sql);
 if (!$result) {
     die("Erro na consulta: " . mysqli_error($conn));
 }
+
+$tags = [];
+$tagResult = $conn->query("SELECT * FROM tags ORDER BY criado_em DESC");
+if ($tagResult) {
+    while ($row = $tagResult->fetch_assoc()) {
+        $tags[] = $row;
+    }
+}
+
 ?>
+
 
 
 <!DOCTYPE html>
@@ -18,6 +28,7 @@ if (!$result) {
       <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <!-- <link rel="stylesheet" href="../../../assets/sidebar.css"> -->
   <link rel="stylesheet" href="../../../assets/produtos.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 </head>
 
@@ -76,7 +87,22 @@ if (!$result) {
             <option value="lote-desc">Lote (Z-A)</option>
         </select>
     </div>
+<div class="busca-tags">
     <input type="text" id="pesquisa" placeholder="Procurar pelo produto...">
+
+    <div class="tags-area">
+    <?php foreach ($tags as $tag): ?>
+        <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>">
+            <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" 
+               style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i>
+            <?= htmlspecialchars($tag['nome']) ?>
+        </div>
+    <?php endforeach; ?>
+    <a href="../tag.php" class="nova-tag">+ Criar nova tag</a>
+</div>
+
+</div>
+
 </div>
 
 
