@@ -1,21 +1,112 @@
 <?php
 include __DIR__ . '/../../conexao.php';
 
-// Somar total de entradas
-$sqlEntradas = "SELECT SUM(quantidade) AS total_entradas 
-                FROM movimentacoes_estoque 
-                WHERE tipo = 'entrada'";
-$resEntradas = mysqli_query($conn, $sqlEntradas);
-$entradas = (mysqli_fetch_assoc($resEntradas)['total_entradas']) ?? 0;
+$filtro = $_GET['filtro'] ?? 'dia'; // padrão: dia
 
-// Somar total de saídas
-$sqlSaidas = "SELECT SUM(quantidade) AS total_saidas 
-              FROM movimentacoes_estoque 
-              WHERE tipo = 'saida'";
-$resSaidas = mysqli_query($conn, $sqlSaidas);
-$saidas = (mysqli_fetch_assoc($resSaidas)['total_saidas']) ?? 0;
+switch ($filtro) {
+    case 'bimestre':
+        $sql = "SELECT CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/2)+1, 2, '0')) AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/2)+1, 2, '0'))
+                ORDER BY periodo ASC";
+        break;
 
-// Calcular variação percentual
+    case 'trimestre':
+        $sql = "SELECT CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/3)+1, 2, '0')) AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/3)+1, 2, '0'))
+                ORDER BY periodo ASC";
+        break;
+
+    case 'semestre':
+        $sql = "SELECT CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/6)+1, 2, '0')) AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/6)+1, 2, '0'))
+                ORDER BY periodo ASC";
+        break;
+
+    case 'mes':
+        $sql = "SELECT DATE_FORMAT(data_movimentacao, '%Y-%m') AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY DATE_FORMAT(data_movimentacao, '%Y-%m')
+                ORDER BY periodo ASC";
+        break;
+
+    case 'ano':
+        $sql = "SELECT YEAR(data_movimentacao) AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY YEAR(data_movimentacao)
+                ORDER BY periodo ASC";
+        break;
+
+    default: // dia
+        $sql = "SELECT DATE(data_movimentacao) AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY DATE(data_movimentacao)
+                ORDER BY periodo ASC";
+        break;
+}
+
+$res = mysqli_query($conn, $sql);
+
+$labels = [];
+$dadosEntradas = [];
+$dadosSaidas = [];
+
+while ($row = mysqli_fetch_assoc($res)) {
+    $labels[] = $row['periodo'];
+    $dadosEntradas[] = (int)$row['entradas'];
+    $dadosSaidas[] = (int)$row['saidas'];
+}
+
+// Condição de filtro para os cards
+switch ($filtro) {
+    case 'bimestre':
+        $condicao = "CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/2)+1, 2, '0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/2)+1, 2, '0'))";
+        $tituloFiltro = "Bimestre";
+        break;
+    case 'trimestre':
+        $condicao = "CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/3)+1, 2, '0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/3)+1, 2, '0'))";
+        $tituloFiltro = "Trimestre";
+        break;
+    case 'semestre':
+        $condicao = "CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/6)+1, 2, '0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/6)+1, 2, '0'))";
+        $tituloFiltro = "Semestre";
+        break;
+    case 'mes':
+        $condicao = "DATE_FORMAT(data_movimentacao, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')";
+        $tituloFiltro = "Mês";
+        break;
+    case 'ano':
+        $condicao = "YEAR(data_movimentacao) = YEAR(CURDATE())";
+        $tituloFiltro = "Ano";
+        break;
+    default:
+        $condicao = "DATE(data_movimentacao) = CURDATE()";
+        $tituloFiltro = "Dia";
+        break;
+}
+
+// Totais
+$sqlEntradas = "SELECT SUM(quantidade) AS total_entradas FROM movimentacoes_estoque WHERE tipo='entrada' AND $condicao";
+$entradas = mysqli_fetch_assoc(mysqli_query($conn, $sqlEntradas))['total_entradas'] ?? 0;
+
+$sqlSaidas = "SELECT SUM(quantidade) AS total_saidas FROM movimentacoes_estoque WHERE tipo='saida' AND $condicao";
+$saidas = mysqli_fetch_assoc(mysqli_query($conn, $sqlSaidas))['total_saidas'] ?? 0;
+
+// Variação
 $percentual = 0;
 $seta = "↑";
 $classe = "positivo";
@@ -27,75 +118,38 @@ if ($entradas > 0) {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="../../assets/estoque.css">
-    <link rel="stylesheet" href="../../assets/sidebar.css">
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Decklogistic</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Decklogistic</title>
+<link rel="stylesheet" href="../../assets/sidebar.css">
+<link rel="stylesheet" href="../../assets/giroEstoque.css">
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
-    <style>
-    /* Conteúdo principal */
-.dashboard {
-    margin-left: 0; /* remove o espaço da esquerda */
-    padding: 20px;  /* padding interno para não colar na borda */
-}
 
-/* Container de cards */
-.cards-container {
-    display: flex;
-    gap: 20px;
-    margin-left: 0; /* garante que os cards fiquem alinhados à esquerda */
-}
-
-/* Cards individuais */
-.card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    flex: 1;
-}
-
-/* Gráfico */
-#grafico {
-    margin-top: 30px;
-    margin-left: 0; /* alinha à esquerda */
-}
-
-/* Se quiser ajustar h1 e outros títulos */
-.dashboard h1 {
-    margin-left: 0;
-}
-    </style>
-
-<!-- Sidebar completa -->
+<!-- Sidebar -->
 <aside class="sidebar">
     <div class="logo-area">
         <img src="../../img/logoDecklogistic.webp" alt="Logo">
     </div>
-
     <nav class="nav-section">
         <div class="nav-menus">
             <ul class="nav-list top-section">
-             <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-             <li class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+                <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+                <li class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
             </ul>
-
             <hr>
-
             <ul class="nav-list middle-section">
                 <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
                 <li><a href="/Pages/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
                 <li><a href="/Pages/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-    <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
+                <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
             </ul>
         </div>
-
         <div class="bottom-links">
             <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
             <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
@@ -103,41 +157,53 @@ if ($entradas > 0) {
     </nav>
 </aside>
 
-<!-- Conteúdo principal -->
+<!-- Dashboard principal -->
 <main class="dashboard">
     <div class="content">
         <h1>Controle de Estoque</h1>
 
         <div class="cards-container">
-            <div class="card <?php echo $classe; ?>">
-                <h2>Entradas</h2>
+            <div class="card entradas">
+                <h2>Entradas (<?php echo $tituloFiltro; ?>)</h2>
                 <p><?php echo $entradas; ?></p>
             </div>
-            <div class="card <?php echo $classe; ?>">
-                <h2>Saídas</h2>
+            <div class="card saidas">
+                <h2>Saídas (<?php echo $tituloFiltro; ?>)</h2>
                 <p><?php echo $saidas; ?></p>
             </div>
-            <div class="card <?php echo $classe; ?>">
-                <h2>Variação</h2>
+            <div class="card variacao <?php echo $classe; ?>">
+                <h2>Variação (<?php echo $tituloFiltro; ?>)</h2>
                 <p><?php echo $seta . " " . number_format($percentual, 2, ',', '.'); ?>%</p>
             </div>
         </div>
+
+        <form method="GET" class="filtros-container">
+            <label for="filtro">Filtrar por:</label>
+            <select name="filtro" id="filtro" onchange="this.form.submit()">
+                <option value="dia" <?php if($filtro==='dia') echo 'selected'; ?>>Dia</option>
+                <option value="mes" <?php if($filtro==='mes') echo 'selected'; ?>>Mês</option>
+                <option value="ano" <?php if($filtro==='ano') echo 'selected'; ?>>Ano</option>
+                <option value="bimestre" <?php if($filtro==='bimestre') echo 'selected'; ?>>Bimestre</option>
+                <option value="trimestre" <?php if($filtro==='trimestre') echo 'selected'; ?>>Trimestre</option>
+                <option value="semestre" <?php if($filtro==='semestre') echo 'selected'; ?>>Semestre</option>
+            </select>
+        </form>
 
         <div id="grafico"></div>
     </div>
 </main>
 
 <script>
-    var options = {
-        chart: { type: 'line', height: 350 },
-        series: [
-            { name: 'Entradas', data: [<?php echo $entradas; ?>] },
-            { name: 'Saídas', data: [<?php echo $saidas; ?>] }
-        ],
-        xaxis: { categories: ['Hoje'] }
-    };
-    var chart = new ApexCharts(document.querySelector("#grafico"), options);
-    chart.render();
+var options = {
+    chart: { type: 'line', height: 350 },
+    series: [
+        { name: 'Entradas', data: <?php echo json_encode($dadosEntradas); ?> },
+        { name: 'Saídas', data: <?php echo json_encode($dadosSaidas); ?> }
+    ],
+    xaxis: { categories: <?php echo json_encode($labels); ?> }
+};
+var chart = new ApexCharts(document.querySelector("#grafico"), options);
+chart.render();
 </script>
 
 </body>

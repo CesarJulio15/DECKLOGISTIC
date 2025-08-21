@@ -1,11 +1,11 @@
-CREATE DATABASE IF NOT EXISTS decklog_db;
+CREATE SCHEMA `decklog_db` ;
 USE decklog_db;
 
 -- Tabela lojas
 CREATE TABLE lojas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cod_estabelecimento VARCHAR(50),
-    cnpj VARCHAR(20) UNIQUE NOT NULL,
+    cnpj VARCHAR(20) UNIQUE,
     razao_social VARCHAR(255),
     nome VARCHAR(255),
     inscricao_estadual VARCHAR(50),
@@ -25,7 +25,7 @@ CREATE TABLE lojas (
     data_nirc DATE,
     regime_estadual VARCHAR(50),
     regime_federal VARCHAR(50),
-    centralizacao_escrituracao BOOLEAN,
+    centralizacao_escrituracao VARCHAR(3),
     area_construida_m2 DECIMAL(10,2),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

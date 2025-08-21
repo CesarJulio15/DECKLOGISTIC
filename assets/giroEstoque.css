@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    color: #111;
+    margin: 0;
+    padding: 0;
+}
+
+/* Dashboard principal */
+.dashboard {
+    margin-left: 250px;
+    padding: 40px 30px;
+}
+
+/* Título */
+.dashboard h1 {
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Container de cards */
+.cards-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* Cards individuais */
+.card {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card h2 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Cores de cards */
+.card.entradas { border-top: 4px solid #4caf50; }
+.card.saidas { border-top: 4px solid #f44336; }
+.card.variacao.positivo { border-top: 4px solid #4caf50; color: #4caf50; }
+.card.variacao.negativo { border-top: 4px solid #f44336; color: #f44336; }
+
+/* Formulário de filtro */
+.filtros-container {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filtros-container select {
+    padding: 5px 10px;
+    font-size: 0.95rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Gráfico */
+#grafico {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

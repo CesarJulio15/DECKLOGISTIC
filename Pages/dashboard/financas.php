@@ -56,34 +56,73 @@
       <h3>Receita x Despesas</h3>
       <div id="chartReceitaDespesa" style="height:300px; margin-top:10px;"></div>
     </div>
-      <!-- Entradas Totais -->
+
+  </div>
+
+<div class="dashboard">
   <div class="card">
-    <h3>Entradas</h3>
-    <div id="entradasTotais" class="value">R$ 0,00</div>
-    <div id="chartEntradas" style="height:60px; margin-top:10px;"></div>
-    <div class="sub-info">
-      <small>Vendas: <span id="totalVendas">R$ 0,00</span></small><br>
-      <small>Outros Recebimentos: <span id="totalOutros">R$ 0,00</span></small>
+    <h3>Top 5 Maiores Despesas Recentes</h3>
+    <div class="table-responsive">
+      <table id="topDespesas">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Descrição</th>
+            <th>Valor (R$)</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4">Carregando...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
-
-  <!-- Saídas Totais -->
-  <div class="card">
-    <h3>Saídas</h3>
-    <div id="saidasTotais" class="value">R$ 0,00</div>
-    <div id="chartSaidas" style="height:60px; margin-top:10px;"></div>
-    <div class="sub-info">
-      <small>Custos Fixos: <span id="totalFixos">R$ 0,00</span></small><br>
-      <small>Custos Variáveis: <span id="totalVariaveis">R$ 0,00</span></small><br>
-      <small>Imprevistos: <span id="totalImprevistos">R$ 0,00</span></small>
+    <div class="card">
+    <h3>Custo Médio por Produto Vendido</h3>
+    <div class="table-responsive">
+      <table id="custoMedioProdutos">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Custo Médio (R$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="2">Carregando...</td></tr>
+        </tbody>
+      </table>
     </div>
-  </div>
-
-  </div>
-
+</div>
   </div>
 
   <script>
+    
+    async function loadTopDespesas() {
+  const lojaId = 1;
+  const data = await fetch(`/DECKLOGISTIC/api/top5_despesas.php?loja_id=${lojaId}`)
+                      .then(r => r.json());
+
+  const tbody = document.querySelector("#topDespesas tbody");
+  tbody.innerHTML = '';
+
+  if(data.length === 0){
+    tbody.innerHTML = '<tr><td colspan="4">Nenhuma despesa encontrada</td></tr>';
+    return;
+  }
+
+  data.forEach(d => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${d.categoria}</td>
+      <td>${d.descricao}</td>
+      <td>${parseFloat(d.valor).toFixed(2)}</td>
+      <td>${d.data_transacao}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
   async function loadLucros() {
     const lojaId = 1;
     const periodo = 'mes';
@@ -157,83 +196,11 @@
     new ApexCharts(document.querySelector("#chartReceitaDespesa"), options).render();
   }
 
-async function loadFinanceiroDetalhado() {
-  const lojaId = 1;
 
-  // Pegando dados
-  const entradas = await fetch(`/DECKLOGISTIC/api/entradas.php?loja_id=${lojaId}`).then(r => r.json());
-  const saidas = await fetch(`/DECKLOGISTIC/api/saidas.php?loja_id=${lojaId}`).then(r => r.json());
-
-  // Somas totais
-  const totalVendas = Object.values(entradas.vendas).reduce((a,b)=>a+b,0).toFixed(2);
-  const totalOutros = Object.values(entradas.outros).reduce((a,b)=>a+b,0).toFixed(2);
-  const totalFixos = Object.values(saidas.fixos).reduce((a,b)=>a+b,0).toFixed(2);
-  const totalVariaveis = Object.values(saidas.variaveis).reduce((a,b)=>a+b,0).toFixed(2);
-  const totalImprevistos = Object.values(saidas.imprevistos).reduce((a,b)=>a+b,0).toFixed(2);
-
-  const totalEntrada = (parseFloat(totalVendas)+parseFloat(totalOutros)).toFixed(2);
-  const totalSaida = (parseFloat(totalFixos)+parseFloat(totalVariaveis)+parseFloat(totalImprevistos)).toFixed(2);
-  const lucroLiquido = (totalEntrada - totalSaida).toFixed(2);
-  const margem = totalEntrada>0 ? ((lucroLiquido/totalEntrada)*100).toFixed(2) : 0;
-
-  // Atualiza cards
-  document.getElementById('lucroBruto').innerText = `R$ ${totalEntrada}`;
-  document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquido}`;
-  document.getElementById('margemLucro').innerText = `${margem}%`;
-
-  // Mini gráficos
-  const optionsEntrada = {
-    chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-    series: [{ data: Object.values(entradas.vendas).map(parseFloat) }],
-    colors: ['#10b981']
-  };
-  const optionsSaida = {
-    chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-    series: [{ data: Object.values(saidas.fixos).map(parseFloat) }],
-    colors: ['#ef4444']
-  };
-  const optionsMargem = {
-    chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-    series: [{ data: [margem] }],
-    colors: ['#f59e0b']
-  };
-
-  new ApexCharts(document.querySelector("#chartBruto"), optionsEntrada).render();
-  new ApexCharts(document.querySelector("#chartLiquido"), optionsSaida).render();
-  new ApexCharts(document.querySelector("#chartMargem"), optionsMargem).render();
-
-  // Gráfico detalhado Receita x Despesa
-  const dias = [...new Set([
-    ...Object.keys(entradas.vendas),
-    ...Object.keys(entradas.outros),
-    ...Object.keys(saidas.fixos),
-    ...Object.keys(saidas.variaveis),
-    ...Object.keys(saidas.imprevistos)
-  ])].sort();
-
-  const receitaTotal = dias.map(d => (parseFloat(entradas.vendas[d]||0)+parseFloat(entradas.outros[d]||0)));
-  const despesaTotal = dias.map(d => 
-    (parseFloat(saidas.fixos[d]||0)+parseFloat(saidas.variaveis[d]||0)+parseFloat(saidas.imprevistos[d]||0))
-  );
-
-  const optionsDetalhado = {
-    chart: { type: 'line', height: 300 },
-    series: [
-      { name: 'Entradas', data: receitaTotal },
-      { name: 'Saídas', data: despesaTotal }
-    ],
-    xaxis: { categories: dias },
-    stroke: { curve: 'smooth' },
-    colors: ['#10b981','#ef4444']
-  };
-
-  new ApexCharts(document.querySelector("#chartReceitaDespesa"), optionsDetalhado).render();
-}
-
-
-  loadFinanceiroDetalhado();
   loadLucros();
   loadReceitaDespesa();
+  loadTopDespesas();
+
   </script>
   </body>
   </html>
