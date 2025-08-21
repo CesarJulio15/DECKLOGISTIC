@@ -182,10 +182,10 @@ if ($entradas > 0) {
             <select name="filtro" id="filtro" onchange="this.form.submit()">
                 <option value="dia" <?php if($filtro==='dia') echo 'selected'; ?>>Dia</option>
                 <option value="mes" <?php if($filtro==='mes') echo 'selected'; ?>>Mês</option>
-                <option value="ano" <?php if($filtro==='ano') echo 'selected'; ?>>Ano</option>
                 <option value="bimestre" <?php if($filtro==='bimestre') echo 'selected'; ?>>Bimestre</option>
                 <option value="trimestre" <?php if($filtro==='trimestre') echo 'selected'; ?>>Trimestre</option>
                 <option value="semestre" <?php if($filtro==='semestre') echo 'selected'; ?>>Semestre</option>
+                <option value="ano" <?php if($filtro==='ano') echo 'selected'; ?>>Ano</option>
             </select>
         </form>
 
