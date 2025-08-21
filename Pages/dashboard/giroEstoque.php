@@ -127,6 +127,7 @@ if ($entradas > 0) {
 <title>Dashboard - Decklogistic</title>
 <link rel="stylesheet" href="../../assets/sidebar.css">
 <link rel="stylesheet" href="../../assets/giroEstoque.css">
+<link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>

@@ -1,31 +1,43 @@
 <?php
-require_once '../conexao.php';
+session_start();
+include __DIR__ . '/../conexao.php';
 
-$loja_id = $_GET['loja_id'] ?? 1;
-
-$sql = "
-    SELECT 
-        p.id AS produto_id,
-        p.nome AS produto_nome,
-        SUM(iv.custo_unitario * iv.quantidade) / SUM(iv.quantidade) AS custo_medio
-    FROM itens_venda iv
-    JOIN produtos p ON iv.produto_id = p.id
-    JOIN vendas v ON iv.venda_id = v.id
-    WHERE v.loja_id = ?
-    GROUP BY p.id, p.nome
-    ORDER BY custo_medio DESC
-";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $loja_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-$produtos = [];
-while($row = $result->fetch_assoc()){
-    $row['custo_medio'] = number_format($row['custo_medio'], 2, '.', '');
-    $produtos[] = $row;
+// Pega o id da loja logada na sessão
+$lojaId = $_SESSION['id'] ?? 0;
+if(!$lojaId) {
+    die(json_encode([]));
 }
 
+/**
+ * Cálculo do custo médio:
+ * - Pega todas as movimentações de estoque do tipo 'entrada' para cada produto da loja.
+ * - Soma (quantidade * preço unitário) / soma quantidade.
+ * - Se não houver entradas, custo_medio = 0
+ */
+$stmt = $conn->prepare("
+    SELECT 
+        p.id,
+        p.nome AS produto,
+        IFNULL(SUM(m.quantidade * p.preco_unitario) / NULLIF(SUM(m.quantidade),0), 0) AS custo_medio
+    FROM produtos p
+    LEFT JOIN movimentacoes_estoque m ON m.produto_id = p.id AND m.tipo = 'entrada'
+    WHERE p.loja_id = ?
+    GROUP BY p.id
+");
+$stmt->bind_param("i", $lojaId);
+$stmt->execute();
+$res = $stmt->get_result();
+
+$data = [];
+while($row = $res->fetch_assoc()){
+    $data[] = [
+        'produto' => $row['produto'],
+        'custo_medio' => (float)$row['custo_medio']
+    ];
+}
+
+$stmt->close();
+$conn->close();
+
 header('Content-Type: application/json');
-echo json_encode($produtos);
+echo json_encode($data);
