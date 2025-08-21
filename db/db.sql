@@ -1,3 +1,4 @@
+CREATE SCHEMA `decklog_db` ;
 USE decklog_db;
 
 -- Tabela lojas
