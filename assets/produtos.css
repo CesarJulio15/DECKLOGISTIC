@@ -81,24 +81,23 @@ button {
     font-size: 14px;
 }
 
-
 .btn-novo {
-    background-color: black;
+    background-color: rgb(0, 0, 0);
     color: white;
     display: flex;
-    align-items: center;     /* Alinha verticalmente todo o conteúdo */
-    justify-content: center; /* Centraliza horizontalmente */
-    gap: 8px;
-    padding: 10px 20px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 3px 8px;   /* menor altura/largura */
     border: none;
-    font-size: 16px;
+    font-size: 14px;    /* fonte menor */
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 .btn-novo .icon {
-    width: 16px;
-    height: 16px;
+    width: 6px;
+    height: 6px;
     display: block;       /* Remove espaçamento interno da linha */
     vertical-align: middle; /* Garante alinhamento vertical no caso de texto */
 }
@@ -385,20 +384,7 @@ hr {
   display: block;
 }
 
-#pesquisa-produtos {
-    padding: 8px 12px;
-    width: 250px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.2s ease;
-}
 
-#pesquisa-produtos:focus {
-    border-color: #e63946; /* cor vermelha parecida com seu tema */
-    box-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
-}
 
 /* Mobile */
 @media (max-width: 768px) {
@@ -457,14 +443,20 @@ hr {
   }
 
  .dashboard {
-      margin-left: 220px; /* mesma largura da sidebar */
+    
       padding: 20px;
   }
 
 .conteudo {
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    margin-left: 0; /* remove a margem daqui */
+    display: block;
+    margin-left: 220px; /* largura da sidebar */
+    width: calc(100% - 220px); /* impede de entrar por baixo */
+    box-sizing: border-box;
+}
+
+/* Garante que a tabela não quebre layout */
+.conteudo table {
+    width: 100%;
+    border-collapse: collapse;
 }
 }

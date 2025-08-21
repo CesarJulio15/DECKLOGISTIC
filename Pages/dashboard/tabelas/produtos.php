@@ -48,6 +48,7 @@ if ($tagVincResult) {
 </head>
 
 <body>
+    
 <aside class="sidebar">
     <div class="logo-area">
         <img src="../../../img/logoDecklogistic.webp" alt="Logo">
@@ -75,6 +76,7 @@ if ($tagVincResult) {
 
 <main class="dashboard">
 <div class="content">
+    
 <div class="conteudo">
 
 <h1>Produtos</h1>
@@ -82,7 +84,7 @@ if ($tagVincResult) {
 <div class="acoes">
     <div class="botoes">
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
-    <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:6px 10px; width:250px; border-radius:4px; border:1px solid #ccc;">
+    <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
 </div>
         <button class="btn-novo">Novo item <span><img class="icon" src="../../../img/icon-plus.svg" alt="Adicionar"></span></button>
         <select id="ordenar">
@@ -236,9 +238,10 @@ document.addEventListener('click', function () {
 document.getElementById('pesquisa').addEventListener('keyup', function() {
     let filtro = this.value.toLowerCase();
     let linhas = document.querySelectorAll('#tabela-produtos tr');
+
     linhas.forEach(linha => {
-        let texto = linha.querySelector('td span:last-child').textContent.toLowerCase();
-        linha.style.display = texto.includes(filtro) ? '' : 'none';
+        let textoLinha = linha.innerText.toLowerCase(); // pega todo o texto da linha
+        linha.style.display = textoLinha.includes(filtro) ? '' : 'none';
     });
 });
 // Filtrar por tag
