@@ -5,6 +5,7 @@
     <title>Finanças - Decklogistic</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
       <link rel="stylesheet" href="../../assets/financas.css">
+      <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   </head>
   <body>
 
