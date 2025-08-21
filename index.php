@@ -2,8 +2,13 @@
 require_once 'config.php';
 session_start(); // inicia a sessão
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['id'])) {
     header('Location: pages/auth/lojas/cadastro.php'); 
+    exit; 
+}
+
+if (isset($_SESSION['id'])) {
+    header('Location: pages/dashboard/financas.php'); 
     exit; 
 }
 ?>
