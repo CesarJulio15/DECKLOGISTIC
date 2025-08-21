@@ -1,4 +1,3 @@
-CREATE DATABASE IF NOT EXISTS decklog_db;
 USE decklog_db;
 
 -- Tabela lojas

@@ -56,7 +56,7 @@
     <script>
         async function carregarGrafico() {
             try {
-                const response = await fetch("../auth/lojas/lucroL_api.php?loja_id=1&periodo=mes");
+                const response = await fetch("/DECKLOGISTIC/api/lucro_liquidoMap.php");
                 const data = await response.json();
 
                 // Cria arrays de labels e valores
