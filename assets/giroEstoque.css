@@ -1,0 +1,172 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    color: #111;
+    margin: 20px;
+      padding-left: 250px;
+}
+
+h1 {
+  margin-top: 70px;
+  margin-bottom: 20px;
+  margin-left: 60px; /* ajusta conforme quiser */
+  text-align: left;
+}
+
+.total-estoque {
+    width: 200px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #111; /* mantém a borda */
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    position: relative;
+    left: 20px; /* deslocamento para a direita */
+    text-align: center; /* mantém o conteúdo centralizado */
+}
+
+
+
+.ver-mais {
+    display: block;
+    position: relative;
+    left: 20px; /* ajusta conforme quiser */
+    margin-bottom: 30px;
+    text-decoration: none;
+    font-size: 12px;
+    color: #007bff;
+}
+.tables-container {
+    max-width: 1000px;
+    margin-left: 60px; /* ajusta conforme quiser */
+}
+
+.tables-container table {
+        margin-top: 10px;
+    width: 75%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 14px;
+}
+
+.tables-container th, .tables-container td {
+    border: 1px solid #ddd;
+    padding: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tables-container th {
+    background-color: #f2f2f2;
+}
+
+
+.charts-container {
+ display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 50px auto 0 auto; 
+    margin-left: 40px;
+    margin-bottom: 40px;
+}
+
+canvas {
+    width: 100%;
+    height: 300px;
+    display: block;
+}
+
+h2{
+margin-bottom: 20px;
+}
+
+.visu {
+    display: block;
+    position: relative;
+    left: 20px; 
+    margin-bottom: 30px;
+    text-decoration: none;
+    font-size: 12px;
+    color: #007bff;
+}
+
+.total-estoque {
+    width: 200px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+        margin-left: 30px;
+        
+}
+
+.total-estoque span {
+    font-size: 1em;
+}
+
+.ver-mais {
+    margin-left: 40px;
+    display: block;
+    text-align: left;
+    margin-top: -15px;
+    color: #0056b3;
+    font-weight: bold;
+    text-decoration: none;
+
+}
+
+.ver-mais:hover {
+    text-decoration: underline;
+}
+.filtros-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.filtro-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filtro-btn button {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+}
+
+.filtro-btn button:hover {
+    background-color: #e9e9e9;
+}
+
+.icone-filtro {
+    width: 14px;
+    height: 14px;
+}
+
+#selectFiltro {
+    padding: 3px 6px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #fff;
+}

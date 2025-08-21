@@ -1,19 +1,94 @@
 <?php
 include __DIR__ . '/../../conexao.php';
 
-// Somar total de entradas
+$filtro = $_GET['filtro'] ?? 'dia'; // padrão: dia
+
+switch ($filtro) {
+    case 'mes':
+        $sql = "SELECT DATE_FORMAT(data_movimentacao, '%Y-%m') AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY DATE_FORMAT(data_movimentacao, '%Y-%m')
+                ORDER BY periodo ASC";
+        break;
+
+    case 'ano':
+        $sql = "SELECT YEAR(data_movimentacao) AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY YEAR(data_movimentacao)
+                ORDER BY periodo ASC";
+        break;
+
+    default: // dia
+        $sql = "SELECT DATE(data_movimentacao) AS periodo,
+                       SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
+                       SUM(CASE WHEN tipo = 'saida' THEN quantidade ELSE 0 END) AS saidas
+                FROM movimentacoes_estoque
+                GROUP BY DATE(data_movimentacao)
+                ORDER BY periodo ASC";
+        break;
+}
+
+$res = mysqli_query($conn, $sql);
+
+$labels = [];
+$dadosEntradas = [];
+$dadosSaidas = [];
+
+while ($row = mysqli_fetch_assoc($res)) {
+    $labels[] = $row['periodo'];
+    $dadosEntradas[] = (int)$row['entradas'];
+    $dadosSaidas[] = (int)$row['saidas'];
+}
+
+
+// Definir condição de filtro para os cards
+switch ($filtro) {
+    case 'mes':
+        $condicao = "DATE_FORMAT(data_movimentacao, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')";
+        $tituloFiltro = "Mês";
+        break;
+
+    case 'ano':
+        $condicao = "YEAR(data_movimentacao) = YEAR(CURDATE())";
+        $tituloFiltro = "Ano";
+        break;
+
+    default: // dia
+        $condicao = "DATE(data_movimentacao) = CURDATE()";
+        $tituloFiltro = "Dia";
+        break;
+}
+
+// Somar total de entradas no período
 $sqlEntradas = "SELECT SUM(quantidade) AS total_entradas 
                 FROM movimentacoes_estoque 
-                WHERE tipo = 'entrada'";
+                WHERE tipo = 'entrada' AND $condicao";
 $resEntradas = mysqli_query($conn, $sqlEntradas);
 $entradas = (mysqli_fetch_assoc($resEntradas)['total_entradas']) ?? 0;
 
-// Somar total de saídas
+// Somar total de saídas no período
 $sqlSaidas = "SELECT SUM(quantidade) AS total_saidas 
               FROM movimentacoes_estoque 
-              WHERE tipo = 'saida'";
+              WHERE tipo = 'saida' AND $condicao";
 $resSaidas = mysqli_query($conn, $sqlSaidas);
 $saidas = (mysqli_fetch_assoc($resSaidas)['total_saidas']) ?? 0;
+
+// Calcular variação percentual
+$percentual = 0;
+$seta = "↑";
+$classe = "positivo";
+if ($entradas > 0) {
+    $percentual = (($entradas - $saidas) / $entradas) * 100;
+    if ($percentual < 0) {
+        $seta = "↓";
+        $classe = "negativo";
+    }
+}
+
 
 // Calcular variação percentual
 $percentual = 0;
@@ -31,7 +106,7 @@ if ($entradas > 0) {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="../../assets/estoque.css">
+    <link rel="stylesheet" href="../../assets/giroEstoque.css">
     <link rel="stylesheet" href="../../assets/sidebar.css">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -110,18 +185,27 @@ if ($entradas > 0) {
 
         <div class="cards-container">
             <div class="card <?php echo $classe; ?>">
-                <h2>Entradas</h2>
-                <p><?php echo $entradas; ?></p>
-            </div>
-            <div class="card <?php echo $classe; ?>">
-                <h2>Saídas</h2>
-                <p><?php echo $saidas; ?></p>
-            </div>
-            <div class="card <?php echo $classe; ?>">
-                <h2>Variação</h2>
-                <p><?php echo $seta . " " . number_format($percentual, 2, ',', '.'); ?>%</p>
+                <h2>Entradas (<?php echo $tituloFiltro; ?>)</h2>
+<p><?php echo $entradas; ?></p>
+
+<h2>Saídas (<?php echo $tituloFiltro; ?>)</h2>
+<p><?php echo $saidas; ?></p>
+
+<h2>Variação (<?php echo $tituloFiltro; ?>)</h2>
+<p><?php echo $seta . " " . number_format($percentual, 2, ',', '.'); ?>%</p>
+
             </div>
         </div>
+
+<form method="GET" style="margin-bottom:20px;">
+    <label for="filtro">Filtrar por:</label>
+    <select name="filtro" id="filtro" onchange="this.form.submit()">
+        <option value="dia" <?php if(($_GET['filtro'] ?? '') === 'dia') echo 'selected'; ?>>Dia</option>
+        <option value="mes" <?php if(($_GET['filtro'] ?? '') === 'mes') echo 'selected'; ?>>Mês</option>
+        <option value="ano" <?php if(($_GET['filtro'] ?? '') === 'ano') echo 'selected'; ?>>Ano</option>
+    </select>
+</form>
+
 
         <div id="grafico"></div>
     </div>
@@ -130,11 +214,11 @@ if ($entradas > 0) {
 <script>
     var options = {
         chart: { type: 'line', height: 350 },
-        series: [
-            { name: 'Entradas', data: [<?php echo $entradas; ?>] },
-            { name: 'Saídas', data: [<?php echo $saidas; ?>] }
-        ],
-        xaxis: { categories: ['Hoje'] }
+series: [
+    { name: 'Entradas', data: <?php echo json_encode($dadosEntradas); ?> },
+    { name: 'Saídas', data: <?php echo json_encode($dadosSaidas); ?> }
+],
+xaxis: { categories: <?php echo json_encode($labels); ?> }
     };
     var chart = new ApexCharts(document.querySelector("#grafico"), options);
     chart.render();
