@@ -78,6 +78,21 @@
       </table>
     </div>
   </div>
+    <div class="card">
+    <h3>Custo Médio por Produto Vendido</h3>
+    <div class="table-responsive">
+      <table id="custoMedioProdutos">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Custo Médio (R$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="2">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
 </div>
   </div>
 

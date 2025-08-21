@@ -24,7 +24,7 @@ CREATE TABLE lojas (
     data_nirc DATE,
     regime_estadual VARCHAR(50),
     regime_federal VARCHAR(50),
-    centralizacao_escrituracao BOOLEAN,
+    centralizacao_escrituracao VARCHAR(3),
     area_construida_m2 DECIMAL(10,2),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
