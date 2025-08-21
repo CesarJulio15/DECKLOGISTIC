@@ -86,7 +86,7 @@ if ($tagVincResult) {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
     <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
 </div>
-        <button class="btn-novo">Novo item <span><img class="icon" src="../../../img/icon-plus.svg" alt="Adicionar"></span></button>
+        <button class="btn-novo">Novo item +</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
             <option value="nome-asc">Nome (A-Z)</option>
@@ -107,6 +107,11 @@ if ($tagVincResult) {
       <?= htmlspecialchars($tag['nome']) ?>
   </div>
 <?php endforeach; ?>
+<button class="btn-reset-filtro" onclick="resetFiltro()">
+    <i class="fa-solid fa-xmark" style="color: #000000ff;"></i>
+</button>
+<button class="btn-nova-tag" onclick="window.location.href='../tag.php'">Nova Tag +</button>
+
 </div>
 </div>
 </div>
@@ -123,37 +128,37 @@ if ($tagVincResult) {
     <tbody id="tabela-produtos">
     <?php while ($produto = mysqli_fetch_assoc($result)): ?>
         <tr>
-            <td style="display:flex; align-items:center; gap:10px;">
-                <!-- Ícones vinculados -->
-                <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
-                  <?php if (isset($produtoTags[$produto['id']])): ?>
-                    <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
-                      <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;" data-tag-id="<?= $tag['id'] ?>"></i>
-                    <?php endforeach; ?>
-                  <?php endif; ?>
-                </span>
+         <td style="display:flex; align-items:center; gap:10px;">
+    <!-- Dropdown para adicionar tags -->
+    <div class="tag-dropdown" style="position:relative;">
+        <button class="btn-add" data-id="<?= $produto['id'] ?>">+</button>
+        <div class="dropdown-content">
+            <?php foreach ($tags as $tag): ?>
+            <div class="tag-option" 
+                 data-produto="<?= $produto['id'] ?>" 
+                 data-tag="<?= $tag['id'] ?>"
+                 data-icone="<?= htmlspecialchars($tag['icone']) ?>"
+                 data-cor="<?= htmlspecialchars($tag['cor']) ?>">
+                <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" 
+                   style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i>
+                <?= htmlspecialchars($tag['nome']) ?>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
 
-                <!-- Nome do produto -->
-                <span><?= htmlspecialchars($produto['nome']) ?></span>
+    <!-- Ícones vinculados -->
+    <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
+      <?php if (isset($produtoTags[$produto['id']])): ?>
+        <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
+          <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;" data-tag-id="<?= $tag['id'] ?>"></i>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </span>
 
-                <!-- Dropdown para adicionar tags -->
-                <div class="tag-dropdown" style="position:relative;">
-                    <button class="btn-add" data-id="<?= $produto['id'] ?>">+</button>
-                    <div class="dropdown-content">
-                        <?php foreach ($tags as $tag): ?>
-                        <div class="tag-option" 
-                             data-produto="<?= $produto['id'] ?>" 
-                             data-tag="<?= $tag['id'] ?>"
-                             data-icone="<?= htmlspecialchars($tag['icone']) ?>"
-                             data-cor="<?= htmlspecialchars($tag['cor']) ?>">
-                            <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" 
-                               style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i>
-                            <?= htmlspecialchars($tag['nome']) ?>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </td>
+    <!-- Nome do produto -->
+    <span><?= htmlspecialchars($produto['nome']) ?></span>
+</td>
             <td>R$ <?= number_format($produto['preco_unitario'], 2, ',', '.') ?></td>
             <td><?= intval($produto['quantidade_estoque']) ?></td>
             <td><?= htmlspecialchars($produto['lote']) ?></td>
@@ -260,6 +265,15 @@ document.querySelectorAll('.tag-item').forEach(tag => {
         });
     });
 });
+function resetFiltro() {
+    // Limpa o input de pesquisa
+    document.getElementById('pesquisa').value = '';
+    // Mostra todas as linhas da tabela
+    document.querySelectorAll('#tabela-produtos tr').forEach(linha => {
+        linha.style.display = '';
+    });
+}
 </script>
+
 </body>
 </html>
