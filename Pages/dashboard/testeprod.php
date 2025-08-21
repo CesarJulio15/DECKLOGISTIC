@@ -1,8 +1,17 @@
 <?php
+session_start();
+
 // Exibe erros para debug
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// ID da loja logada
+$loja_id = $_SESSION['id'] ?? 0;
+
+if (!$loja_id) {
+    die('Loja não identificada. Faça login.');
+}
 
 // Conexão com o banco
 include __DIR__ . '/../../conexao.php';
@@ -10,7 +19,6 @@ include __DIR__ . '/../../conexao.php';
 $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $loja_id = $_POST['loja_id'] ?? null;
     $nome = $_POST['nome'] ?? null;
     $descricao = $_POST['descricao'] ?? '';
     $preco_unitario = $_POST['preco_unitario'] ?? 0;
@@ -18,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lote = $_POST['lote'] ?? '';
     $data_reabastecimento = $_POST['data_reabastecimento'] ?? null;
 
-    if (!$loja_id || !$nome || !$preco_unitario || !$data_reabastecimento) {
+    if (!$nome || !$preco_unitario || !$data_reabastecimento) {
         $msg = 'Campos obrigatórios faltando.';
     } else {
         // Inserir produto
@@ -78,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php endif; ?>
 
 <form method="POST">
-    <input type="number" name="loja_id" placeholder="ID da Loja" required>
     <input type="text" name="nome" placeholder="Nome do Produto" required>
     <textarea name="descricao" placeholder="Descrição"></textarea>
     <input type="number" step="0.01" name="preco_unitario" placeholder="Preço Unitário" required>

@@ -88,7 +88,7 @@ button {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 3px 8px;   /* menor altura/largura */
+    padding: 10px 8px;   /* menor altura/largura */
     border: none;
     font-size: 14px;    /* fonte menor */
     cursor: pointer;

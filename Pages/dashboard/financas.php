@@ -1,41 +1,47 @@
-  <!DOCTYPE html>
-  <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8">
-    <title>Finanças - Decklogistic</title>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-      <link rel="stylesheet" href="../../assets/financas.css">
-  </head>
-  <body>
+<?php
+session_start();
 
-  <div class="content">
-    <div class="sidebar">
-      <link rel="stylesheet" href="../../assets/sidebar.css">
-      <div class="logo-area">
-        <img src="../../img/logoDecklogistic.webp" alt="Logo">
-      </div>
-      <nav class="nav-section">
-        <div class="nav-menus">
-          <ul class="nav-list top-section">
-            <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-            <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
-          </ul>
-          <hr>
-          <ul class="nav-list middle-section">
-            <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-            <li><a href="/Pages/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
-            <li><a href="/Pages/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-              <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
-          </ul>
-        </div>
-        <div class="bottom-links">
-          <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
-          <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
-        </div>
-      </nav>
+// ID da loja logada na sessão
+$lojaId = $_SESSION['id'] ?? 0;
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Finanças - Decklogistic</title>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="stylesheet" href="../../assets/financas.css">
+</head>
+<body>
+
+<div class="content">
+  <div class="sidebar">
+    <link rel="stylesheet" href="../../assets/sidebar.css">
+    <div class="logo-area">
+      <img src="../../img/logoDecklogistic.webp" alt="Logo">
     </div>
+    <nav class="nav-section">
+      <div class="nav-menus">
+        <ul class="nav-list top-section">
+          <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+          <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+        </ul>
+        <hr>
+        <ul class="nav-list middle-section">
+          <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+          <li><a href="/Pages/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+          <li><a href="/Pages/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+          <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
+        </ul>
+      </div>
+      <div class="bottom-links">
+        <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+        <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+      </div>
+    </nav>
+  </div>
 
-    <!-- Dashboard Cards -->
+  <!-- Dashboard Cards -->
   <div class="dashboard">
     <div class="card">
       <h3>Lucro Bruto</h3>
@@ -56,75 +62,99 @@
       <h3>Receita x Despesas</h3>
       <div id="chartReceitaDespesa" style="height:300px; margin-top:10px;"></div>
     </div>
-
   </div>
 
-<div class="dashboard">
-  <div class="card">
-    <h3>Top 5 Maiores Despesas Recentes</h3>
-    <div class="table-responsive">
-      <table id="topDespesas">
-        <thead>
-          <tr>
-            <th>Categoria</th>
-            <th>Descrição</th>
-            <th>Valor (R$)</th>
-            <th>Data</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="4">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <div class="dashboard">
     <div class="card">
-    <h3>Custo Médio por Produto Vendido</h3>
-    <div class="table-responsive">
-      <table id="custoMedioProdutos">
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Custo Médio (R$)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="2">Carregando...</td></tr>
-        </tbody>
-      </table>
+      <h3>Top 5 Maiores Despesas Recentes</h3>
+      <div class="table-responsive">
+        <table id="topDespesas">
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Descrição</th>
+              <th>Valor (R$)</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-</div>
+
+    <div class="card">
+      <h3>Custo Médio por Produto Vendido</h3>
+      <div class="table-responsive">
+        <table id="custoMedioProdutos">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Custo Médio (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="2">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <script>
-    
-    async function loadTopDespesas() {
-  const lojaId = 1;
-  const data = await fetch(`/DECKLOGISTIC/api/top5_despesas.php?loja_id=${lojaId}`)
-                      .then(r => r.json());
+</div>
 
-  const tbody = document.querySelector("#topDespesas tbody");
-  tbody.innerHTML = '';
+<script>
+  // Pega o loja_id do PHP
+  const lojaId = <?= $lojaId ?>;
 
-  if(data.length === 0){
-    tbody.innerHTML = '<tr><td colspan="4">Nenhuma despesa encontrada</td></tr>';
-    return;
+  async function loadTopDespesas() {
+    const data = await fetch(`/DECKLOGISTIC/api/top5_despesas.php?loja_id=${lojaId}`)
+                        .then(r => r.json());
+
+    const tbody = document.querySelector("#topDespesas tbody");
+    tbody.innerHTML = '';
+
+    if(data.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4">Nenhuma despesa encontrada</td></tr>';
+      return;
+    }
+
+    data.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${d.categoria}</td>
+        <td>${d.descricao}</td>
+        <td>${parseFloat(d.valor).toFixed(2)}</td>
+        <td>${d.data_transacao}</td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
 
-  data.forEach(d => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${d.categoria}</td>
-      <td>${d.descricao}</td>
-      <td>${parseFloat(d.valor).toFixed(2)}</td>
-      <td>${d.data_transacao}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
+  async function loadCustoMedioProdutos() {
+    const data = await fetch(`/DECKLOGISTIC/api/custo_medio_produto.php?loja_id=${lojaId}`)
+                        .then(r => r.json());
+
+    const tbody = document.querySelector("#custoMedioProdutos tbody");
+    tbody.innerHTML = '';
+
+    if(data.length === 0){
+      tbody.innerHTML = '<tr><td colspan="2">Nenhum produto encontrado</td></tr>';
+      return;
+    }
+
+    data.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${d.produto}</td>
+        <td>${parseFloat(d.custo_medio).toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
   async function loadLucros() {
-    const lojaId = 1;
     const periodo = 'mes';
 
     const bruto = await fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json());
@@ -139,28 +169,9 @@
     document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
     document.getElementById('margemLucro').innerText = `${margemVal}%`;
 
-    // Gráficos pequenos
-    const optionsBruto = {
-      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-      stroke: { curve: 'smooth' },
-      fill: { opacity: 0.3, gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0 } },
-      series: [{ data: [10, 15, 12, 18, 25, parseFloat(lucroBrutoVal)] }],
-      colors: ['#10b981']
-    };
-    const optionsLiquido = {
-      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-      stroke: { curve: 'smooth' },
-      fill: { opacity: 0.3 },
-      series: [{ data: [5, 8, 6, 12, 15, parseFloat(lucroLiquidoVal)] }],
-      colors: ['#3b82f6']
-    };
-    const optionsMargem = {
-      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-      stroke: { curve: 'smooth' },
-      fill: { opacity: 0.3 },
-      series: [{ data: [2, 4, 3, 5, 6, parseFloat(margemVal)] }],
-      colors: ['#f59e0b']
-    };
+    const optionsBruto = { chart: { type: 'area', height: 60, sparkline: { enabled: true } }, stroke: { curve: 'smooth' }, fill: { opacity: 0.3 }, series: [{ data: [10,15,12,18,25,parseFloat(lucroBrutoVal)] }], colors:['#10b981'] };
+    const optionsLiquido = { chart: { type: 'area', height: 60, sparkline: { enabled: true } }, stroke: { curve: 'smooth' }, fill: { opacity: 0.3 }, series: [{ data: [5,8,6,12,15,parseFloat(lucroLiquidoVal)] }], colors:['#3b82f6'] };
+    const optionsMargem = { chart: { type: 'area', height: 60, sparkline: { enabled: true } }, stroke: { curve: 'smooth' }, fill: { opacity: 0.3 }, series: [{ data: [2,4,3,5,6,parseFloat(margemVal)] }], colors:['#f59e0b'] };
 
     new ApexCharts(document.querySelector("#chartBruto"), optionsBruto).render();
     new ApexCharts(document.querySelector("#chartLiquido"), optionsLiquido).render();
@@ -168,19 +179,16 @@
   }
 
   async function loadReceitaDespesa() {
-    const lojaId = 1;
     const data = await fetch(`/DECKLOGISTIC/api/receita_despesas.php?loja_id=${lojaId}`)
-                      .then(r => r.json());
+                        .then(r => r.json());
 
-    // Transformar as chaves em datas válidas e ordenar
     const dias = [...new Set([...Object.keys(data.receita), ...Object.keys(data.despesa)])]
                 .map(d => new Date(d))
-                .sort((a,b) => a - b)
-                .map(d => d.toISOString().slice(0,10)); // voltar para YYYY-MM-DD
+                .sort((a,b)=>a-b)
+                .map(d=>d.toISOString().slice(0,10));
 
-    // Gerar arrays de valores
-    const receita = dias.map(d => parseFloat(data.receita[d] || 0));
-    const despesa = dias.map(d => parseFloat(data.despesa[d] || 0));
+    const receita = dias.map(d => parseFloat(data.receita[d]||0));
+    const despesa = dias.map(d => parseFloat(data.despesa[d]||0));
 
     const options = {
       chart: { type: 'line', height: 300 },
@@ -196,11 +204,12 @@
     new ApexCharts(document.querySelector("#chartReceitaDespesa"), options).render();
   }
 
-
+  // Chamada das funções
   loadLucros();
   loadReceitaDespesa();
   loadTopDespesas();
+  loadCustoMedioProdutos();
+</script>
 
-  </script>
-  </body>
-  </html>
+</body>
+</html>
