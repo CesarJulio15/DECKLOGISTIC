@@ -25,15 +25,14 @@ $tagVincResult = $conn->query("
     JOIN tags ON produto_tag.tag_id = tags.id
 ");
 if ($tagVincResult) {
-while ($row = $tagVincResult->fetch_assoc()) {
-    $produtoTags[$row['produto_id']][] = [
-        'id' => $row['tag_id'],
-        'icone' => $row['icone'],
-        'cor' => $row['cor']
-    ];
+    while ($row = $tagVincResult->fetch_assoc()) {
+        $produtoTags[$row['produto_id']][] = [
+            'id' => $row['tag_id'],
+            'icone' => $row['icone'],
+            'cor' => $row['cor']
+        ];
+    }
 }
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -45,6 +44,7 @@ while ($row = $tagVincResult->fetch_assoc()) {
 <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/produtos.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body>
@@ -76,10 +76,14 @@ while ($row = $tagVincResult->fetch_assoc()) {
 <main class="dashboard">
 <div class="content">
 <div class="conteudo">
+
 <h1>Produtos</h1>
 
 <div class="acoes">
     <div class="botoes">
+        <div class="pesquisa-produtos" style="margin-bottom:15px;">
+    <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:6px 10px; width:250px; border-radius:4px; border:1px solid #ccc;">
+</div>
         <button class="btn-novo">Novo item <span><img class="icon" src="../../../img/icon-plus.svg" alt="Adicionar"></span></button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
@@ -102,7 +106,7 @@ while ($row = $tagVincResult->fetch_assoc()) {
   </div>
 <?php endforeach; ?>
 </div>
-    </div>
+</div>
 </div>
 
 <table>
@@ -117,19 +121,21 @@ while ($row = $tagVincResult->fetch_assoc()) {
     <tbody id="tabela-produtos">
     <?php while ($produto = mysqli_fetch_assoc($result)): ?>
         <tr>
-            <td>
-                <?= htmlspecialchars($produto['nome']) ?>
-   <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>">
-    <?php if (isset($produtoTags[$produto['id']])): ?>
-        <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
-            <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" 
-               style="color: <?= htmlspecialchars($tag['cor']) ?>; margin-right:5px;"
-               data-tag-id="<?= $tag['id'] ?>"></i>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</span>
+            <td style="display:flex; align-items:center; gap:10px;">
+                <!-- Ícones vinculados -->
+                <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
+                  <?php if (isset($produtoTags[$produto['id']])): ?>
+                    <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
+                      <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;" data-tag-id="<?= $tag['id'] ?>"></i>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                </span>
 
-                <div class="tag-dropdown">
+                <!-- Nome do produto -->
+                <span><?= htmlspecialchars($produto['nome']) ?></span>
+
+                <!-- Dropdown para adicionar tags -->
+                <div class="tag-dropdown" style="position:relative;">
                     <button class="btn-add" data-id="<?= $produto['id'] ?>">+</button>
                     <div class="dropdown-content">
                         <?php foreach ($tags as $tag): ?>
@@ -158,35 +164,21 @@ while ($row = $tagVincResult->fetch_assoc()) {
 </main>
 
 <script>
-// Filtro de pesquisa
-document.getElementById('pesquisa').addEventListener('keyup', function() {
-    let filtro = this.value.toLowerCase();
-    let linhas = document.querySelectorAll('#tabela-produtos tr');
-    linhas.forEach(linha => {
-        let texto = linha.textContent.toLowerCase();
-        linha.style.display = texto.includes(filtro) ? '' : 'none';
-    });
-});
-
 // Ordenação
 function sortTable(columnIndex, asc = true, isNumeric = false) {
     const table = document.querySelector("table tbody");
     const rows = Array.from(table.rows);
-
     rows.sort((a, b) => {
         let aVal = a.cells[columnIndex].innerText.trim();
         let bVal = b.cells[columnIndex].innerText.trim();
-
         if (isNumeric) {
             aVal = parseFloat(aVal.replace(/[R$\s.]/g, '').replace(',', '.'));
             bVal = parseFloat(bVal.replace(/[R$\s.]/g, '').replace(',', '.'));
         }
-
         if (aVal < bVal) return asc ? -1 : 1;
         if (aVal > bVal) return asc ? 1 : -1;
         return 0;
     });
-
     rows.forEach(row => table.appendChild(row));
 }
 
@@ -211,7 +203,6 @@ document.querySelectorAll('.tag-option').forEach(option => {
         let tagId = this.dataset.tag;
         let icone = this.dataset.icone;
         let cor = this.dataset.cor;
-
         fetch('vincular_tag.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -231,6 +222,7 @@ document.querySelectorAll('.tag-option').forEach(option => {
     });
 });
 
+// Botão + dropdown
 document.querySelectorAll('.btn-add').forEach(btn => {
     btn.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -238,9 +230,16 @@ document.querySelectorAll('.btn-add').forEach(btn => {
         dropdown.classList.toggle('show');
     });
 });
-
 document.addEventListener('click', function () {
     document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+});
+document.getElementById('pesquisa').addEventListener('keyup', function() {
+    let filtro = this.value.toLowerCase();
+    let linhas = document.querySelectorAll('#tabela-produtos tr');
+    linhas.forEach(linha => {
+        let texto = linha.querySelector('td span:last-child').textContent.toLowerCase();
+        linha.style.display = texto.includes(filtro) ? '' : 'none';
+    });
 });
 // Filtrar por tag
 document.querySelectorAll('.tag-item').forEach(tag => {
@@ -250,7 +249,7 @@ document.querySelectorAll('.tag-item').forEach(tag => {
         linhas.forEach(linha => {
             let produtoId = linha.querySelector('.btn-add').dataset.id;
             let container = document.getElementById(`tags-produto-${produtoId}`);
-            if (container && container.querySelector(`[data-tag-id='${tagId}']`) || container.className.includes(tagId)) {
+            if (container && container.querySelector(`[data-tag-id='${tagId}']`)) {
                 linha.style.display = '';
             } else {
                 linha.style.display = 'none';
@@ -258,7 +257,6 @@ document.querySelectorAll('.tag-item').forEach(tag => {
         });
     });
 });
-
 </script>
 </body>
 </html>

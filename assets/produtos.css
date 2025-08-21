@@ -1,5 +1,42 @@
 /* produtos.css */
-
+  .dashboard {
+      margin-left: 220px; /* mesma largura da sidebar */
+      padding: 20px;
+  }
+  table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+  th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+  }
+  .btn-add {
+      cursor: pointer;
+      padding: 2px 6px;
+      margin-left: auto;
+      background-color: #eee;
+      border: none;
+      border-radius: 4px;
+  }
+  .dropdown-content {
+      display: none;
+      background-color: #fff;
+      min-width: 120px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      z-index: 100;
+  }
+  .dropdown-content.show {
+      display: block;
+  }
+  .tag-option {
+      padding: 5px;
+      cursor: pointer;
+  }
+  .tag-option:hover {
+      background-color: #f0f0f0;
+  }
 /* Área principal */
 .conteudo {
     padding: 20px;
@@ -90,6 +127,8 @@ table {
     overflow: hidden;
     border: 1px solid #ccc; /* borda da tabela */
     margin-top: 20px;
+      border-collapse: collapse;
+  
 }
 
 thead {
@@ -346,7 +385,20 @@ hr {
   display: block;
 }
 
+#pesquisa-produtos {
+    padding: 8px 12px;
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
 
+#pesquisa-produtos:focus {
+    border-color: #e63946; /* cor vermelha parecida com seu tema */
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
+}
 
 /* Mobile */
 @media (max-width: 768px) {
@@ -405,9 +457,10 @@ hr {
   }
 
  .dashboard {
-    margin-left: 220px; /* desloca todo o conteúdo pra não entrar na sidebar */
-    padding: 20px;
-}
+      margin-left: 220px; /* mesma largura da sidebar */
+      padding: 20px;
+  }
+
 .conteudo {
     padding: 20px;
     background-color: #f9f9f9;
