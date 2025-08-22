@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gráfico Lucro Líquido</title>
-    <link rel="stylesheet" href="../../assets/sidebar.css">
-    <link rel="stylesheet" href="../../assets/lucroL.css">
+    <link rel="stylesheet" href="../../../assets/sidebar.css">
+    <link rel="stylesheet" href="../../../assets/lucroL.css">
 </head>
 <body>
     <body>
-    <!-- Botão Voltar -->
-    <button class="btn-voltar" onclick="history.back()">← Voltar</button>
+   <!-- Botão Voltar -->
+<button class="btn-voltar" onclick="window.location.href='../../dashboard/financas.php'">← Voltar</button>
 
-    <div class="top-bar">Gráfico lucro líquido por mês</div>
-    <div class="pagina">
+
+  
 
         <!-- Sidebar -->
         <div class="sidebar">
