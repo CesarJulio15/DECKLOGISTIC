@@ -44,7 +44,6 @@ $lojaId = $_SESSION['id'] ?? 0;
 .btn-modern {
     display: inline-block;
     padding: 10px 20px;
-    margin-top: 10px;
     font-size: 14px;
     font-weight: bold;
     color: #fff;
@@ -54,6 +53,7 @@ $lojaId = $_SESSION['id'] ?? 0;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
+    margin-top: auto; /* empurra o botão para o bottom do card */
 }
 
 .btn-modern:hover {
@@ -68,18 +68,19 @@ $lojaId = $_SESSION['id'] ?? 0;
       <h3>Lucro Bruto</h3>
       <div id="lucroBruto" class="value">R$ 0,00</div>
       <div id="chartBruto" style="height:60px; margin-top:10px;"></div>
+      <button id="btnLucroBruto" class="btn-modern">Ver detalhes</button>
     </div>
     <div class="card">
       <h3>Lucro Líquido</h3>
       <div id="lucroLiquido" class="value">R$ 0,00</div>
-      <!-- Botão moderno de redirecionamento -->
-      <button id="btnLucroLiquido" class="btn-modern">Ver detalhes</button>
       <div id="chartLiquido" style="height:60px; margin-top:10px;"></div>
+      <button id="btnLucroLiquido" class="btn-modern">Ver detalhes</button>
     </div>
     <div class="card">
       <h3>Margem de Lucro</h3>
       <div id="margemLucro" class="value">0%</div>
       <div id="chartMargem" style="height:60px; margin-top:10px;"></div>
+      <button id="btnLucroMargem" class="btn-modern">Ver detalhes</button>
     </div>
     <div class="card">
       <h3>Receita x Despesas</h3>
@@ -247,6 +248,12 @@ $lojaId = $_SESSION['id'] ?? 0;
   }
 // Redireciona ao clicar no botão
 document.getElementById('btnLucroLiquido').addEventListener('click', () => {
+    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
+});
+document.getElementById('btnLucroBruto').addEventListener('click', () => {
+    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
+});
+document.getElementById('btnLucroMargem').addEventListener('click', () => {
     window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
 });
   // Chamada inicial das funções
