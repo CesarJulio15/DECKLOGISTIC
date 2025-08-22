@@ -251,10 +251,10 @@ document.getElementById('btnLucroLiquido').addEventListener('click', () => {
     window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
 });
 document.getElementById('btnLucroBruto').addEventListener('click', () => {
-    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
+    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroB.php';
 });
 document.getElementById('btnLucroMargem').addEventListener('click', () => {
-    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
+    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/margem.php';
 });
   // Chamada inicial das funções
   loadLucros();

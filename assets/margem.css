@@ -1,0 +1,81 @@
+body {
+    margin: 0;
+    background: #999999;
+    font-family: Arial, sans-serif;
+}
+
+
+
+.pagina {
+    display: flex;
+    height: calc(100vh - 25px);
+}
+
+.conteudo {
+    flex: 1;
+    padding: 20px;
+    margin-left: 220px; /* mesma largura da sidebar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 18px;
+}
+
+.grafico-container {
+    width: 1450px;   /* tamanho fixo */
+    height: 850px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+}
+
+.header-grafico {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.indicador {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    color: green;
+}
+
+.indicador span {
+    margin-right: 5px;
+}
+
+.titulo {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+canvas {
+    flex: 1;
+}
+.btn-voltar {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1000;
+    transition: background 0.3s;
+    margin-left: 1700px;
+    margin-top: 890px;
+}
+
+.btn-voltar:hover {
+    background-color: #000000;
+}
