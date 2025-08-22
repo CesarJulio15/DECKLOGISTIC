@@ -105,13 +105,10 @@ $lojaId = $_SESSION['id'] ?? 0;
 </div>
 
 <script>
-  // Pega o loja_id do PHP
   const lojaId = <?= $lojaId ?>;
 
   async function loadTopDespesas() {
-    const data = await fetch(`/DECKLOGISTIC/api/top5_despesas.php?loja_id=${lojaId}`)
-                        .then(r => r.json());
-
+    const data = await fetch(`/DECKLOGISTIC/api/top5_despesas.php?loja_id=${lojaId}`).then(r => r.json());
     const tbody = document.querySelector("#topDespesas tbody");
     tbody.innerHTML = '';
 
@@ -133,9 +130,7 @@ $lojaId = $_SESSION['id'] ?? 0;
   }
 
   async function loadCustoMedioProdutos() {
-    const data = await fetch(`/DECKLOGISTIC/api/custo_medio_produto.php?loja_id=${lojaId}`)
-                        .then(r => r.json());
-
+    const data = await fetch(`/DECKLOGISTIC/api/custo_medio_produto.php?loja_id=${lojaId}`).then(r => r.json());
     const tbody = document.querySelector("#custoMedioProdutos tbody");
     tbody.innerHTML = '';
 
@@ -155,42 +150,68 @@ $lojaId = $_SESSION['id'] ?? 0;
   }
 
   async function loadLucros() {
-    const periodo = 'mes';
+    const periodo = 'mes'; 
 
-    const bruto = await fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json());
-    const liquido = await fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json());
-    const margem = await fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json());
+    // Consome as APIs
+    const [bruto, liquido, margem] = await Promise.all([
+      fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+      fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+      fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
+    ]);
 
-    const lucroBrutoVal = parseFloat(bruto.lucro_bruto || 0).toFixed(2);
-    const lucroLiquidoVal = parseFloat(liquido.lucro_liquido || 0).toFixed(2);
-    const margemVal = parseFloat(margem.margem_lucro_percent || 0).toFixed(2);
+    // Valores totais
+    const lucroBrutoVal = parseFloat(bruto.total || 0).toFixed(2);
+    const lucroLiquidoVal = parseFloat(liquido.total || 0).toFixed(2);
+    const margemVal = parseFloat(margem.total || 0).toFixed(2);
 
     document.getElementById('lucroBruto').innerText = `R$ ${lucroBrutoVal}`;
     document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
     document.getElementById('margemLucro').innerText = `${margemVal}%`;
 
-    const optionsBruto = { chart: { type: 'area', height: 60, sparkline: { enabled: true } }, stroke: { curve: 'smooth' }, fill: { opacity: 0.3 }, series: [{ data: [10,15,12,18,25,parseFloat(lucroBrutoVal)] }], colors:['#10b981'] };
-    const optionsLiquido = { chart: { type: 'area', height: 60, sparkline: { enabled: true } }, stroke: { curve: 'smooth' }, fill: { opacity: 0.3 }, series: [{ data: [5,8,6,12,15,parseFloat(lucroLiquidoVal)] }], colors:['#3b82f6'] };
-    const optionsMargem = { chart: { type: 'area', height: 60, sparkline: { enabled: true } }, stroke: { curve: 'smooth' }, fill: { opacity: 0.3 }, series: [{ data: [2,4,3,5,6,parseFloat(margemVal)] }], colors:['#f59e0b'] };
+    // Séries históricas
+    const brutoSeries = bruto.series.map(item => item.valor);
+    const liquidoSeries = liquido.series.map(item => item.valor);
+    const margemSeries = margem.series.map(item => item.valor);
 
-    new ApexCharts(document.querySelector("#chartBruto"), optionsBruto).render();
-    new ApexCharts(document.querySelector("#chartLiquido"), optionsLiquido).render();
-    new ApexCharts(document.querySelector("#chartMargem"), optionsMargem).render();
+    // Sparkline Lucro Bruto
+    new ApexCharts(document.querySelector("#chartBruto"), {
+      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
+      stroke: { curve: 'smooth' },
+      fill: { opacity: 0.3 },
+      series: [{ data: brutoSeries }],
+      colors: ['#10b981']
+    }).render();
+
+    // Sparkline Lucro Líquido
+    new ApexCharts(document.querySelector("#chartLiquido"), {
+      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
+      stroke: { curve: 'smooth' },
+      fill: { opacity: 0.3 },
+      series: [{ data: liquidoSeries }],
+      colors: ['#3b82f6']
+    }).render();
+
+    // Sparkline Margem de Lucro
+    new ApexCharts(document.querySelector("#chartMargem"), {
+      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
+      stroke: { curve: 'smooth' },
+      fill: { opacity: 0.3 },
+      series: [{ data: margemSeries }],
+      colors: ['#f59e0b']
+    }).render();
   }
 
   async function loadReceitaDespesa() {
-    const data = await fetch(`/DECKLOGISTIC/api/receita_despesas.php?loja_id=${lojaId}`)
-                        .then(r => r.json());
-
+    const data = await fetch(`/DECKLOGISTIC/api/receita_despesas.php?loja_id=${lojaId}`).then(r => r.json());
     const dias = [...new Set([...Object.keys(data.receita), ...Object.keys(data.despesa)])]
-                .map(d => new Date(d))
-                .sort((a,b)=>a-b)
-                .map(d=>d.toISOString().slice(0,10));
+                  .map(d => new Date(d))
+                  .sort((a,b)=>a-b)
+                  .map(d=>d.toISOString().slice(0,10));
 
     const receita = dias.map(d => parseFloat(data.receita[d]||0));
     const despesa = dias.map(d => parseFloat(data.despesa[d]||0));
 
-    const options = {
+    new ApexCharts(document.querySelector("#chartReceitaDespesa"), {
       chart: { type: 'line', height: 300 },
       series: [
         { name: 'Receita', data: receita },
@@ -199,12 +220,10 @@ $lojaId = $_SESSION['id'] ?? 0;
       xaxis: { categories: dias },
       stroke: { curve: 'smooth' },
       colors: ['#10b981', '#ef4444']
-    };
-
-    new ApexCharts(document.querySelector("#chartReceitaDespesa"), options).render();
+    }).render();
   }
 
-  // Chamada das funções
+  // Chamada inicial das funções
   loadLucros();
   loadReceitaDespesa();
   loadTopDespesas();

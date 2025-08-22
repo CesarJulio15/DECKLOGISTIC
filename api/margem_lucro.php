@@ -1,35 +1,119 @@
 <?php
-require_once '../config.php';
+session_start();
+header('Content-Type: application/json; charset=utf-8');
 
-$loja_id = $_GET['loja_id'] ?? 1;
-$periodo = $_GET['periodo'] ?? 'mes';
+// Ajuste este caminho se necessário
+require_once __DIR__ . '/../conexao.php';
 
-$wherePeriodo = '';
-switch($periodo) {
-    case 'mes':
-        $wherePeriodo = "YEAR(data_venda) = YEAR(CURDATE()) AND MONTH(data_venda) = MONTH(CURDATE())";
-        break;
-    case 'semestre':
-        $semestre = ceil(date('n') / 6);
-        $wherePeriodo = "YEAR(data_venda) = YEAR(CURDATE()) AND CEIL(MONTH(data_venda)/6) = $semestre";
-        break;
-    case 'ano':
-        $wherePeriodo = "YEAR(data_venda) = YEAR(CURDATE())";
-        break;
+if (!isset($_SESSION['id']) || !is_numeric($_SESSION['id'])) {
+    echo json_encode(["error" => "Loja não autenticada"]);
+    exit;
+}
+$lojaId = (int) $_SESSION['id'];
+
+// --------- período ----------
+$periodo = $_GET['periodo'] ?? 'mes'; // 'mes' | '30d' | 'ano'
+$agruparPor = 'dia';
+$inicio = $fim = null;
+
+$hoje = new DateTime('today');
+
+if ($periodo === '30d') {
+    $fim = clone $hoje;
+    $inicio = (clone $hoje)->modify('-29 days');
+    $agruparPor = 'dia';
+} elseif ($periodo === 'ano') {
+    $inicio = new DateTime(date('Y-01-01'));
+    $fim    = new DateTime(date('Y-12-31'));
+    $agruparPor = 'mes';
+} else { // 'mes'
+    $inicio = new DateTime(date('Y-m-01'));
+    $fim    = new DateTime(date('Y-m-t'));
+    $agruparPor = 'dia';
 }
 
-$stmt = $pdo->prepare("
-    SELECT SUM(valor_total) AS receita, SUM(custo_total) AS custo
-    FROM vendas
-    WHERE loja_id = ? AND $wherePeriodo
-");
-$stmt->execute([$loja_id]);
-$data = $stmt->fetch(PDO::FETCH_ASSOC);
+$iniStr = $inicio->format('Y-m-d');
+$fimStr = $fim->format('Y-m-d');
 
-$margem = 0;
-if ($data['receita'] > 0) {
-    $margem = (($data['receita'] - $data['custo']) / $data['receita']) * 100;
+// --------- receita e lucro bruto por período ----------
+if ($agruparPor === 'mes') {
+    $sql = "
+        SELECT DATE_FORMAT(v.data_venda, '%Y-%m') AS periodo,
+               SUM(v.valor_total) AS receita,
+               SUM(v.valor_total - v.custo_total) AS lucro_bruto
+        FROM vendas v
+        WHERE v.loja_id = ?
+          AND v.data_venda BETWEEN ? AND ?
+        GROUP BY DATE_FORMAT(v.data_venda, '%Y-%m')
+        ORDER BY periodo ASC
+    ";
+} else {
+    $sql = "
+        SELECT DATE(v.data_venda) AS periodo,
+               SUM(v.valor_total) AS receita,
+               SUM(v.valor_total - v.custo_total) AS lucro_bruto
+        FROM vendas v
+        WHERE v.loja_id = ?
+          AND v.data_venda BETWEEN ? AND ?
+        GROUP BY DATE(v.data_venda)
+        ORDER BY periodo ASC
+    ";
 }
 
-header('Content-Type: application/json');
-echo json_encode(['margem_lucro_percent' => round($margem, 2)]);
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('iss', $lojaId, $iniStr, $fimStr);
+$stmt->execute();
+$res = $stmt->get_result();
+
+$mapRec = [];
+$mapLuc = [];
+$sumRec = 0.0;
+$sumLuc = 0.0;
+
+while ($row = $res->fetch_assoc()) {
+    $periodoKey = $row['periodo'];
+    $receita = (float) ($row['receita'] ?? 0);
+    $lucro   = (float) ($row['lucro_bruto'] ?? 0);
+    $mapRec[$periodoKey] = $receita;
+    $mapLuc[$periodoKey] = $lucro;
+    $sumRec += $receita;
+    $sumLuc += $lucro;
+}
+$stmt->close();
+
+// --------- preencher faltas e calcular margem ----------
+$series = [];
+if ($agruparPor === 'mes') {
+    $cursor = new DateTime($inicio->format('Y-m-01'));
+    $limit  = new DateTime($fim->format('Y-m-01'));
+    $limit->modify('last day of this month');
+    while ($cursor <= $limit) {
+        $key = $cursor->format('Y-m');
+        $r = $mapRec[$key] ?? 0.0;
+        $l = $mapLuc[$key] ?? 0.0;
+        $margem = ($r > 0) ? ($l / $r * 100.0) : 0.0;
+        $series[] = ["data" => $key, "valor" => $margem];
+        $cursor->modify('first day of next month');
+    }
+} else {
+    $cursor = new DateTime($iniStr);
+    $limit  = new DateTime($fimStr);
+    while ($cursor <= $limit) {
+        $key = $cursor->format('Y-m-d');
+        $r = $mapRec[$key] ?? 0.0;
+        $l = $mapLuc[$key] ?? 0.0;
+        $margem = ($r > 0) ? ($l / $r * 100.0) : 0.0;
+        $series[] = ["data" => $key, "valor" => $margem];
+        $cursor->modify('+1 day');
+    }
+}
+
+// --------- margem total do período ----------
+$margem_total = ($sumRec > 0) ? ($sumLuc / $sumRec * 100.0) : 0.0;
+
+echo json_encode([
+    "total" => $margem_total,      // média ponderada do período
+    "series" => $series,
+    "periodo" => $periodo,
+    "agrupamento" => $agruparPor
+]);
