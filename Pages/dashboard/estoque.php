@@ -131,8 +131,15 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
   <nav class="nav-section">
     <div class="nav-menus">
       <ul class="nav-list top-section">
-      <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-      <li class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+ <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
+<ul class="nav-list top-section">
+  <li class="<?= $currentPage=='financas.php' ? 'active' : '' ?>">
+    <a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a>
+  </li>
+  <li class="<?= $currentPage=='estoque.php' ? 'active' : '' ?>">
+    <a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a>
+  </li>
+</ul>
       </ul>
       <hr>
       <ul class="nav-list middle-section">
@@ -143,7 +150,7 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
       </ul>
     </div>
     <div class="bottom-links">
-      <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+      <a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
       <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
     </div>
   </nav>

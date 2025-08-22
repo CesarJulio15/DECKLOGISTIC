@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gráfico Lucro Líquido</title>
-    <link rel="stylesheet" href="../../assets/sidebar.css">
-    <link rel="stylesheet" href="../../assets/lucroL.css">
+    <link rel="stylesheet" href="../../../assets/sidebar.css">
+    <link rel="stylesheet" href="../../../assets/lucroL.css">
 </head>
 <body>
-    <div class="top-bar">Gráfico lucro líquido por mês</div>
-    <div class="pagina">
+    <body>
+   <!-- Botão Voltar -->
+<button class="btn-voltar" onclick="window.location.href='../../dashboard/financas.php'">← Voltar</button>
+
+
+  
+
         <!-- Sidebar -->
         <div class="sidebar">
             <link rel="stylesheet" href="../../../assets/sidebar.css">
@@ -80,7 +85,7 @@
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
                         scales: {
                             y: {
                                 beginAtZero: true
