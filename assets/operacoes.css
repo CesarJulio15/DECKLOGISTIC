@@ -1,0 +1,33 @@
+h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+th {
+    background: #fafafa;
+    font-weight: bold;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
