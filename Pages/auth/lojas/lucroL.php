@@ -45,7 +45,6 @@
         <div class="conteudo">
             <div class="grafico-container">
                 <div class="header-grafico">
-                    <div>&lt; 12 Dias &gt;</div>
                     <div class="indicador">
                         <span>▲</span> <b>34%</b>
                     </div>
