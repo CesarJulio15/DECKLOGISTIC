@@ -119,7 +119,17 @@ input[type="color"] {
     height: 40px;
     box-sizing: border-box;
 }
-
+.nav-list li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  transition: background 0.2s;
+  box-shadow: none;
+  outline: none;
+}
 .rep {
     margin-top: -20px;
     font-size: 25px;

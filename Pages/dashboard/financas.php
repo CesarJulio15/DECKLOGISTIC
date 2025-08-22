@@ -22,17 +22,10 @@ $lojaId = $_SESSION['id'] ?? 0;
     </div>
     <nav class="nav-section">
       <div class="nav-menus">
-        <ul class="nav-list top-section">
-        <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
-<ul class="nav-list top-section">
-  <li class="<?= $currentPage=='financas.php' ? 'active' : '' ?>">
-    <a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a>
-  </li>
-  <li class="<?= $currentPage=='estoque.php' ? 'active' : '' ?>">
-    <a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a>
-  </li>
+       <ul class="nav-list top-section">
+    <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+    <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
 </ul>
-        </ul>
         <hr>
         <ul class="nav-list middle-section">
           <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>

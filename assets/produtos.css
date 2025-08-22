@@ -233,7 +233,14 @@ body {
   background-color: #555;
   border-radius: 4px;
   color: #fff;
-  box-shadow: none;
+}
+.nav-list li.active a::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 100%;
+  background-color: #fff; /* barra branca */
+  margin-right: 10px;
 }
 
 /* Linha divisória */
