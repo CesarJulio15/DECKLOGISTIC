@@ -4,12 +4,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
-.top-bar {
-    font-size: 14px;
-    color: white;
-    background: #888;
-    padding: 5px 10px;
-}
+
 
 .pagina {
     display: flex;
@@ -23,11 +18,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 18px;
 }
 
 .grafico-container {
-    width: 600px;   /* tamanho fixo */
-    height: 400px;
+    width: 1450px;   /* tamanho fixo */
+    height: 850px;
     background: #fff;
     border-radius: 8px;
     padding: 15px;
@@ -66,7 +62,7 @@ canvas {
     position: fixed;
     top: 10px;
     left: 10px;
-    background-color: #1a73e8;
+    background-color: #000000;
     color: white;
     border: none;
     padding: 8px 14px;
@@ -76,8 +72,10 @@ canvas {
     font-weight: bold;
     z-index: 1000;
     transition: background 0.3s;
+    margin-left: 1700px;
+    margin-top: 890px;
 }
 
 .btn-voltar:hover {
-    background-color: #1558b0;
+    background-color: #000000;
 }
