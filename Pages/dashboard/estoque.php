@@ -268,6 +268,9 @@ new ApexCharts(document.querySelector("#graficoEntradaSaida"), {
     ],
     xaxis: { categories: labels3 }
 }).render();
+
+
+
 </script>
 </body>
 </html>
