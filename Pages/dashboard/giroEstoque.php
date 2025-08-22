@@ -191,10 +191,62 @@ if ($entradas > 0) {
         </form>
 
         <div id="grafico"></div>
+        
+        <button id="toggleView" class="toggle-btn">Ver Tabela</button>
+        <div id="tabela-container" style="display:none;">
+    <table>
+        <thead>
+            <tr>
+                <th>Período</th>
+                <th>Entradas</th>
+                <th>Saídas</th>
+                <th>Saldo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Preenche a tabela com os dados do PHP
+            foreach ($labels as $i => $periodo) {
+                $entrada = $dadosEntradas[$i] ?? 0;
+                $saida = $dadosSaidas[$i] ?? 0;
+                $saldo = $entrada - $saida;
+                echo "<tr>
+                        <td>{$periodo}</td>
+                        <td>{$entrada}</td>
+                        <td>{$saida}</td>
+                        <td>{$saldo}</td>
+                      </tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Alternar gráfico <-> tabela
+    document.getElementById('toggleView').addEventListener('click', () => {
+        const grafico = document.getElementById('grafico');
+        const tabela = document.getElementById('tabela-container');
+        const btn = document.getElementById('toggleView');
+
+        if (tabela.style.display === 'none') {
+            grafico.style.display = 'none';
+            tabela.style.display = 'block';
+            btn.innerText = 'Ver Gráfico';
+        } else {
+            grafico.style.display = 'block';
+            tabela.style.display = 'none';
+            btn.innerText = 'Ver Tabela';
+        }
+    });
+</script>
+
     </div>
+    
 </main>
 
 <script>
+    
 var options = {
     chart: { type: 'line', height: 350 },
     series: [
@@ -206,6 +258,20 @@ var options = {
 var chart = new ApexCharts(document.querySelector("#grafico"), options);
 chart.render();
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const filtroSelecionado = "<?php echo $filtro; ?>";
+    const tabela = document.getElementById('tabela-container');
+    const grafico = document.getElementById('grafico');
+    const btn = document.getElementById('toggleView');
 
+    // Se houver filtro diferente de "dia", mostra a tabela automaticamente
+    if(filtroSelecionado) {
+        grafico.style.display = 'none';
+        tabela.style.display = 'block';
+        btn.innerText = 'Ver Gráfico';
+    }
+});
+</script>
 </body>
 </html>
