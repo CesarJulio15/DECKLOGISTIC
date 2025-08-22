@@ -27,13 +27,15 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
         if($stmt->execute()){
             $produto_id = $stmt->insert_id;
             if($quantidade_estoque > 0){
+                // Movimentação de estoque
                 $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'entrada', ?, 'Reabastecimento inicial', ?)");
                 $stmtMov->bind_param("iis", $produto_id, $quantidade_estoque, $data_reabastecimento);
                 $stmtMov->execute();
                 $stmtMov->close();
 
+                // Transação financeira
                 $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, ?)");
-                $valor_saida = $quantidade_estoque * $custo_unitario;   
+                $valor_saida = $quantidade_estoque * $custo_unitario;
                 $descricao = "Compra inicial do produto $nome";
                 $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_saida, $data_reabastecimento);
                 $stmtFin->execute();
@@ -53,6 +55,7 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
 if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
     $produto_id = intval($_POST['produto_id'] ?? 0);
     $quantidade = intval($_POST['quantidade'] ?? 0);
+    $data_venda = $_POST['data_venda'] ?? date('Y-m-d');
 
     if($produto_id && $quantidade > 0){
         $resProd = $conn->query("SELECT nome, preco_unitario, custo_unitario, quantidade_estoque FROM produtos WHERE id = $produto_id AND loja_id = $loja_id");
@@ -71,28 +74,28 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
                 if($stmt->execute()){
                     $stmt->close();
 
-                    $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'saida', ?, 'Venda', NOW())");
-                    $stmtMov->bind_param("ii", $produto_id, $quantidade);
+                    $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'saida', ?, 'Venda', ?)");
+                    $stmtMov->bind_param("iis", $produto_id, $quantidade, $data_venda);
                     $stmtMov->execute();
                     $stmtMov->close();
 
                     $valor_total = $quantidade * $preco_unitario;
                     $custo_total  = $quantidade * $custo_unitario;
 
-                    $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total) VALUES (?, NOW(), ?, ?)");
-                    $stmtVenda->bind_param("idd", $loja_id, $valor_total, $custo_total);
+                    $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total) VALUES (?, ?, ?, ?)");
+                    $stmtVenda->bind_param("issd", $loja_id, $data_venda, $valor_total, $custo_total);
                     $stmtVenda->execute();
                     $venda_id = $stmtVenda->insert_id;
                     $stmtVenda->close();
 
-                    $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, NOW())");
-                    $stmtItem->bind_param("iiidd", $venda_id, $produto_id, $quantidade, $preco_unitario, $custo_unitario);
+                    $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $preco_unitario, $custo_unitario, $data_venda);
                     $stmtItem->execute();
                     $stmtItem->close();
 
                     $descricao = "Venda do produto $nome";
-                    $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Venda', ?, 'entrada', ?, NOW())");
-                    $stmtFin->bind_param("isd", $loja_id, $descricao, $valor_total);
+                    $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Venda', ?, 'entrada', ?, ?)");
+                    $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_total, $data_venda);
                     $stmtFin->execute();
                     $stmtFin->close();
 
@@ -116,9 +119,10 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
 if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
     $produto_id = intval($_POST['produto_id'] ?? 0);
     $quantidade = intval($_POST['quantidade'] ?? 0);
+    $data_compra = $_POST['data_compra'] ?? date('Y-m-d');
 
     if($produto_id && $quantidade > 0){
-        $resProd = $conn->query("SELECT nome, preco_unitario, custo_unitario FROM produtos WHERE id = $produto_id AND loja_id = $loja_id");
+        $resProd = $conn->query("SELECT nome, preco_unitario FROM produtos WHERE id = $produto_id AND loja_id = $loja_id");
         if($resProd->num_rows){
             $prod = $resProd->fetch_assoc();
             $preco_unitario = $prod['preco_unitario'];
@@ -127,15 +131,15 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
             $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id = ? AND loja_id = ?");
             $stmt->bind_param("iii", $quantidade, $produto_id, $loja_id);
             if($stmt->execute()){
-                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'entrada', ?, 'Compra/Reabastecimento', NOW())");
-                $stmtMov->bind_param("ii", $produto_id, $quantidade);
+                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'entrada', ?, 'Compra/Reabastecimento', ?)");
+                $stmtMov->bind_param("iis", $produto_id, $quantidade, $data_compra);
                 $stmtMov->execute();
                 $stmtMov->close();
 
-                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, NOW())");
+                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, ?)");
                 $valor_saida = $quantidade * $preco_unitario;
                 $descricao = "Compra/Reabastecimento do produto $nome";
-                $stmtFin->bind_param("isd", $loja_id, $descricao, $valor_saida);
+                $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_saida, $data_compra);
                 $stmtFin->execute();
                 $stmtFin->close();
 
@@ -145,37 +149,6 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
             }
             $stmt->close();
         }
-    }
-}
-
-// ============================
-// APAGAR PRODUTO
-// ============================
-if(isset($_POST['acao']) && $_POST['acao'] === 'apagar_produto'){
-    $produto_id = intval($_POST['produto_id'] ?? 0);
-
-    if($produto_id){
-        // Apaga produto, itens de venda e movimentações associadas
-        $stmtMov = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id = ?");
-        $stmtMov->bind_param("i", $produto_id);
-        $stmtMov->execute();
-        $stmtMov->close();
-
-        $stmtItem = $conn->prepare("DELETE FROM itens_venda WHERE produto_id = ?");
-        $stmtItem->bind_param("i", $produto_id);
-        $stmtItem->execute();
-        $stmtItem->close();
-
-        $stmt = $conn->prepare("DELETE FROM produtos WHERE id = ? AND loja_id = ?");
-        $stmt->bind_param("ii", $produto_id, $loja_id);
-        if($stmt->execute()){
-            $msg = "Produto apagado com sucesso!";
-        } else {
-            $msg = "Erro ao apagar produto: ".$stmt->error;
-        }
-        $stmt->close();
-    } else {
-        $msg = "Produto inválido.";
     }
 }
 
@@ -277,6 +250,7 @@ button.apagar{background:#dc3545;}
 <?php endforeach; ?>
 </select>
 <input type="number" name="quantidade" placeholder="Quantidade" required>
+<input type="date" name="data_venda" value="<?= date('Y-m-d') ?>" required>
 <button type="submit">Registrar Venda</button>
 </form>
 
@@ -290,6 +264,7 @@ button.apagar{background:#dc3545;}
 <?php endforeach; ?>
 </select>
 <input type="number" name="quantidade" placeholder="Quantidade" required>
+<input type="date" name="data_compra" value="<?= date('Y-m-d') ?>" required>
 <button type="submit">Registrar Compra</button>
 </form>
 </div>
