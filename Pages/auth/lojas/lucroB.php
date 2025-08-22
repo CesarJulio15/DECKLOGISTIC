@@ -3,69 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfico Lucro Bruto</title>
+    <title>Gráfico Lucro Líquido</title>
     <link rel="stylesheet" href="../../../assets/sidebar.css">
-    <link rel="stylesheet" href="../../../assets/lucroB.css">
+    <link rel="stylesheet" href="../../../assets/lucroL.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <body>
    <!-- Botão Voltar -->
-<button class="btn-voltar" onclick="window.location.href='../../dashboard/financas.php'">← Voltar</button>
+   <button class="btn-voltar" onclick="window.location.href='../../dashboard/financas.php'">← Voltar</button>
 
-
-  
-
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <link rel="stylesheet" href="../../../assets/sidebar.css">
-            <div class="logo-area">
-                <img src="../../../img/logoDecklogistic.webp" alt="Logo">
-            </div>
-            <nav class="nav-section">
-                <div class="nav-menus">
-                    <ul class="nav-list top-section">
-                        <li><a href="../../dashboard/financas.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-                        <li class="active"><a href="../../dashboard/estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
-                    </ul>
-                    <hr>
-                    <ul class="nav-list middle-section">
-                        <li><a href="/Pages/visaoGeral.php"><span><img src="../../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-                        <li><a href="/Pages/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
-                        <li><a href="../../dashboard/giroEstoque.php B"><span><img src="../../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-                    </ul>
-                </div>
-                <div class="bottom-links">
-                    <a href="/Pages/conta.php"><span><img src="../../../img/icon-config.svg" alt="Conta"></span> Conta</a>
-                    <a href="/Pages/dicas.php"><span><img src="../../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
-                </div>
-            </nav>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <img src="../../../img/logoDecklogistic.webp" alt="Logo">
         </div>
-
-        <!-- Conteúdo -->
-        <div class="conteudo">
-            <div class="grafico-container">
-                <div class="header-grafico">
-                    <div class="indicador">
-                        <span>▲</span> <b>34%</b>
-                    </div>
-                </div>
-                <div class="titulo">Lucro Bruto</div>
-                <canvas id="grafico"></canvas>
+        <nav class="nav-section">
+            <div class="nav-menus">
+                <ul class="nav-list top-section">
+                    <li><a href="../../dashboard/financas.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+                    <li class="active"><a href="../../dashboard/estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+                </ul>
+                <hr>
+                <ul class="nav-list middle-section">
+                    <li><a href="/Pages/visaoGeral.php"><span><img src="../../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+                    <li><a href="/Pages/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+                    <li><a href="../../dashboard/giroEstoque.php"><span><img src="../../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+                </ul>
             </div>
+            <div class="bottom-links">
+                <a href="/Pages/conta.php"><span><img src="../../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+                <a href="/Pages/dicas.php"><span><img src="../../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="conteudo">
+        <div class="grafico-container">
+            <div class="header-grafico">
+                <div class="indicador">
+                    <span>▲</span> <b>34%</b>
+                </div>
+            </div>
+            <div class="titulo">Lucro Bruto</div>
+            <canvas id="grafico"></canvas>
         </div>
     </div>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Script -->
     <script>
-        async function carregarGrafico() {
+       async function carregarGrafico() {
             try {
-                const response = await fetch("/DECKLOGISTIC/api/lucro_brutoMap.php");
+                const response = await fetch("/DECKLOGISTIC/api/lucro_bruto.php");
                 const data = await response.json();
 
-                // Cria arrays de labels e valores
-                const labels = data.map(item => item.mes);
-                const valores = data.map(item => item.lucro_bruto);
+                console.log("Retorno da API:", data); // <-- DEBUG
+
+                if (!data.series) {
+                    throw new Error("Formato inesperado. Esperava 'series'.");
+                }
+
+                const labels = data.series.map(item => item.data);
+                const valores = data.series.map(item => item.valor);
 
                 const ctx = document.getElementById('grafico').getContext('2d');
                 new Chart(ctx, {
@@ -73,9 +72,9 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Lucro Bruto',
+                            label: 'Lucro Líquido',
                             data: valores,
-                            borderColor: 'rgba(127, 255, 95, 0.8)',
+                            borderColor: 'rgba(54, 162, 235, 0.8)',
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             borderWidth: 2,
                             fill: true,
@@ -84,7 +83,7 @@
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: true,
+                        maintainAspectRatio: false,
                         scales: {
                             y: {
                                 beginAtZero: true
