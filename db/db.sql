@@ -50,6 +50,7 @@ CREATE TABLE produtos (
     lote VARCHAR(50),
     quantidade_estoque INT,
     preco_unitario DECIMAL(10,2),
+    custo_unitario DECIMAL(10,2),
     data_reabastecimento DATE,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (loja_id) REFERENCES lojas(id)

@@ -5,25 +5,25 @@ include __DIR__ . '/../../conexao.php';
 $loja_id = $_SESSION['id'] ?? 0;
 if (!$loja_id) die('Faça login para acessar a simulação.');
 
-// Mensagem de retorno
 $msg = '';
 
 // ============================
-// ADICIONAR PRODUTO
+// ADICIONAR PRODUTO COM CUSTO UNITÁRIO
 // ============================
 if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
     $nome = $_POST['nome'] ?? '';
     $descricao = $_POST['descricao'] ?? '';
     $preco_unitario = floatval($_POST['preco_unitario'] ?? 0);
+    $custo_unitario = floatval($_POST['valor_unitario'] ?? 0);
     $quantidade_estoque = intval($_POST['quantidade_estoque'] ?? 0);
     $lote = $_POST['lote'] ?? '';
     $data_reabastecimento = $_POST['data_reabastecimento'] ?? date('Y-m-d');
 
-    if(!$nome || !$preco_unitario){
+    if(!$nome || !$preco_unitario || !$custo_unitario){
         $msg = 'Campos obrigatórios faltando.';
     } else {
-        $stmt = $conn->prepare("INSERT INTO produtos (loja_id, nome, descricao, preco_unitario, quantidade_estoque, lote, data_reabastecimento) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("issdiss", $loja_id, $nome, $descricao, $preco_unitario, $quantidade_estoque, $lote, $data_reabastecimento);
+        $stmt = $conn->prepare("INSERT INTO produtos (loja_id, nome, descricao, preco_unitario, custo_unitario, quantidade_estoque, lote, data_reabastecimento) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("issddiss", $loja_id, $nome, $descricao, $preco_unitario, $custo_unitario, $quantidade_estoque, $lote, $data_reabastecimento);
         if($stmt->execute()){
             $produto_id = $stmt->insert_id;
             if($quantidade_estoque > 0){
@@ -32,11 +32,12 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
                 $stmtMov->bind_param("iis", $produto_id, $quantidade_estoque, $data_reabastecimento);
                 $stmtMov->execute();
                 $stmtMov->close();
-                // Simula transação financeira de saída (compra do estoque)
+
+                // Transação financeira
                 $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, ?)");
-                $valor_saida = $quantidade_estoque * $preco_unitario;
+                $valor_saida = $quantidade_estoque * $custo_unitario;
                 $descricao = "Compra inicial do produto $nome";
-                $stmtFin->bind_param("issds", $loja_id, $descricao, $valor_saida, $data_reabastecimento);
+                $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_saida, $data_reabastecimento);
                 $stmtFin->execute();
                 $stmtFin->close();
             }
@@ -54,39 +55,61 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
 if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
     $produto_id = intval($_POST['produto_id'] ?? 0);
     $quantidade = intval($_POST['quantidade'] ?? 0);
+    $data_venda = $_POST['data_venda'] ?? date('Y-m-d');
 
     if($produto_id && $quantidade > 0){
-        // Pega o preço unitário atual
-        $resProd = $conn->query("SELECT nome, preco_unitario FROM produtos WHERE id = $produto_id AND loja_id = $loja_id");
+        $resProd = $conn->query("SELECT nome, preco_unitario, custo_unitario, quantidade_estoque FROM produtos WHERE id = $produto_id AND loja_id = $loja_id");
         if($resProd->num_rows){
             $prod = $resProd->fetch_assoc();
-            $preco_unitario = $prod['preco_unitario'];
             $nome = $prod['nome'];
+            $preco_unitario = $prod['preco_unitario'];
+            $custo_unitario = $prod['custo_unitario'];
+            $estoque_atual = $prod['quantidade_estoque'];
 
-            // Atualiza estoque
-            $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id = ? AND loja_id = ?");
-            $stmt->bind_param("iii", $quantidade, $produto_id, $loja_id);
-            if($stmt->execute()){
-                // Movimentação de estoque
-                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'saida', ?, 'Venda simulada', NOW())");
-                $stmtMov->bind_param("ii", $produto_id, $quantidade);
-                $stmtMov->execute();
-                $stmtMov->close();
-
-                // Transação financeira de entrada (venda)
-                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Venda', ?, 'entrada', ?, NOW())");
-                $valor_entrada = $quantidade * $preco_unitario;
-                $descricao = "Venda do produto $nome";
-                $stmtFin->bind_param("isd", $loja_id, $descricao, $valor_entrada);
-                $stmtFin->execute();
-                $stmtFin->close();
-
-                $msg = 'Venda registrada com sucesso!';
+            if($quantidade > $estoque_atual){
+                $msg = "Não há estoque suficiente. Estoque atual: $estoque_atual";
             } else {
-                $msg = 'Erro na venda: ' . $stmt->error;
+                $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id = ? AND loja_id = ?");
+                $stmt->bind_param("iii", $quantidade, $produto_id, $loja_id);
+                if($stmt->execute()){
+                    $stmt->close();
+
+                    $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'saida', ?, 'Venda', ?)");
+                    $stmtMov->bind_param("iis", $produto_id, $quantidade, $data_venda);
+                    $stmtMov->execute();
+                    $stmtMov->close();
+
+                    $valor_total = $quantidade * $preco_unitario;
+                    $custo_total  = $quantidade * $custo_unitario;
+
+                    $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total) VALUES (?, ?, ?, ?)");
+                    $stmtVenda->bind_param("issd", $loja_id, $data_venda, $valor_total, $custo_total);
+                    $stmtVenda->execute();
+                    $venda_id = $stmtVenda->insert_id;
+                    $stmtVenda->close();
+
+                    $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $preco_unitario, $custo_unitario, $data_venda);
+                    $stmtItem->execute();
+                    $stmtItem->close();
+
+                    $descricao = "Venda do produto $nome";
+                    $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Venda', ?, 'entrada', ?, ?)");
+                    $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_total, $data_venda);
+                    $stmtFin->execute();
+                    $stmtFin->close();
+
+                    $msg = "Venda registrada com sucesso! Valor total: R$ ".number_format($valor_total,2,',','.');
+                } else {
+                    $msg = 'Erro na venda: ' . $stmt->error;
+                    $stmt->close();
+                }
             }
-            $stmt->close();
+        } else {
+            $msg = "Produto não encontrado.";
         }
+    } else {
+        $msg = "Selecione um produto e informe a quantidade corretamente.";
     }
 }
 
@@ -96,6 +119,7 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
 if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
     $produto_id = intval($_POST['produto_id'] ?? 0);
     $quantidade = intval($_POST['quantidade'] ?? 0);
+    $data_compra = $_POST['data_compra'] ?? date('Y-m-d');
 
     if($produto_id && $quantidade > 0){
         $resProd = $conn->query("SELECT nome, preco_unitario FROM produtos WHERE id = $produto_id AND loja_id = $loja_id");
@@ -107,17 +131,15 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
             $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id = ? AND loja_id = ?");
             $stmt->bind_param("iii", $quantidade, $produto_id, $loja_id);
             if($stmt->execute()){
-                // Movimentação de estoque
-                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'entrada', ?, 'Compra/Reabastecimento', NOW())");
-                $stmtMov->bind_param("ii", $produto_id, $quantidade);
+                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'entrada', ?, 'Compra/Reabastecimento', ?)");
+                $stmtMov->bind_param("iis", $produto_id, $quantidade, $data_compra);
                 $stmtMov->execute();
                 $stmtMov->close();
 
-                // Transação financeira de saída (compra)
-                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, NOW())");
+                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, ?)");
                 $valor_saida = $quantidade * $preco_unitario;
                 $descricao = "Compra/Reabastecimento do produto $nome";
-                $stmtFin->bind_param("isd", $loja_id, $descricao, $valor_saida);
+                $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_saida, $data_compra);
                 $stmtFin->execute();
                 $stmtFin->close();
 
@@ -138,7 +160,6 @@ $res = $conn->query("SELECT * FROM produtos WHERE loja_id = $loja_id ORDER BY id
 while($row = $res->fetch_assoc()){
     $produtos[] = $row;
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -159,6 +180,7 @@ th,td{padding:8px;text-align:left;border:1px solid #ddd;}
 thead{background:#007BFF;color:#fff;}
 .table-container{display:flex;gap:20px;flex-wrap:wrap;}
 .table-container .card{flex:1;min-width:300px;}
+button.apagar{background:#dc3545;}
 </style>
 </head>
 <body>
@@ -172,12 +194,15 @@ thead{background:#007BFF;color:#fff;}
 <div class="card">
 <h3>Produtos</h3>
 <table>
-<thead><tr>
+<thead>
+<tr>
 <th>ID</th>
 <th>Nome</th>
 <th>Preço Unit.</th>
 <th>Qtd Estoque</th>
-</tr></thead>
+<th>Ações</th>
+</tr>
+</thead>
 <tbody>
 <?php foreach($produtos as $p): ?>
 <tr>
@@ -185,6 +210,13 @@ thead{background:#007BFF;color:#fff;}
 <td><?= $p['nome'] ?></td>
 <td><?= number_format($p['preco_unitario'],2,',','.') ?></td>
 <td><?= $p['quantidade_estoque'] ?></td>
+<td>
+    <form method="POST" style="display:inline;">
+        <input type="hidden" name="acao" value="apagar_produto">
+        <input type="hidden" name="produto_id" value="<?= $p['id'] ?>">
+        <button type="submit" class="apagar" onclick="return confirm('Confirma apagar este produto?')">Apagar</button>
+    </form>
+</td>
 </tr>
 <?php endforeach; ?>
 </tbody>
@@ -196,6 +228,7 @@ thead{background:#007BFF;color:#fff;}
 <input type="text" name="nome" placeholder="Nome do Produto" required>
 <textarea name="descricao" placeholder="Descrição"></textarea>
 <input type="number" step="0.01" name="preco_unitario" placeholder="Preço Unitário" required>
+<input type="number" step="0.01" name="valor_unitario" placeholder="Valor Unitário" required>
 <input type="number" name="quantidade_estoque" placeholder="Quantidade" value="0">
 <input type="text" name="lote" placeholder="Lote">
 <input type="date" name="data_reabastecimento" value="<?= date('Y-m-d') ?>" required>
@@ -217,6 +250,7 @@ thead{background:#007BFF;color:#fff;}
 <?php endforeach; ?>
 </select>
 <input type="number" name="quantidade" placeholder="Quantidade" required>
+<input type="date" name="data_venda" value="<?= date('Y-m-d') ?>" required>
 <button type="submit">Registrar Venda</button>
 </form>
 
@@ -230,11 +264,11 @@ thead{background:#007BFF;color:#fff;}
 <?php endforeach; ?>
 </select>
 <input type="number" name="quantidade" placeholder="Quantidade" required>
+<input type="date" name="data_compra" value="<?= date('Y-m-d') ?>" required>
 <button type="submit">Registrar Compra</button>
 </form>
 </div>
 
 </div>
-
 </body>
 </html>

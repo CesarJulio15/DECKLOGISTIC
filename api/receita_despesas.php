@@ -22,10 +22,10 @@ while ($row = $result->fetch_assoc()) {
     $receita[$row['dia']] = (float)$row['receita'];
 }
 
-// Despesas: soma de transações por dia
+// Despesas: soma de transações de saída por dia
 $queryDespesa = "SELECT data_transacao as dia, SUM(valor) as despesa
                  FROM transacoes_financeiras
-                 WHERE loja_id = ? AND tipo='despesa' AND data_transacao BETWEEN ? AND ?
+                 WHERE loja_id = ? AND tipo='saida' AND data_transacao BETWEEN ? AND ?
                  GROUP BY data_transacao";
 $stmt = $conn->prepare($queryDespesa);
 $stmt->bind_param("iss", $loja_id, $data_inicio, $data_fim);
