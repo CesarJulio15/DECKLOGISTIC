@@ -40,6 +40,27 @@ $lojaId = $_SESSION['id'] ?? 0;
       </div>
     </nav>
   </div>
+<style>
+.btn-modern {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+</style>
 
   <!-- Dashboard Cards -->
   <div class="dashboard">
@@ -51,6 +72,8 @@ $lojaId = $_SESSION['id'] ?? 0;
     <div class="card">
       <h3>Lucro Líquido</h3>
       <div id="lucroLiquido" class="value">R$ 0,00</div>
+      <!-- Botão moderno de redirecionamento -->
+      <button id="btnLucroLiquido" class="btn-modern">Ver detalhes</button>
       <div id="chartLiquido" style="height:60px; margin-top:10px;"></div>
     </div>
     <div class="card">
@@ -222,7 +245,10 @@ $lojaId = $_SESSION['id'] ?? 0;
       colors: ['#10b981', '#ef4444']
     }).render();
   }
-
+// Redireciona ao clicar no botão
+document.getElementById('btnLucroLiquido').addEventListener('click', () => {
+    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
+});
   // Chamada inicial das funções
   loadLucros();
   loadReceitaDespesa();
