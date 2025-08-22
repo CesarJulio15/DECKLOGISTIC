@@ -8,8 +8,13 @@
     <link rel="stylesheet" href="../../assets/lucroL.css">
 </head>
 <body>
+    <body>
+    <!-- Botão Voltar -->
+    <button class="btn-voltar" onclick="history.back()">← Voltar</button>
+
     <div class="top-bar">Gráfico lucro líquido por mês</div>
     <div class="pagina">
+
         <!-- Sidebar -->
         <div class="sidebar">
             <link rel="stylesheet" href="../../../assets/sidebar.css">
@@ -19,14 +24,14 @@
             <nav class="nav-section">
                 <div class="nav-menus">
                     <ul class="nav-list top-section">
-                        <li><a href="/Pages/financeiro.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-                        <li class="active"><a href="/Pages/estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+                        <li><a href="../../dashboard/financas.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+                        <li class="active"><a href="../../dashboard/estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
                     </ul>
                     <hr>
                     <ul class="nav-list middle-section">
                         <li><a href="/Pages/visaoGeral.php"><span><img src="../../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
                         <li><a href="/Pages/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
-                        <li><a href="/Pages/produtos.php"><span><img src="../../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+                        <li><a href="../../dashboard/giroEstoque.php B"><span><img src="../../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
                     </ul>
                 </div>
                 <div class="bottom-links">
@@ -80,7 +85,7 @@
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
                         scales: {
                             y: {
                                 beginAtZero: true

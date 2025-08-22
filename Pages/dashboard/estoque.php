@@ -224,7 +224,7 @@ while ($row = mysqli_fetch_assoc($resGrafico3)) {
     </div>
     <div>
         <h4>Entrada e saída de produtos</h4>
-         <a href="" class="visu">Visualizar comparativo</a>
+         <a href="giroEstoque.php" class="visu">Visualizar comparativo</a>
         <div id="graficoEntradaSaida"></div>
        
     </div>
