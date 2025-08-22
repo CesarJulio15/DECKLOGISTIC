@@ -51,7 +51,7 @@ $lojaId = $_SESSION['id'] ?? 0;
 
     <div class="card">
       <h3>Produtos em Falta</h3>
-      <div id="chartReceitaDespesa" style="height:300px; margin-top:10px;"></div>
+      <div id="tabelaProdutosFalta" style="margin-top:10px;"></div>
     </div>
     <div class="card">
       <h3>Produtos com Estoque Parado</h3>
@@ -66,21 +66,78 @@ $lojaId = $_SESSION['id'] ?? 0;
 
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  // API: Total de estoque
-  fetch('../api/total_estoque.php')
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('estoque').textContent = data.total;
-    })
-    .catch(err => console.error('Erro ao carregar total de estoque:', err));
+const lojaId = <?= $lojaId ?>;
 
-  // Aqui você faria o mesmo para outras APIs, por exemplo:
-  // fetch('api/produtos_falta.php') => atualizar gráfico de produtos em falta
-  // fetch('api/produtos_parado.php') => atualizar gráfico de produtos parados
-  // fetch('api/entrada_saida.php') => atualizar gráfico de entrada/saída
-});
+async function loadEstoqueTotal() {
+  try {
+    const data = await fetch(`/DECKLOGISTIC/api/total_estoque.php`).then(r => r.json());
+    const estoqueEl = document.querySelector("#estoque");
+
+    if (!data || data.total === undefined) {
+      estoqueEl.textContent = "Erro ao carregar estoque";
+      return;
+    }
+
+    estoqueEl.textContent = data.total;
+  } catch (error) {
+    console.error("Erro ao carregar estoque:", error);
+    document.querySelector("#estoque").textContent = "Erro";
+  }
+}
+
+// =========================
+// Produtos em Falta (Tabela)
+// =========================
+async function loadProdutosFalta() {
+  try {
+    const data = await fetch(`/DECKLOGISTIC/api/produtos_falta.php`).then(r => r.json());
+
+    const tabelaContainer = document.querySelector("#tabelaProdutosFalta");
+
+    if (!Array.isArray(data) || data.length === 0) {
+      tabelaContainer.innerHTML = "<p>Nenhum produto em falta.</p>";
+      return;
+    }
+
+    let tabela = `
+      <table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:14px;">
+        <thead style="background:#f3f4f6; text-align:left;">
+          <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    data.forEach(p => {
+      tabela += `
+        <tr style="background:${p.quantidade_estoque <= 0 ? '#fee2e2' : '#fff'};">
+          <td>${p.nome}</td>
+          <td style="color:${p.quantidade_estoque <= 0 ? '#dc2626' : '#000'};">
+            ${p.quantidade_estoque}
+          </td>
+        </tr>
+      `;
+    });
+
+    tabela += `
+        </tbody>
+      </table>
+    `;
+
+    tabelaContainer.innerHTML = tabela;
+
+  } catch (error) {
+    console.error("Erro ao carregar produtos em falta:", error);
+    document.querySelector("#tabelaProdutosFalta").innerHTML = "<p>Erro ao carregar dados</p>";
+  }
+}
+
+loadEstoqueTotal();
+loadProdutosFalta();
 </script>
+
 
 </body>
 </html>
