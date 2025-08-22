@@ -8,8 +8,13 @@
     <link rel="stylesheet" href="../../assets/lucroL.css">
 </head>
 <body>
+    <body>
+    <!-- Botão Voltar -->
+    <button class="btn-voltar" onclick="history.back()">← Voltar</button>
+
     <div class="top-bar">Gráfico lucro líquido por mês</div>
     <div class="pagina">
+
         <!-- Sidebar -->
         <div class="sidebar">
             <link rel="stylesheet" href="../../../assets/sidebar.css">
@@ -80,7 +85,7 @@
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
                         scales: {
                             y: {
                                 beginAtZero: true
