@@ -234,7 +234,7 @@ body {
   border-radius: 4px;
   color: #fff;
 }
-.nav-list li.active a::before {
+.nav-list .active a::before {
   content: '';
   display: block;
   width: 4px;
