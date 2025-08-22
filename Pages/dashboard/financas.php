@@ -47,7 +47,7 @@ $lojaId = $_SESSION['id'] ?? 0;
     font-size: 14px;
     font-weight: bold;
     color: #fff;
-    background: linear-gradient(90deg, #3b82f6, #10b981);
+    background: linear-gradient(90deg, #1a1b1bff, #000000ff);
     border: none;
     border-radius: 8px;
     cursor: pointer;
