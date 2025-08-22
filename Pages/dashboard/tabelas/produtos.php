@@ -44,11 +44,9 @@ if ($tagVincResult) {
 <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/produtos.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 </head>
 
 <body>
-    
 <aside class="sidebar">
     <link rel="stylesheet" href="../../../assets/sidebar.css">
     <div class="logo-area">
@@ -85,7 +83,6 @@ if ($tagVincResult) {
 
 <main class="dashboard">
 <div class="content">
-    
 <div class="conteudo">
 
 <h1>Produtos</h1>
@@ -93,8 +90,8 @@ if ($tagVincResult) {
 <div class="acoes">
     <div class="botoes">
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
-    <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
-</div>
+            <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
+        </div>
         <button class="btn-novo">Novo item +</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
@@ -120,7 +117,6 @@ if ($tagVincResult) {
     <i class="fa-solid fa-xmark" style="color: #000000ff;"></i>
 </button>
 <button class="btn-nova-tag" onclick="window.location.href='../tag.php'">Nova Tag +</button>
-
 </div>
 </div>
 </div>
@@ -138,7 +134,6 @@ if ($tagVincResult) {
     <?php while ($produto = mysqli_fetch_assoc($result)): ?>
         <tr>
          <td style="display:flex; align-items:center; gap:10px;">
-    <!-- Dropdown para adicionar tags -->
     <div class="tag-dropdown" style="position:relative;">
         <button class="btn-add" data-id="<?= $produto['id'] ?>">+</button>
         <div class="dropdown-content">
@@ -156,7 +151,6 @@ if ($tagVincResult) {
         </div>
     </div>
 
-    <!-- Ícones vinculados -->
     <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
       <?php if (isset($produtoTags[$produto['id']])): ?>
         <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
@@ -165,7 +159,6 @@ if ($tagVincResult) {
       <?php endif; ?>
     </span>
 
-    <!-- Nome do produto -->
     <span><?= htmlspecialchars($produto['nome']) ?></span>
 </td>
             <td>R$ <?= number_format($produto['preco_unitario'], 2, ',', '.') ?></td>
@@ -191,9 +184,7 @@ function sortTable(columnIndex, asc = true, isNumeric = false) {
             aVal = parseFloat(aVal.replace(/[R$\s.]/g, '').replace(',', '.'));
             bVal = parseFloat(bVal.replace(/[R$\s.]/g, '').replace(',', '.'));
         }
-        if (aVal < bVal) return asc ? -1 : 1;
-        if (aVal > bVal) return asc ? 1 : -1;
-        return 0;
+        return (aVal < bVal ? -1 : 1) * (asc ? 1 : -1);
     });
     rows.forEach(row => table.appendChild(row));
 }
@@ -212,27 +203,37 @@ document.getElementById('ordenar').addEventListener('change', function() {
     }
 });
 
-// Dropdown de tags
+// Dropdown e vincular tag
 document.querySelectorAll('.tag-option').forEach(option => {
     option.addEventListener('click', function() {
-        let produtoId = this.dataset.produto;
-        let tagId = this.dataset.tag;
-        let icone = this.dataset.icone;
-        let cor = this.dataset.cor;
+        const produtoId = this.dataset.produto;
+        const tagId = this.dataset.tag;
+        const icone = this.dataset.icone;
+        const cor = this.dataset.cor;
+        const container = document.getElementById(`tags-produto-${produtoId}`);
+        
         fetch('vincular_tag.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `produto_id=${produtoId}&tag_id=${tagId}`
         }).then(res => res.text())
-        .then(data => {
+          .then(data => {
             if (data.trim() === "ok") {
-                const container = document.getElementById(`tags-produto-${produtoId}`);
-                container.innerHTML = '';
-                const iconElem = document.createElement('i');
-                iconElem.className = `fa-solid ${icone}`;
-                iconElem.style.color = cor;
-                iconElem.style.marginLeft = "5px";
-                container.appendChild(iconElem);
+                // Verifica duplicidade depois da resposta
+                if (!container.querySelector(`[data-tag-id='${tagId}']`)) {
+                    const iconElem = document.createElement('i');
+                    iconElem.className = `fa-solid ${icone}`;
+                    iconElem.style.color = cor;
+                    iconElem.style.marginLeft = "5px";
+                    iconElem.dataset.tagId = tagId;
+                    container.appendChild(iconElem);
+
+                    // Atualiza filtro se houver tag ativa
+                    const ativa = document.querySelector('.tags-area .tag-item.active');
+                    if (ativa) {
+                        filtrarPorTag(ativa.dataset.tagId);
+                    }
+                }
             }
         });
     });
@@ -249,40 +250,40 @@ document.querySelectorAll('.btn-add').forEach(btn => {
 document.addEventListener('click', function () {
     document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
 });
+
+// Pesquisa
 document.getElementById('pesquisa').addEventListener('keyup', function() {
     let filtro = this.value.toLowerCase();
-    let linhas = document.querySelectorAll('#tabela-produtos tr');
-
-    linhas.forEach(linha => {
-        let textoLinha = linha.innerText.toLowerCase(); // pega todo o texto da linha
+    document.querySelectorAll('#tabela-produtos tr').forEach(linha => {
+        let textoLinha = linha.innerText.toLowerCase();
         linha.style.display = textoLinha.includes(filtro) ? '' : 'none';
     });
 });
-// Filtrar por tag
-document.querySelectorAll('.tag-item').forEach(tag => {
-    tag.addEventListener('click', function() {
-        let tagId = this.dataset.tagId;
-        let linhas = document.querySelectorAll('#tabela-produtos tr');
-        linhas.forEach(linha => {
-            let produtoId = linha.querySelector('.btn-add').dataset.id;
-            let container = document.getElementById(`tags-produto-${produtoId}`);
-            if (container && container.querySelector(`[data-tag-id='${tagId}']`)) {
-                linha.style.display = '';
-            } else {
-                linha.style.display = 'none';
-            }
-        });
-    });
-});
+
+// Reset filtro
 function resetFiltro() {
-    // Limpa o input de pesquisa
     document.getElementById('pesquisa').value = '';
-    // Mostra todas as linhas da tabela
+    document.querySelectorAll('#tabela-produtos tr').forEach(linha => linha.style.display = '');
+    document.querySelectorAll('.tags-area .tag-item').forEach(tag => tag.classList.remove('active'));
+}
+
+// Filtrar por tag
+function filtrarPorTag(tagId) {
     document.querySelectorAll('#tabela-produtos tr').forEach(linha => {
-        linha.style.display = '';
+        const container = linha.querySelector('.tags-vinculadas');
+        linha.style.display = (container && container.querySelector(`[data-tag-id='${tagId}']`)) ? '' : 'none';
     });
 }
-</script>
 
+document.querySelector('.tags-area').addEventListener('click', function(e) {
+    const tag = e.target.closest('.tag-item');
+    if (!tag) return;
+
+    document.querySelectorAll('.tags-area .tag-item').forEach(t => t.classList.remove('active'));
+    tag.classList.add('active');
+
+    filtrarPorTag(tag.dataset.tagId);
+});
+</script>
 </body>
 </html>

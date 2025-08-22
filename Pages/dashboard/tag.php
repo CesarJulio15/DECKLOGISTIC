@@ -56,19 +56,6 @@ $stmt->close();
 }
 
 // Inserir nova tag se o formulário foi enviado
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tag_name'])) {
-    $tagName = $_POST['tag_name'] ?? '';
-    $icon = $_POST['icon'] ?? '';
-    $color = $_POST['color'] ?? '#000000';
-
-    if ($tagName && $icon) {
-        $stmt = $conn->prepare("INSERT INTO tags (nome, cor, icone, criado_em) VALUES (?, ?, ?, NOW())");
-        $stmt->bind_param("sss", $tagName, $color, $icon);
-        $stmt->execute();
-        $stmt->close();
-    }
-}
-
 // Buscar todas as tags
 $tags = [];
 $result = $conn->query("SELECT * FROM tags ORDER BY criado_em DESC");
