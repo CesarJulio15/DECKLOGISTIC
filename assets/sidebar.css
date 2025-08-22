@@ -87,8 +87,9 @@ body {
 }
 
 .nav-list li.active a {
-    border-radius: 4px;
-    color: #fff;
+    background-color: #222;  /* fundo mais claro */
+    border-left: 4px solid #fff; /* barra lateral clara */
+    padding-left: 16px; /* ajusta para não encostar no texto */
 }
 
 /* Linha divisória */
