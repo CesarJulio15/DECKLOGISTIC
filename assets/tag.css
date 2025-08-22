@@ -3,17 +3,26 @@ body {
     margin: 0;
     display: flex;
 }
+
 .main {
     flex: 1;
-    padding: 30px 30px 30px 260px; /* aumentei o padding-left de 80px para 180px */
+    padding: 30px 30px 30px 300px; /* antes 260px */
 }
 
 .icon-grid-wrapper {
-    margin-left: 10px; 
+    margin-left: 50px; /* antes 120px */
+    max-height: 400px;
+    overflow-y: auto;
+    width: max-content;
+    box-sizing: content-box;
 }
 
-h1 { margin-bottom: 70px;
-margin-top: 50px; }
+h1 {
+    margin-left: -30px;
+    margin-bottom: 60px;
+    margin-top: 30px;
+}
+
 input[type="text"], input[type="color"] {
     padding: 10px;
     font-size: 16px;
@@ -21,12 +30,14 @@ input[type="text"], input[type="color"] {
     border: 1px solid #000000;
     border-radius: 20px;
     margin-bottom: 50px;
-      margin-left: 120px;
+    margin-left: 50px; 
 }
+
 input[name="tag_name"] {
-    height: 50px; /* aumenta só a altura dessa */
-    width: 700px;
+    height: 50px;
+    width: 600px; /* ajustado */
 }
+
 .search {
     padding: 8px;
     margin: 15px 0;
@@ -34,13 +45,17 @@ input[name="tag_name"] {
     border: 1px solid #ccc;
     border-radius: 8px;
 }
+
 .icon-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 60px);
+    grid-template-columns: repeat(12, 60px); /* 12 colunas */
+    grid-template-rows: repeat(10, 60px);   /* 10 linhas */
     gap: 15px;
-    max-width: 400px;
     margin-top: 10px;
+    width: max-content;
+    height: max-content;
 }
+
 .icon-item {
     text-align: center;
     font-size: 28px;
@@ -57,6 +72,7 @@ input[name="tag_name"] {
     border-color: #000;
     background: #e0e0e0;
 }
+
 button {
     padding: 10px 20px;
     font-size: 16px;
@@ -65,15 +81,15 @@ button {
 }
 
 p {
-    margin-left: 130px;
+    margin-left: 50px; /* antes 130px */
     margin-top: 50px;
-    margin-bottom: 20px;
-    font-size: 23px; /* texto maior */
-    color: #222; /* mais escuro */
-    font-weight: bold; /* opcional para destacar */
+    font-size: 23px;
+    color: #222;
+    font-weight: bold;
 }
+
 input[type="color"] {
-    margin-left: 130px;
+    margin-left: 50px; /* antes 130px */
     width: 30px;
     height: 30px;
     padding: 0;
@@ -95,51 +111,40 @@ input[type="color"] {
     transform: translateY(-50%);
     color: #777;
     font-size: 18px;
-    pointer-events: none; /* evita clicar no ícone */
+    pointer-events: none;
 }
 
 .search-wrapper .search {
-    padding-left: 40px; /* espaço para a lupa */
-    height: 40px; /* igual à altura do input */
+    padding-left: 40px;
+    height: 40px;
     box-sizing: border-box;
 }
-.icon-grid-wrapper {
-    max-height: 400px;
-    overflow-y: auto;
-    width: max-content; /* faz o wrapper caber certinho nos ícones */
-    box-sizing: content-box; /* evita empurrar a barra para fora */
-    margin-left: 120px; /* aumenta o espaço à esquerda dos ícones */
-}
 
-.icon-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 60px);
-    gap: 15px;
+.rep {
+    margin-top: -20px;
+    font-size: 25px;
+    color: #222;
+    font-weight: bold;
 }
-
 .rep{
-    margin-top: 10px;
-    font-size: 25px; /* texto maior */
-    color: #222; /* mais escuro */
-    font-weight: bold; /* opcional para destacar */
+    margin-left: 60px; /* antes 120px */
 }
-.rep, .pronto {
-    margin-left:120px; /* move os textos e botões */
-}
-.pronto{
-    margin-left: 180px;
+
+.pronto {
+    margin-top: -110px;
+    margin-left: 750px; /* antes 180px */
     color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 200px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 25px;
-  background-color: #000000;
-  cursor: pointer;
-  margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 200px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #000000;
+    cursor: pointer;
+    margin-bottom: 15px;
 }
 
 .tags-sidebar {
@@ -181,31 +186,58 @@ input[type="color"] {
 }
 
 .input-wrapper {
-  position: relative;
-  display: inline-block;
-  margin-left: 120px; 
+    position: relative;
+    display: inline-block;
+    margin-left: 50px; 
 }
 
 .input-wrapper input[name="tag_name"] {
-  height: 50px;
-  width: 700px;
-  padding-right: 50px; /* espaço para o ícone */
-  box-sizing: border-box;
+    height: 45px;
+    width: 800px; 
+    padding-right: 50px;
+    box-sizing: border-box;
     margin-left: 0px;
 }
 
 .input-wrapper .check-icon {
-  position: absolute;
-  right: 5px;
-  top: 25%;
-  transform: translateY(-50%);
-  width: 100px;
-  height: 30px;
-  background-color: #000000; /* verde */
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px; /* quadrado com bordas arredondadas */
-  font-size: 16px;
+    position: absolute;
+    right: 5px;
+    top: 25%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 30px;
+    background-color: #000000;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    font-size: 16px;
+}
+
+.context-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    width: 150px;
+}
+
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+}
+
+.context-menu li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.context-menu li:hover {
+    background: #f0f0f0;
 }
