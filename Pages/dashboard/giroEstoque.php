@@ -12,7 +12,6 @@ switch ($filtro) {
                 GROUP BY CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/2)+1, 2, '0'))
                 ORDER BY periodo ASC";
         break;
-
     case 'trimestre':
         $sql = "SELECT CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/3)+1, 2, '0')) AS periodo,
                        SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
@@ -21,7 +20,6 @@ switch ($filtro) {
                 GROUP BY CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/3)+1, 2, '0'))
                 ORDER BY periodo ASC";
         break;
-
     case 'semestre':
         $sql = "SELECT CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/6)+1, 2, '0')) AS periodo,
                        SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
@@ -30,7 +28,6 @@ switch ($filtro) {
                 GROUP BY CONCAT(YEAR(data_movimentacao), '-', LPAD(FLOOR((MONTH(data_movimentacao)-1)/6)+1, 2, '0'))
                 ORDER BY periodo ASC";
         break;
-
     case 'mes':
         $sql = "SELECT DATE_FORMAT(data_movimentacao, '%Y-%m') AS periodo,
                        SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
@@ -39,7 +36,6 @@ switch ($filtro) {
                 GROUP BY DATE_FORMAT(data_movimentacao, '%Y-%m')
                 ORDER BY periodo ASC";
         break;
-
     case 'ano':
         $sql = "SELECT YEAR(data_movimentacao) AS periodo,
                        SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
@@ -48,7 +44,6 @@ switch ($filtro) {
                 GROUP BY YEAR(data_movimentacao)
                 ORDER BY periodo ASC";
         break;
-
     default: // dia
         $sql = "SELECT DATE(data_movimentacao) AS periodo,
                        SUM(CASE WHEN tipo = 'entrada' THEN quantidade ELSE 0 END) AS entradas,
@@ -132,7 +127,6 @@ if ($entradas > 0) {
 </head>
 <body>
 
-<!-- Sidebar -->
 <aside class="sidebar">
     <div class="logo-area">
         <img src="../../img/logoDecklogistic.webp" alt="Logo">
@@ -158,7 +152,6 @@ if ($entradas > 0) {
     </nav>
 </aside>
 
-<!-- Dashboard principal -->
 <main class="dashboard">
     <div class="content">
         <h1>Controle de Estoque</h1>
@@ -180,7 +173,7 @@ if ($entradas > 0) {
 
         <form method="GET" class="filtros-container">
             <label for="filtro">Filtrar por:</label>
-            <select name="filtro" id="filtro" onchange="this.form.submit()">
+            <select name="filtro" id="filtro">
                 <option value="dia" <?php if($filtro==='dia') echo 'selected'; ?>>Dia</option>
                 <option value="mes" <?php if($filtro==='mes') echo 'selected'; ?>>Mês</option>
                 <option value="bimestre" <?php if($filtro==='bimestre') echo 'selected'; ?>>Bimestre</option>
@@ -194,33 +187,32 @@ if ($entradas > 0) {
         
         <button id="toggleView" class="toggle-btn">Ver Tabela</button>
         <div id="tabela-container" style="display:none;">
-    <table>
-        <thead>
-            <tr>
-                <th>Período</th>
-                <th>Entradas</th>
-                <th>Saídas</th>
-                <th>Saldo</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            // Preenche a tabela com os dados do PHP
-            foreach ($labels as $i => $periodo) {
-                $entrada = $dadosEntradas[$i] ?? 0;
-                $saida = $dadosSaidas[$i] ?? 0;
-                $saldo = $entrada - $saida;
-                echo "<tr>
-                        <td>{$periodo}</td>
-                        <td>{$entrada}</td>
-                        <td>{$saida}</td>
-                        <td>{$saldo}</td>
-                      </tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Entradas</th>
+                        <th>Saídas</th>
+                        <th>Saldo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach ($labels as $i => $periodo) {
+                        $entrada = $dadosEntradas[$i] ?? 0;
+                        $saida = $dadosSaidas[$i] ?? 0;
+                        $saldo = $entrada - $saida;
+                        echo "<tr>
+                                <td>{$periodo}</td>
+                                <td>{$entrada}</td>
+                                <td>{$saida}</td>
+                                <td>{$saldo}</td>
+                              </tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
 
 <script>
     // Alternar gráfico <-> tabela
@@ -239,39 +231,45 @@ if ($entradas > 0) {
             btn.innerText = 'Ver Tabela';
         }
     });
-</script>
 
+    // Salvar estado ao mudar filtro
+    const filtroSelect = document.getElementById('filtro');
+    filtroSelect.addEventListener('change', function() {
+        localStorage.setItem('viewState', document.getElementById('tabela-container').style.display);
+        this.form.submit();
+    });
+
+    // Restaurar estado ao carregar
+    document.addEventListener("DOMContentLoaded", () => {
+        const tabela = document.getElementById('tabela-container');
+        const grafico = document.getElementById('grafico');
+        const btn = document.getElementById('toggleView');
+
+        const estado = localStorage.getItem('viewState');
+        if(estado === 'block') {
+            tabela.style.display = 'block';
+            grafico.style.display = 'none';
+            btn.innerText = 'Ver Gráfico';
+        } else {
+            tabela.style.display = 'none';
+            grafico.style.display = 'block';
+            btn.innerText = 'Ver Tabela';
+        }
+    });
+
+    // ApexCharts
+    var options = {
+        chart: { type: 'line', height: 350 },
+        series: [
+            { name: 'Entradas', data: <?php echo json_encode($dadosEntradas); ?> },
+            { name: 'Saídas', data: <?php echo json_encode($dadosSaidas); ?> }
+        ],
+        xaxis: { categories: <?php echo json_encode($labels); ?> }
+    };
+    var chart = new ApexCharts(document.querySelector("#grafico"), options);
+    chart.render();
+</script>
     </div>
-    
 </main>
-
-<script>
-    
-var options = {
-    chart: { type: 'line', height: 350 },
-    series: [
-        { name: 'Entradas', data: <?php echo json_encode($dadosEntradas); ?> },
-        { name: 'Saídas', data: <?php echo json_encode($dadosSaidas); ?> }
-    ],
-    xaxis: { categories: <?php echo json_encode($labels); ?> }
-};
-var chart = new ApexCharts(document.querySelector("#grafico"), options);
-chart.render();
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const filtroSelecionado = "<?php echo $filtro; ?>";
-    const tabela = document.getElementById('tabela-container');
-    const grafico = document.getElementById('grafico');
-    const btn = document.getElementById('toggleView');
-
-    // Se houver filtro diferente de "dia", mostra a tabela automaticamente
-    if(filtroSelecionado) {
-        grafico.style.display = 'none';
-        tabela.style.display = 'block';
-        btn.innerText = 'Ver Gráfico';
-    }
-});
-</script>
 </body>
 </html>

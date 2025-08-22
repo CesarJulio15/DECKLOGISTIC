@@ -68,7 +68,7 @@ $tagsCriadas = $conn->query("
         <h1>Operações Recentes</h1>
 
         <section>
-            <h2>📦 Produtos adicionados recentemente</h2>
+            <h2>Produtos adicionados recentemente</h2>
             <table>
                 <tr><th>ID</th><th>Nome</th><th>Estoque</th><th>Data</th></tr>
                 <?php while($p = $produtosAdicionados->fetch_assoc()): ?>
@@ -83,7 +83,7 @@ $tagsCriadas = $conn->query("
         </section>
 
         <section>
-            <h2>🛒 Produtos vendidos recentemente</h2>
+            <h2>Produtos vendidos recentemente</h2>
             <table>
                 <tr><th>ID</th><th>Produto</th><th>Qtd</th><th>Venda</th><th>Data</th></tr>
                 <?php while($v = $produtosVendidos->fetch_assoc()): ?>
@@ -99,7 +99,7 @@ $tagsCriadas = $conn->query("
         </section>
 
         <section>
-            <h2>🏷️ Tags criadas</h2>
+            <h2>Tags criadas</h2>
             <table>
                 <tr><th>ID</th><th>Nome</th><th>Cor</th><th>Ícone</th><th>Data</th></tr>
                 <?php while($t = $tagsCriadas->fetch_assoc()): ?>
