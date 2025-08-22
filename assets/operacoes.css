@@ -1,33 +1,86 @@
+/* ===== TÍTULOS ===== */
 h2 {
     margin-top: 30px;
-    margin-bottom: 15px;
-    color: #333;
+    margin-bottom: 20px;
+    color: #1f1f1f;
+    font-size: 1.7rem;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
 }
 
+h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: #3498db;
+    margin: 8px auto 0;
+    border-radius: 2px;
+}
+
+/* ===== SEÇÕES ===== */
 section {
-    margin-bottom: 40px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
+/* ===== TABELA ===== */
 table {
-    width: 100%;
+    width: 95%;
+    max-width: 1100px;
+    margin: 0 auto;
     border-collapse: collapse;
-    background: #fff;
-    border-radius: 10px;
+    background-color: #fff;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+table:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
 }
 
 th, td {
-    padding: 10px 15px;
+    padding: 14px 20px;
     border-bottom: 1px solid #eee;
     text-align: left;
+    font-size: 0.95rem;
+    transition: background 0.2s ease;
 }
 
 th {
-    background: #fafafa;
-    font-weight: bold;
+    background-color: #f4f6f8;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+tr:hover td {
+    background-color: #f0f8ff;
+}
+
+/* Remove borda da última linha */
 tr:last-child td {
     border-bottom: none;
 }
+
+/* ===== MAIN ===== */
+main {
+    margin-left: 220px;
+    padding: 35px;
+    background-color: #f5f6fa;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease, padding 0.3s ease;
+}
+
