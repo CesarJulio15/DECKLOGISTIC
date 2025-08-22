@@ -199,21 +199,19 @@ body {
 }
 
 .nav-list li {
-  margin-bottom: 5px;
+  position: relative; /* necessário para o ::before absoluto */
 }
 
-.nav-list li a {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  color: #fff;
-  text-decoration: none;
-  font-size: 15px;
-  transition: background 0.2s;
-  box-shadow: none;
-  outline: none;
+.nav-list li.active a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #fff; /* barra branca */
+  border-radius: 2px;
 }
-
 .nav-list li a span {
   margin-right: 10px;
   font-size: 16px;
