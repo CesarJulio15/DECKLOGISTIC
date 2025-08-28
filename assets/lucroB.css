@@ -207,7 +207,7 @@ body {
         font-size: 14px;
         padding: 10px;
     }
- .cards-container {
+.cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
@@ -233,10 +233,11 @@ body {
     font-size: 1.6rem;
     font-weight: bold;
 }
-
-/* Cores dos cards */
-.card.receita { border-top: 4px solid #4caf50; color: #4caf50; }
-.card.custo { border-top: 4px solid #f44336; color: #f44336; }
-.card.lucro.positivo { border-top: 4px solid #4caf50; color: #4caf50; }
-.card.lucro.negativo { border-top: 4px solid #f44336; color: #f44336; }
+.card.entradas { border-top: 4px solid #4caf50; }
+.card.saidas { border-top: 4px solid #f44336; }
+.card.variacao.positivo { border-top: 4px solid #4caf50; color: #4caf50; }
+.card.variacao.negativo { border-top: 4px solid #f44336; color: #f44336; }
 }
+ .cards-container {
+        grid-template-columns: 1fr; /* sempre em coluna */
+    }
