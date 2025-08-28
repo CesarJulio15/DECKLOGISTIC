@@ -21,6 +21,41 @@
       nir.value = criptografar(nir.value);
     }
 
+  // Função para aplicar máscara de CNPJ
+  function formatarCNPJ(cnpj) {
+    return cnpj
+      .replace(/\D/g, "") // remove tudo que não é número
+      .replace(/^(\d{2})(\d)/, "$1.$2") // 2 primeiros -> 99.
+      .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3") // depois -> 99.999.
+      .replace(/\.(\d{3})(\d)/, ".$1/$2") // depois -> 99.999.999/9
+      .replace(/(\d{4})(\d)/, "$1-$2") // depois -> 99.999.999/9999-99
+      .substring(0, 18); // limita ao tamanho máximo
+  }
+
+  // Aplicar máscara dinamicamente
+  document.addEventListener("DOMContentLoaded", () => {
+    const cnpjInput = document.getElementById("cnpj");
+    cnpjInput.addEventListener("input", (e) => {
+      e.target.value = formatarCNPJ(e.target.value);
+    });
+
+    const cepInput = document.getElementById("cep");
+    cepInput.addEventListener("input", (e) => {
+      e.target.value = e.target.value.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").substring(0, 9);
+    });
+
+    const telefoneInput = document.querySelector("input[name='fone']");
+    telefoneInput.addEventListener("input", (e) => {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length <= 10) {
+        e.target.value = v.replace(/(\d{2})(\d{4})(\d)/, "($1) $2-$3");
+      } else {
+        e.target.value = v.replace(/(\d{2})(\d{5})(\d)/, "($1) $2-$3");
+      }
+    });
+  });
+
+
     // Consulta CEP
     function consultarCEP() {
       const cep = document.getElementById("cep").value.replace(/\D/g, '');
