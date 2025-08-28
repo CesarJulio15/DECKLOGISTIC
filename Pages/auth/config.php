@@ -73,7 +73,7 @@
             </div>
 
             <!-- Botão de Logout -->
-            <a href="/logout.php" class="btn-sair">Sair da conta</a>
+            <a href="/DECKLOGISTIC/Pages/auth/logout.php" class="btn-sair">Sair da conta</a>
 
             <!-- Botão de excluir conta -->
             <form action="/logout.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
