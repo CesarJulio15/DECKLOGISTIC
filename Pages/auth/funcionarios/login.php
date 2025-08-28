@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro | DeckLogistic</title>
+  <title>Login Funcionário | DeckLogistic</title>
   <link rel="stylesheet" href="../../../assets/login.css">
   <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 </head>
@@ -21,7 +21,7 @@
       <?php
       if (isset($_SESSION['erro_login'])) {
           echo '<div class="erro-msg">' . $_SESSION['erro_login'] . '</div>';
-          unset($_SESSION['erro_login']); // Limpa a mensagem após mostrar
+          unset($_SESSION['erro_login']);
       }
       ?>
 
@@ -30,8 +30,8 @@
         <input type="password" name="senha" placeholder="Insira sua Senha" required>
 
         <div class="login-link">
-          Ainda não tem uma conta para sua empresa?
-          <a href="../auth/lojas/cadastro.php">Cadastrar</a>
+          Ainda não tem uma conta para funcionário?
+          <a href="cadastroFuncionario.php">Cadastrar</a>
         </div>
         <button type="submit" class="btn">Continuar</button>
       </form>

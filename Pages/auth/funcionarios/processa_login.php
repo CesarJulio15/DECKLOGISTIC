@@ -1,39 +1,34 @@
 <?php
 session_start();
-include '../../../conexao.php'; 
+include __DIR__ . '/../../../conexao.php';
 
-if (isset($_POST['email']) && isset($_POST['senha'])) {
-    $email = $_POST['email'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email']);
     $senha = $_POST['senha'];
 
-    $email = mysqli_real_escape_string($conn, $email);
-    $query = "SELECT id, loja_id, nome, senha_hash FROM usuarios WHERE email = '$email' LIMIT 1";
-    $result = mysqli_query($conn, $query);
+    $sql = "SELECT * FROM usuarios WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
 
-    if ($result && mysqli_num_rows($result) > 0) {
-        $usuario = mysqli_fetch_assoc($result);
+    if ($resultado->num_rows === 1) {
+        $usuario = $resultado->fetch_assoc();
 
-        // Verifica a senha corretamente
         if (password_verify($senha, $usuario['senha_hash'])) {
+            // Salva dados na sessão
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['usuario_nome'] = $usuario['nome'];
-            $_SESSION['usuario_loja_id'] = $usuario['loja_id'];
+            $_SESSION['loja_id'] = $usuario['loja_id'];
+            $_SESSION['tipo_login'] = 'funcionario';
 
-            header("Location: ../../index.php");
-            exit;
-        } else {
-            $_SESSION['erro_login'] = "Senha incorreta.";
-            header("Location: login.php");
+            header("Location: ../../dashboard/financas.php");
             exit;
         }
-    } else {
-        $_SESSION['erro_login'] = "E-mail não cadastrado.";
-        header("Location: login.php");
-        exit;
     }
-} else {
-    $_SESSION['erro_login'] = "Preencha e-mail e senha.";
-    header("Location: login.php");
+
+    $_SESSION['erro_login'] = "E-mail ou senha inválidos.";
+    header("Location: login_funcionario.php");
     exit;
 }
 ?>
