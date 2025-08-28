@@ -1,8 +1,6 @@
 <?php
 include __DIR__ . '../../../../conexao.php';
 
-
-
 $filtro = $_GET['filtro'] ?? 'dia';
 
 // Função para gerar campo de data conforme filtro
@@ -92,7 +90,7 @@ if ($receita > 0) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lucro Bruto - Decklogistic</title>
 <link rel="stylesheet" href="../../../assets/sidebar.css">
-<link rel="stylesheet" href="../../assets/lucroB.css">
+<link rel="stylesheet" href="../../assets/lucroB.css?v=1">
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
@@ -126,20 +124,19 @@ if ($receita > 0) {
     <div class="content">
         <h1>Lucro Bruto</h1>
 
-  <div class="cards-container">
-    <div class="card receita">
-        <h2>Receita</h2>
-        <p>R$ <?php echo number_format($receita, 2, ',', '.'); ?></p>
-    </div>
-    <div class="card custo">
-        <h2>Custo</h2>
-        <p>R$ <?php echo number_format($custo, 2, ',', '.'); ?></p>
-    </div>
-    <div class="card lucro">
-        <h2>Lucro</h2>
-        <p>R$ <?php echo number_format($lucro, 2, ',', '.'); ?></p>
-    </div>
-</div>
+        <div class="cards-container">
+            <div class="card receita">
+                <h2>Receita (<?php echo $tituloFiltro; ?>)</h2>
+                <p><?php echo number_format($receita, 2, ',', '.'); ?></p>
+            </div>
+            <div class="card custo">
+                <h2>Custo (<?php echo $tituloFiltro; ?>)</h2>
+                <p><?php echo number_format($custo, 2, ',', '.'); ?></p>
+            </div>
+            <div class="card variacao <?php echo $classe; ?>">
+                <h2>Lucro (<?php echo $tituloFiltro; ?>)</h2>
+                <p><?php echo $seta . " " . number_format($percentual, 2, ',', '.'); ?>%</p>
+            </div>
         </div>
 
         <form method="GET" class="filtros-container">
