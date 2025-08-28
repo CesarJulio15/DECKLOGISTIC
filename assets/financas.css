@@ -63,24 +63,16 @@ body {
 }
 
 .nav-list li a {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  color: #fff;
-  text-decoration: none;
-  font-size: 15px;
-  transition: background 0.2s;
+  gap: unset; /* ou remova */
 }
 
 .nav-list li a span {
   margin-right: 10px;
-  font-size: 16px;
 }
 
 .nav-list li a span img {
   width: 18px;
   height: 18px;
-  object-fit: contain;
 }
 
 .nav-list li a:hover {
