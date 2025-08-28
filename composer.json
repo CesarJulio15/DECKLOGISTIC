@@ -1,0 +1,21 @@
+{
+    "name": "aluno/decklogistic",
+    "description": "Sistema Deck Logistic",
+    "type": "project",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Aluno\\Decklogistic\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "GabrielPrudente10",
+            "email": "168013736+GabrielPrudente10@users.noreply.github.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.0"
+    }
+}
