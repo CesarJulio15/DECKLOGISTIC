@@ -46,7 +46,9 @@
                 </div>
             </div>
             <div class="titulo">Lucro Líquido</div>
-            <canvas id="grafico"></canvas>
+            <div class="canvas-wrapper">
+                <canvas id="grafico"></canvas>
+            </div>
         </div>
     </div>
 
@@ -56,12 +58,6 @@
             try {
                 const response = await fetch("/DECKLOGISTIC/api/lucro_liquido.php");
                 const data = await response.json();
-
-                console.log("Retorno da API:", data); // <-- DEBUG
-
-                if (!data.series) {
-                    throw new Error("Formato inesperado. Esperava 'series'.");
-                }
 
                 const labels = data.series.map(item => item.data);
                 const valores = data.series.map(item => item.valor);
@@ -85,6 +81,12 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 0
+                                }
+                            },
                             y: {
                                 beginAtZero: true
                             }
@@ -96,7 +98,7 @@
             }
         }
 
-        carregarGrafico();
-    </script>
+        carregarGrafico();  
+    </script> 
 </body>
 </html>

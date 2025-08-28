@@ -1,8 +1,6 @@
 <?php
 include __DIR__ . '../../../../conexao.php';
 
-
-
 $filtro = $_GET['filtro'] ?? 'dia';
 
 // Função para gerar campo de data conforme filtro
@@ -92,7 +90,7 @@ if ($receita > 0) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lucro Bruto - Decklogistic</title>
 <link rel="stylesheet" href="../../../assets/sidebar.css">
-<link rel="stylesheet" href="../../assets/lucroB.css">
+<link rel="stylesheet" href="../../../assets/lucroB.css">
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
@@ -123,119 +121,117 @@ if ($receita > 0) {
 </aside>
 
 <main class="dashboard">
-    <div class="content">
-        <h1>Lucro Bruto</h1>
+    <h1>Lucro Bruto</h1>
 
-  <div class="cards-container">
-    <div class="card receita">
-        <h2>Receita</h2>
-        <p>R$ <?php echo number_format($receita, 2, ',', '.'); ?></p>
-    </div>
-    <div class="card custo">
-        <h2>Custo</h2>
-        <p>R$ <?php echo number_format($custo, 2, ',', '.'); ?></p>
-    </div>
-    <div class="card lucro">
-        <h2>Lucro</h2>
-        <p>R$ <?php echo number_format($lucro, 2, ',', '.'); ?></p>
-    </div>
-</div>
+    <div class="cards-container">
+        <div class="card receita">
+            <h2>Receita (<?php echo $tituloFiltro; ?>)</h2>
+            <p><?php echo number_format($receita, 2, ',', '.'); ?></p>
         </div>
-
-        <form method="GET" class="filtros-container">
-            <label for="filtro">Filtrar por:</label>
-            <select name="filtro" id="filtro">
-                <option value="dia" <?php if($filtro==='dia') echo 'selected'; ?>>Dia</option>
-                <option value="mes" <?php if($filtro==='mes') echo 'selected'; ?>>Mês</option>
-                <option value="bimestre" <?php if($filtro==='bimestre') echo 'selected'; ?>>Bimestre</option>
-                <option value="trimestre" <?php if($filtro==='trimestre') echo 'selected'; ?>>Trimestre</option>
-                <option value="semestre" <?php if($filtro==='semestre') echo 'selected'; ?>>Semestre</option>
-                <option value="ano" <?php if($filtro==='ano') echo 'selected'; ?>>Ano</option>
-            </select>
-        </form>
-
-        <div id="grafico"></div>
-        
-        <button id="toggleView" class="toggle-btn">Ver Tabela</button>
-        <div id="tabela-container" style="display:none;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Período</th>
-                        <th>Receita</th>
-                        <th>Custo</th>
-                        <th>Lucro</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    foreach ($labels as $i => $periodo) {
-                        $r = $dadosReceita[$i] ?? 0;
-                        $c = $dadosCusto[$i] ?? 0;
-                        $l = $r - $c;
-                        echo "<tr>
-                                <td>{$periodo}</td>
-                                <td>".number_format($r,2,',','.')."</td>
-                                <td>".number_format($c,2,',','.')."</td>
-                                <td>".number_format($l,2,',','.')."</td>
-                              </tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+        <div class="card custo">
+            <h2>Custo (<?php echo $tituloFiltro; ?>)</h2>
+            <p><?php echo number_format($custo, 2, ',', '.'); ?></p>
         </div>
+        <div class="card variacao <?php echo $classe; ?>">
+            <h2>Lucro (<?php echo $tituloFiltro; ?>)</h2>
+            <p><?php echo $seta . " " . number_format($percentual, 2, ',', '.'); ?>%</p>
+        </div>
+    </div>
+
+    <form method="GET" class="filtros-container">
+        <label for="filtro">Filtrar por:</label>
+        <select name="filtro" id="filtro">
+            <option value="dia" <?php if($filtro==='dia') echo 'selected'; ?>>Dia</option>
+            <option value="mes" <?php if($filtro==='mes') echo 'selected'; ?>>Mês</option>
+            <option value="bimestre" <?php if($filtro==='bimestre') echo 'selected'; ?>>Bimestre</option>
+            <option value="trimestre" <?php if($filtro==='trimestre') echo 'selected'; ?>>Trimestre</option>
+            <option value="semestre" <?php if($filtro==='semestre') echo 'selected'; ?>>Semestre</option>
+            <option value="ano" <?php if($filtro==='ano') echo 'selected'; ?>>Ano</option>
+        </select>
+    </form>
+
+    <div id="grafico"></div>
+    
+    <button id="toggleView" class="toggle-btn">Ver Tabela</button>
+    <div id="tabela-container" style="display:none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Período</th>
+                    <th>Receita</th>
+                    <th>Custo</th>
+                    <th>Lucro</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                foreach ($labels as $i => $periodo) {
+                    $r = $dadosReceita[$i] ?? 0;
+                    $c = $dadosCusto[$i] ?? 0;
+                    $l = $r - $c;
+                    echo "<tr>
+                            <td>{$periodo}</td>
+                            <td>".number_format($r,2,',','.')."</td>
+                            <td>".number_format($c,2,',','.')."</td>
+                            <td>".number_format($l,2,',','.')."</td>
+                          </tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
 
 <script>
-    document.getElementById('toggleView').addEventListener('click', () => {
-        const grafico = document.getElementById('grafico');
-        const tabela = document.getElementById('tabela-container');
-        const btn = document.getElementById('toggleView');
+document.getElementById('toggleView').addEventListener('click', () => {
+    const grafico = document.getElementById('grafico');
+    const tabela = document.getElementById('tabela-container');
+    const btn = document.getElementById('toggleView');
 
-        if (tabela.style.display === 'none') {
-            grafico.style.display = 'none';
-            tabela.style.display = 'block';
-            btn.innerText = 'Ver Gráfico';
-        } else {
-            grafico.style.display = 'block';
-            tabela.style.display = 'none';
-            btn.innerText = 'Ver Tabela';
-        }
-    });
+    if (tabela.style.display === 'none') {
+        grafico.style.display = 'none';
+        tabela.style.display = 'block';
+        btn.innerText = 'Ver Gráfico';
+    } else {
+        grafico.style.display = 'block';
+        tabela.style.display = 'none';
+        btn.innerText = 'Ver Tabela';
+    }
+});
 
-    const filtroSelect = document.getElementById('filtro');
-    filtroSelect.addEventListener('change', function() {
-        localStorage.setItem('viewState', document.getElementById('tabela-container').style.display);
-        this.form.submit();
-    });
+const filtroSelect = document.getElementById('filtro');
+filtroSelect.addEventListener('change', function() {
+    localStorage.setItem('viewState', document.getElementById('tabela-container').style.display);
+    this.form.submit();
+});
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const tabela = document.getElementById('tabela-container');
-        const grafico = document.getElementById('grafico');
-        const btn = document.getElementById('toggleView');
+document.addEventListener("DOMContentLoaded", () => {
+    const tabela = document.getElementById('tabela-container');
+    const grafico = document.getElementById('grafico');
+    const btn = document.getElementById('toggleView');
 
-        const estado = localStorage.getItem('viewState');
-        if(estado === 'block') {
-            tabela.style.display = 'block';
-            grafico.style.display = 'none';
-            btn.innerText = 'Ver Gráfico';
-        } else {
-            tabela.style.display = 'none';
-            grafico.style.display = 'block';
-            btn.innerText = 'Ver Tabela';
-        }
-    });
+    const estado = localStorage.getItem('viewState');
+    if(estado === 'block') {
+        tabela.style.display = 'block';
+        grafico.style.display = 'none';
+        btn.innerText = 'Ver Gráfico';
+    } else {
+        tabela.style.display = 'none';
+        grafico.style.display = 'block';
+        btn.innerText = 'Ver Tabela';
+    }
+});
 
-    // ApexCharts
-    var options = {
-        chart: { type: 'line', height: 350 },
-        series: [
-            { name: 'Receita', data: <?php echo json_encode($dadosReceita); ?> },
-            { name: 'Custo', data: <?php echo json_encode($dadosCusto); ?> }
-        ],
-        xaxis: { categories: <?php echo json_encode($labels); ?> }
-    };
-    var chart = new ApexCharts(document.querySelector("#grafico"), options);
-    chart.render();
+// ApexCharts
+var options = {
+    chart: { type: 'line', height: 350 },
+    series: [
+        { name: 'Receita', data: <?php echo json_encode($dadosReceita); ?> },
+        { name: 'Custo', data: <?php echo json_encode($dadosCusto); ?> }
+    ],
+    xaxis: { categories: <?php echo json_encode($labels); ?> }
+};
+var chart = new ApexCharts(document.querySelector("#grafico"), options);
+chart.render();
 </script>
 
 </main>

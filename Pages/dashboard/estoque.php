@@ -10,7 +10,7 @@ $lojaId = $_SESSION['id'] ?? 0;
   <meta charset="UTF-8">
   <title>Finanças - Decklogistic</title>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <link rel="stylesheet" href="../../assets/estoque.css">
+<link rel="stylesheet" href="../../assets/estoque.css?v=2">
 </head>
 <body>
 
@@ -94,7 +94,7 @@ async function loadEstoqueTotal() {
       stroke: { curve: 'smooth' },
       fill: { opacity: 0.3 },
       series: [{ data: estoqueSeries }],
-      colors: ['#10b981']
+      colors: ['#f816adff']
     }).render();
 
   } catch (error) {
