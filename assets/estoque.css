@@ -176,7 +176,7 @@ hr {
 }
 
 /* cores dos cards */
-#estoque { color: #10b981; }
+#estoque { color: #24b12f; }
 #chartEstoque, #chartReceitaDespesa { color: #3b82f6; }
 
 /* ====================== */
@@ -273,4 +273,27 @@ hr {
   #chartBruto, #chartLiquido, #chartMargem, #chartEstoque {
     display: none;
   }
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+#btnVerMais {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#btnVerMais:hover {
+  opacity: 0.85;
 }
