@@ -13,8 +13,8 @@ $msg = '';
 if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
     $nome = $_POST['nome'] ?? '';
     $descricao = $_POST['descricao'] ?? '';
-    $preco_unitario = floatval($_POST['preco_unitario'] ?? 0);
-    $custo_unitario = floatval($_POST['valor_unitario'] ?? 0);
+    $preco_unitario = floatval($_POST['valor_unitario'] ?? 0);
+    $custo_unitario = floatval($_POST['preco_unitario'] ?? 0);
     $quantidade_estoque = intval($_POST['quantidade_estoque'] ?? 0);
     $lote = $_POST['lote'] ?? '';
     $data_reabastecimento = $_POST['data_reabastecimento'] ?? date('Y-m-d');
@@ -151,6 +151,7 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
         }
     }
 }
+
 
 // ============================
 // LISTAR PRODUTOS

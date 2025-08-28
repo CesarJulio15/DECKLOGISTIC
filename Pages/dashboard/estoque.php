@@ -69,8 +69,11 @@ $lojaId = $_SESSION['id'] ?? 0;
 const lojaId = <?= $lojaId ?>;
 
 async function loadEstoqueTotal() {
+  const periodo = 'mes'; 
   try {
-    const data = await fetch(`/DECKLOGISTIC/api/total_estoque.php`).then(r => r.json());
+    const data = await fetch(`/DECKLOGISTIC/api/total_estoque.php?periodo=${periodo}`)
+      .then(r => r.json());
+
     const estoqueEl = document.querySelector("#estoque");
 
     if (!data || data.total === undefined) {
@@ -78,7 +81,22 @@ async function loadEstoqueTotal() {
       return;
     }
 
-    estoqueEl.textContent = data.total;
+    // Valor total
+    const estoqueVal = parseFloat(data.total || 0).toFixed(2);
+    estoqueEl.textContent = estoqueVal;
+
+    // Série histórica
+    const estoqueSeries = (data.series || []).map(item => item.valor);
+
+    // Sparkline Estoque Total
+    new ApexCharts(document.querySelector("#chartEstoqueTotal"), {
+      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
+      stroke: { curve: 'smooth' },
+      fill: { opacity: 0.3 },
+      series: [{ data: estoqueSeries }],
+      colors: ['#10b981']
+    }).render();
+
   } catch (error) {
     console.error("Erro ao carregar estoque:", error);
     document.querySelector("#estoque").textContent = "Erro";
