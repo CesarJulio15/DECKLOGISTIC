@@ -22,7 +22,7 @@
               <input type="password" name="senha" placeholder="Insira sua Senha" required>
               <input type="password" name="senha2" placeholder="Repita sua senha" required>
           <div class="login-link">
-            Já é registrado? <a href="../login.php">Login</a>
+            Já é registrado? <a href="../funcionarios/login.php">Login</a>
           </div>
           <div class="login-link">
             Já é uma loja registrada? <a href="loginLoja.php">Login</a>
