@@ -1,10 +1,49 @@
+<?php
+session_start();
+include __DIR__ . '/../../../conexao.php';
+
+// Garante que a empresa está logada
+if (!isset($_SESSION['loja_id'])) {
+    die("Acesso negado. Você precisa estar logado como empresa.");
+}
+
+// Se o formulário foi enviado
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nome  = $_POST['nome'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $senha = $_POST['senha'] ?? '';
+    $senha2 = $_POST['senha2'] ?? '';
+
+    if ($nome && $email && $senha && $senha2) {
+        if ($senha !== $senha2) {
+            $msg = "As senhas não coincidem.";
+        } else {
+            $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+            $loja_id = $_SESSION['loja_id'];
+
+            $stmt = $conn->prepare("INSERT INTO usuarios (loja_id, nome, email, senha_hash) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("isss", $loja_id, $nome, $email, $senha_hash);
+
+            if ($stmt->execute()) {
+                $msg = "Funcionário cadastrado com sucesso!";
+            } else {
+                $msg = "Erro ao cadastrar: " . $stmt->error;
+            }
+        }
+    } else {
+        $msg = "Preencha todos os campos.";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | DeckLogistic</title>
+  <title>Cadastro de Funcionário | DeckLogistic</title>
   <link rel="stylesheet" href="../../../assets/cadastrofuncionario.css">
   <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
     .input-container {
@@ -19,7 +58,12 @@
       color: #777;
     }
     .input-container input {
-      padding-left: 35px; /* espaço pro ícone */
+      padding-left: 35px;
+    }
+    .msg {
+      margin: 10px 0;
+      font-weight: bold;
+      color: red;
     }
   </style>
 </head>
@@ -30,11 +74,13 @@
       <div class="form-container">
         <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
         <h1>Cadastre um funcionário</h1>
-        <form action="login2etapa.php" method="POST">
-          
+
+        <?php if (!empty($msg)) echo "<p class='msg'>$msg</p>"; ?>
+
+        <form method="POST">
           <div class="input-container">
             <i class="fa-solid fa-user"></i>
-            <input type="text" name="empresa" placeholder="Nome funcionário" required>
+            <input type="text" name="nome" placeholder="Nome do funcionário" required>
           </div>
 
           <div class="input-container">
@@ -52,11 +98,11 @@
             <input type="password" name="senha2" placeholder="Repita a senha" required>
           </div>
 
-          <button type="submit" class="btn">Prosseguir</button>
-          <button type="submit" onclick="location.href='../lojas/cadastro.php'" class="btn">Voltar</button>
-        
+          <button type="submit" class="btn">Cadastrar Funcionário</button>
+          <button type="button" onclick="location.href='../lojas/cadastro.php'" class="btn">Voltar</button>
         </form>
       </div>
     </div>
   </div>
 </body>
+</html>
