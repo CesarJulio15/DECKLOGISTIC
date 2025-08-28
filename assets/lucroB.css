@@ -1,7 +1,3 @@
-/* ====================== */
-/* Estilos gerais         */
-/* ====================== */
-
 body {
     font-family: Arial, sans-serif;
     background: #f8f9fa;
@@ -25,10 +21,7 @@ body {
     font-size: clamp(1.5rem, 2vw, 2rem);
 }
 
-/* ====================== */
-/* Cards                 */
-/* ====================== */
-
+/* Container de cards */
 .cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -36,6 +29,7 @@ body {
     margin-bottom: 40px;
 }
 
+/* Cards individuais */
 .card {
     background: #fff;
     padding: 20px;
@@ -55,16 +49,13 @@ body {
     font-weight: bold;
 }
 
-/* Cores dos cards */
+/* Cores de cards */
 .card.receita { border-top: 4px solid #4caf50; }
 .card.custo { border-top: 4px solid #f44336; }
 .card.variacao.positivo { border-top: 4px solid #4caf50; color: #4caf50; }
 .card.variacao.negativo { border-top: 4px solid #f44336; color: #f44336; }
 
-/* ====================== */
-/* Formulário de filtro  */
-/* ====================== */
-
+/* Formulário de filtro */
 .filtros-container {
     margin-bottom: 30px;
     display: flex;
@@ -86,10 +77,7 @@ body {
     max-width: 200px;
 }
 
-/* ====================== */
-/* Gráfico               */
-/* ====================== */
-
+/* Gráfico */
 #grafico {
     background: #fff;
     padding: 20px;
@@ -100,10 +88,7 @@ body {
     overflow-x: auto;
 }
 
-/* ====================== */
-/* Botão alternar         */
-/* ====================== */
-
+/* Botão toggle */
 .toggle-btn {
     margin-top: 20px;
     padding: 10px 15px;
@@ -119,14 +104,11 @@ body {
     background: #333;
 }
 
-/* ====================== */
-/* Tabela                */
-/* ====================== */
-
+/* Tabela */
 #tabela-container {
     margin-top: 20px;
     background-color: #ddd;
-    color: #000;
+    color: #000000;
     overflow-x: auto;
 }
 
@@ -138,7 +120,7 @@ body {
 
 #tabela-container th {
     background-color: #f5f5f5;
-    color: #000;
+    color: #000000;
     padding: 12px;
     text-align: center;
 }
@@ -149,83 +131,19 @@ body {
     border-bottom: 1px solid #ddd;
 }
 
-#tabela-container tr:nth-child(even) {
-    background-color: #fff;
-}
+#tabela-container tr:nth-child(even) { background-color: #ffffff; }
+#tabela-container tr:nth-child(odd) { background-color: #cecece; }
 
-#tabela-container tr:nth-child(odd) {
-    background-color: #cecece;
-}
-
-/* ====================== */
-/* Responsividade         */
-/* ====================== */
-
-/* Tablets */
-@media (max-width: 1024px) {
-    .dashboard {
-        margin-left: 200px;
-        padding: 20px;
-    }
-}
-
-/* Celulares */
+/* Responsividade */
+@media (max-width: 1024px) { .dashboard { margin-left: 200px; padding: 20px; } }
 @media (max-width: 768px) {
-    .dashboard {
-        margin-left: 0;
-        padding: 15px;
-    }
-
-    .sidebar {
-        position: fixed;
-        left: -250px;
-        top: 0;
-        height: 100%;
-        width: 250px;
-        background: #fff;
-        transition: left 0.3s ease;
-        z-index: 1000;
-    }
-
-    .sidebar.active {
-        left: 0;
-    }
-
-    .menu-toggle {
-        display: block;
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        background: #333;
-        color: #fff;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        z-index: 1100;
-    }
-
-    .cards-container {
-        grid-template-columns: 1fr; /* cards sempre em coluna */
-    }
-
-    .filtros-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .filtros-container select {
-        max-width: 100%;
-    }
-
-    #grafico {
-        padding: 15px;
-    }
-
-    #tabela-container table,
-    #tabela-container th,
-    #tabela-container td {
-        font-size: 14px;
-        padding: 10px;
-    }
+    .dashboard { margin-left: 0; padding: 15px; }
+    .sidebar { position: fixed; left: -250px; top: 0; height: 100%; width: 250px; background: #fff; transition: left 0.3s ease; z-index: 1000; }
+    .sidebar.active { left: 0; }
+    .menu-toggle { display: block; position: fixed; top: 15px; left: 15px; background: #333; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; z-index: 1100; }
+    .cards-container { grid-template-columns: 1fr; }
+    .filtros-container { flex-direction: column; align-items: stretch; }
+    .filtros-container select { max-width: 100%; }
+    #grafico { padding: 15px; }
+    #tabela-container table, #tabela-container th, #tabela-container td { font-size: 14px; padding: 10px; }
 }
