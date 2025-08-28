@@ -8,6 +8,6 @@ $_SESSION = [];
 session_destroy();
 
 // Redireciona para a página de login (ajuste o caminho se necessário)
-header("Location: ../lojas/cadastro.php");
+header("Location: /lojas/cadastro.php");
 exit;
 ?>
