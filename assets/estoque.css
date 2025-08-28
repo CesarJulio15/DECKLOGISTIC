@@ -1,324 +1,276 @@
-/* Reset básico */
+/* ====================== */
+/* Reset básico           */
+/* ====================== */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f5f7fa;
+}
+
+/* ====================== */
+/* Sidebar                */
+/* ====================== */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.logo-area {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+
+.logo-area img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.nav-menus {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.nav-list {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.nav-list li {
+  margin-bottom: 5px;
+}
+
+.nav-list li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  transition: background 0.2s;
+}
+
+.nav-list li a span {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.nav-list li a span img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.nav-list li a:hover {
+  background-color: #222;
+}
+
+.nav-list li.active a {
+  background-color: #555;
+  border-radius: 4px;
+  color: #fff;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: #444;
+  margin: 15px 20px;
+}
+
+.bottom-links {
+  padding: 15px 20px;
+  border-top: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bottom-links a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.bottom-links a span {
+  margin-right: 8px;
+}
+
+.bottom-links a span img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.bottom-links a:hover {
+  color: #fff;
+}
+
+/* ====================== */
+/* Dashboard e Cards      */
+/* ====================== */
+.dashboard {
+  margin-left: 220px;
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  width: calc(100% - 220px);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  height: 400px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.card h3 {
+  font-size: 1rem;
+  color: #374151;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* cores dos cards */
+#estoque { color: #10b981; }
+#chartEstoque, #chartReceitaDespesa { color: #3b82f6; }
+
+/* ====================== */
+/* Tabelas                */
+/* ====================== */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.card table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  word-wrap: break-word;
+  font-size: 0.9rem;
+}
+
+.card table thead th {
+  background-color: #f3f4f6;
+  color: #374151;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.card table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
+}
+
+.card table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Mobile Tabelas */
+@media (max-width: 768px) {
+  .card table thead, .card table tbody, .card table th, .card table td, .card table tr {
+    display: block;
   }
-  
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f5f7fa;
-  }
-  
-  
-  /* Sidebar */
-  .sidebar {
-    width: 220px;
-    height: 100vh;
-    background-color: #000;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 100;
-    transition: all 0.3s ease;
-  }
-  
-  /* Logo */
-  .logo-area {
-    padding: 15px;
-    text-align: center;
-    border-bottom: 1px solid #333;
-  }
-  
-  .logo-area img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
-  
-  /* Navegação */
-  .nav-section {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  
-  .nav-menus {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-  
-  .nav-list {
-    list-style: none;
-    margin-top: 10px;
-  }
-  
-  .nav-list li {
-    margin-bottom: 5px;
-  }
-  
-  .nav-list li a {
-    display: flex;
-    align-items: center;
-    padding: 12px 20px;
-    color: #fff;
-    text-decoration: none;
-    font-size: 15px;
-    transition: background 0.2s;
-  }
-  
-  .nav-list li a span {
-    margin-right: 10px;
-    font-size: 16px;
-  }
-  
-  .nav-list li a span img {
-    width: 18px;
-    height: 18px;
-    object-fit: contain;
-  }
-  
-  .nav-list li a:hover {
-    background-color: #222;
-  }
-  
-  .nav-list li.active a {
-    background-color: #555;
-    border-radius: 4px;
-    color: #fff;
-  }
-  
-  /* Linha divisória */
-  hr {
-    border: none;
-    height: 1px;
-    background-color: #444;
-    margin: 15px 20px;
-  }
-  
-  /* Parte inferior */
-  .bottom-links {
-    padding: 15px 20px;
-    border-top: 1px solid #333;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .bottom-links a {
-    color: #ccc;
-    text-decoration: none;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    transition: color 0.2s;
-  }
-  
-  .bottom-links a span {
-    margin-right: 8px;
-  }
-  
-  .bottom-links a span img {
-    width: 16px;
-    height: 16px;
-    object-fit: contain;
-  }
-  
-  .bottom-links a:hover {
-    color: #fff;
-  }
-  
-  /* Dashboard */
-  .dashboard {
-    margin-left: 220px;
-    padding: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    width: calc(100% - 220px);
-  }
-  
-  .card {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    height:400px; /* ou altura que você quiser */
-    transition: transform 0.3s, box-shadow 0.3s;
-    overflow: hidden;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-  }
-  
-  .card h3 {
-    font-size: 1rem;
-    color: #374151;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  .value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #111827;
-  }
-  
-  /* cores por tipo de card */
-  #lucroBruto { color: #10b981; }
-  #lucroLiquido { color: #3b82f6; }
-  #margemLucro { color: #f59e0b; }
-  
-  /* Responsividade */
-  @media (max-width: 768px) {
-    /* Sidebar mobile */
-    .sidebar {
-      width: 100%;
-      height: 60px;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 10px;
-    }
-  
-    .logo-area {
-      display: block;
-      width: 40px;
-    }
-  
-    .logo-area img {
-      width: 100%;
-      height: auto;
-    }
-  
-    .nav-section {
-      flex-direction: row;
-      flex: 1;
-      justify-content: space-around;
-      height: 100%;
-    }
-  
-    .nav-menus {
-      flex-direction: row;
-      gap: 5px;
-    }
-  
-    .nav-list {
-      flex-direction: row;
-      gap: 5px;
-      margin: 0;
-    }
-  
-    .nav-list li a {
-      font-size: 0; /* só ícone */
-      padding: 10px 5px;
-      justify-content: center;
-    }
-  
-    .nav-list li a span {
-      margin: 0;
-    }
-  
-    .bottom-links {
-      display: flex;
-      flex-direction: row;
-      gap: 5px;
-    }
-  
-    /* Dashboard mobile */
-    .dashboard {
-      margin-left: 0;
-      margin-top: 60px;
-      width: 100%;
-      padding: 20px 10px;
-      grid-template-columns: 1fr;
-    }
-  
-    .card {
-      padding: 20px 15px;
-    }
-  
-    /* Esconde gráficos se houver */
-    #chartBruto,
-    #chartLiquido,
-    #chartMargem {
-      display: none;
-    }
-  }
-  /* Container responsivo para tabelas */
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto; /* scroll horizontal se necessário */
-  }
-  
-  /* Tabela */
-  .card table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed; /* força colunas a se ajustarem */
-    word-wrap: break-word; /* quebra linhas longas */
-    font-size: 0.9rem;
-  }
-  
-  /* Cabeçalho */
-  .card table thead th {
-    background-color: #f3f4f6;
-    color: #374151;
-    text-align: left;
-    padding: 8px 10px;
+  .card table thead tr { display: none; }
+  .card table tbody tr {
+    margin-bottom: 15px;
     border-bottom: 2px solid #e5e7eb;
   }
-  
-  /* Corpo da tabela */
   .card table tbody td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #e5e7eb;
-    color: #111827;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    text-align: left;
   }
-  
-  /* Hover nas linhas */
-  .card table tbody tr:hover {
-    background-color: #f9fafb;
+  .card table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #374151;
   }
-  
-  /* Ajustes para mobile */
-  @media (max-width: 768px) {
-    .card table thead, .card table tbody, .card table th, .card table td, .card table tr {
-      display: block;
-    }
-  
-    .card table thead tr {
-      display: none; /* esconde cabeçalho no mobile */
-    }
-  
-    .card table tbody tr {
-      margin-bottom: 15px;
-      border-bottom: 2px solid #e5e7eb;
-    }
-  
-    .card table tbody td {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
-      text-align: left;
-    }
-  
-    .card table tbody td::before {
-      content: attr(data-label); /* rótulo da coluna */
-      font-weight: 600;
-      color: #374151;
-    }
+}
+
+/* ====================== */
+/* Responsividade geral   */
+/* ====================== */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
   }
-  
-  
-  
+
+  .logo-area { width: 40px; }
+  .logo-area img { width: 100%; height: auto; }
+
+  .nav-section { flex-direction: row; flex:1; justify-content: space-around; height: 100%; }
+  .nav-menus { flex-direction: row; gap: 5px; }
+  .nav-list { flex-direction: row; gap: 5px; margin: 0; }
+  .nav-list li a { font-size: 0; padding: 10px 5px; justify-content: center; }
+  .nav-list li a span { margin: 0; }
+  .bottom-links { flex-direction: row; gap: 5px; }
+
+  .dashboard {
+    margin-left: 0;
+    margin-top: 60px;
+    width: 100%;
+    padding: 20px 10px;
+    grid-template-columns: 1fr;
+  }
+
+  .card { padding: 20px 15px; }
+
+  /* Esconde gráficos sparklines pequenos */
+  #chartBruto, #chartLiquido, #chartMargem, #chartEstoque {
+    display: none;
+  }
+}
