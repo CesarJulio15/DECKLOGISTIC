@@ -1,13 +1,26 @@
 <?php
 // Inclui a conexão com o banco
+session_start();
 include __DIR__ . '/../../conexao.php';
+
+$usuarioId = $_SESSION['usuario_id'] ?? null;
+if (!$usuarioId) {
+    die("Usuário não está logado.");
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rename_tag_id'], $_POST['rename_tag_nome'])) {
     $id = intval($_POST['rename_tag_id']);
     $novoNome = trim($_POST['rename_tag_nome']);
     if ($id && $novoNome) {
-        $stmt = $conn->prepare("UPDATE tags SET nome = ? WHERE id = ?");
-        $stmt->bind_param("si", $novoNome, $id);
+$stmt = $conn->prepare("
+    UPDATE tags 
+    SET nome_antigo = nome, 
+        nome = ?, 
+        atualizado_em = NOW(), 
+        usuario_atualizacao_id = ? 
+    WHERE id = ?
+");
+$stmt->bind_param("sii", $novoNome, $usuarioId, $id);
         $stmt->execute();
         $stmt->close();
         header("Location: tag.php"); // Atualiza a página após renomear
@@ -21,10 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tag_name'], $_POST['i
     $icon = $_POST['icon'];
     $color = $_POST['color'] ?? '#000000';
     if ($tagName && $icon) {
-        $stmt = $conn->prepare("INSERT INTO tags (nome, cor, icone, criado_em) VALUES (?, ?, ?, NOW())");
-        $stmt->bind_param("sss", $tagName, $color, $icon);
-        $stmt->execute();
-        $stmt->close();
+$usuarioId = $_SESSION['usuario_id'] ?? null;
+if (!$usuarioId) {
+    die("Usuário não está logado.");
+}
+if (!$usuarioId) die("Usuário não logado");
+$stmt = $conn->prepare("INSERT INTO tags (nome, nome_criado, cor, icone, usuario_id, criado_em) VALUES (?, ?, ?, ?, ?, NOW())");
+$stmt->bind_param("ssssi", $tagName, $tagName, $color, $icon, $usuarioId);
+if (!$stmt->execute()) {
+    die("Erro ao inserir tag: " . $stmt->error);
+}
+$stmt->close();
     }
 }
 
@@ -41,20 +61,15 @@ if ($result) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     $idToDelete = (int)$_POST['delete_id'];
     if ($idToDelete) {
-     $stmt = $conn->prepare("DELETE FROM produto_tag WHERE tag_id = ?");
-$stmt->bind_param("i", $idToDelete);
-$stmt->execute();
-$stmt->close();
-
-$stmt = $conn->prepare("DELETE FROM tags WHERE id = ?");
-$stmt->bind_param("i", $idToDelete);
-$stmt->execute();
-$stmt->close();
-        header("Location: ".$_SERVER['PHP_SELF']); // Recarrega a página
+        $usuarioId = $_SESSION['usuario_id'] ?? null;
+        $stmt = $conn->prepare("UPDATE tags SET deletado_em = NOW(), usuario_exclusao_id = ? WHERE id = ?");
+        $stmt->bind_param("ii", $usuarioId, $idToDelete);
+        $stmt->execute();
+        $stmt->close();
+        header("Location: ".$_SERVER['PHP_SELF']);
         exit;
     }
 }
-
 // Inserir nova tag se o formulário foi enviado
 // Buscar todas as tags
 $tags = [];

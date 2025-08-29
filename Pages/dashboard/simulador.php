@@ -2,8 +2,9 @@
 session_start();
 include __DIR__ . '/../../conexao.php';
 
-$loja_id = $_SESSION['id'] ?? 0;
-if (!$loja_id) die('Faça login para acessar a simulação.');
+$loja_id = $_SESSION['loja_id'] ?? 0; // id da loja
+$usuario_id = $_SESSION['usuario_id'] ?? 0;   // id do usuário logado
+if (!$loja_id || !$usuario_id) die('Faça login para acessar a simulação.');
 
 $msg = '';
 
@@ -13,8 +14,8 @@ $msg = '';
 if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
     $nome = $_POST['nome'] ?? '';
     $descricao = $_POST['descricao'] ?? '';
-    $preco_unitario = floatval($_POST['valor_unitario'] ?? 0);
-    $custo_unitario = floatval($_POST['preco_unitario'] ?? 0);
+    $preco_unitario = floatval($_POST['preco_unitario'] ?? 0);
+    $custo_unitario = floatval($_POST['valor_unitario'] ?? 0);
     $quantidade_estoque = intval($_POST['quantidade_estoque'] ?? 0);
     $lote = $_POST['lote'] ?? '';
     $data_reabastecimento = $_POST['data_reabastecimento'] ?? date('Y-m-d');
@@ -22,25 +23,32 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
     if(!$nome || !$preco_unitario || !$custo_unitario){
         $msg = 'Campos obrigatórios faltando.';
     } else {
-        $stmt = $conn->prepare("INSERT INTO produtos (loja_id, nome, descricao, preco_unitario, custo_unitario, quantidade_estoque, lote, data_reabastecimento) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("issddiss", $loja_id, $nome, $descricao, $preco_unitario, $custo_unitario, $quantidade_estoque, $lote, $data_reabastecimento);
+   $stmt = $conn->prepare("
+    INSERT INTO produtos 
+    (loja_id, usuario_id, nome, descricao, preco_unitario, custo_unitario, quantidade_estoque, quantidade_inicial, lote, data_reabastecimento) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+");
+$stmt->bind_param("iissddisss", $loja_id, $usuario_id, $nome, $descricao, $preco_unitario, $custo_unitario, $quantidade_estoque, $quantidade_estoque, $lote, $data_reabastecimento);
+
         if($stmt->execute()){
             $produto_id = $stmt->insert_id;
+
             if($quantidade_estoque > 0){
                 // Movimentação de estoque
-                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'entrada', ?, 'Reabastecimento inicial', ?)");
-                $stmtMov->bind_param("iis", $produto_id, $quantidade_estoque, $data_reabastecimento);
+                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, usuario_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, ?, 'entrada', ?, 'Reabastecimento inicial', ?)");
+                $stmtMov->bind_param("iiis", $produto_id, $usuario_id, $quantidade_estoque, $data_reabastecimento);
                 $stmtMov->execute();
                 $stmtMov->close();
 
                 // Transação financeira
-                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, ?)");
                 $valor_saida = $quantidade_estoque * $custo_unitario;
-                $descricao = "Compra inicial do produto $nome";
-                $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_saida, $data_reabastecimento);
+                $descricao_fin = "Compra inicial do produto $nome";
+                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, usuario_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, ?, 'Compra de Estoque', ?, 'saida', ?, ?)");
+                $stmtFin->bind_param("iissds", $loja_id, $usuario_id, $descricao_fin, $valor_saida, $data_reabastecimento);
                 $stmtFin->execute();
                 $stmtFin->close();
             }
+
             $msg = 'Produto adicionado com sucesso!';
         } else {
             $msg = 'Erro: ' . $stmt->error;
@@ -71,39 +79,35 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
             } else {
                 $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id = ? AND loja_id = ?");
                 $stmt->bind_param("iii", $quantidade, $produto_id, $loja_id);
-                if($stmt->execute()){
-                    $stmt->close();
+                $stmt->execute();
+                $stmt->close();
 
-                    $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'saida', ?, 'Venda', ?)");
-                    $stmtMov->bind_param("iis", $produto_id, $quantidade, $data_venda);
-                    $stmtMov->execute();
-                    $stmtMov->close();
+                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, usuario_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, ?, 'saida', ?, 'Venda', ?)");
+                $stmtMov->bind_param("iiis", $produto_id, $usuario_id, $quantidade, $data_venda);
+                $stmtMov->execute();
+                $stmtMov->close();
 
-                    $valor_total = $quantidade * $preco_unitario;
-                    $custo_total  = $quantidade * $custo_unitario;
+                $valor_total = $quantidade * $preco_unitario;
+                $custo_total  = $quantidade * $custo_unitario;
 
-                    $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total) VALUES (?, ?, ?, ?)");
-                    $stmtVenda->bind_param("issd", $loja_id, $data_venda, $valor_total, $custo_total);
-                    $stmtVenda->execute();
-                    $venda_id = $stmtVenda->insert_id;
-                    $stmtVenda->close();
+                $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, usuario_id, data_venda, valor_total, custo_total) VALUES (?, ?, ?, ?, ?)");
+                $stmtVenda->bind_param("iissd", $loja_id, $usuario_id, $data_venda, $valor_total, $custo_total);
+                $stmtVenda->execute();
+                $venda_id = $stmtVenda->insert_id;
+                $stmtVenda->close();
 
-                    $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $preco_unitario, $custo_unitario, $data_venda);
-                    $stmtItem->execute();
-                    $stmtItem->close();
+                $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $preco_unitario, $custo_unitario, $data_venda);
+                $stmtItem->execute();
+                $stmtItem->close();
 
-                    $descricao = "Venda do produto $nome";
-                    $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Venda', ?, 'entrada', ?, ?)");
-                    $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_total, $data_venda);
-                    $stmtFin->execute();
-                    $stmtFin->close();
+                $descricao_fin = "Venda do produto $nome";
+                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, usuario_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, ?, 'Venda', ?, 'entrada', ?, ?)");
+                $stmtFin->bind_param("iissds", $loja_id, $usuario_id, $descricao_fin, $valor_total, $data_venda);
+                $stmtFin->execute();
+                $stmtFin->close();
 
-                    $msg = "Venda registrada com sucesso! Valor total: R$ ".number_format($valor_total,2,',','.');
-                } else {
-                    $msg = 'Erro na venda: ' . $stmt->error;
-                    $stmt->close();
-                }
+                $msg = "Venda registrada com sucesso! Valor total: R$ ".number_format($valor_total,2,',','.');
             }
         } else {
             $msg = "Produto não encontrado.";
@@ -130,28 +134,25 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
 
             $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id = ? AND loja_id = ?");
             $stmt->bind_param("iii", $quantidade, $produto_id, $loja_id);
-            if($stmt->execute()){
-                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, 'entrada', ?, 'Compra/Reabastecimento', ?)");
-                $stmtMov->bind_param("iis", $produto_id, $quantidade, $data_compra);
-                $stmtMov->execute();
-                $stmtMov->close();
-
-                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, 'Compra de Estoque', ?, 'saida', ?, ?)");
-                $valor_saida = $quantidade * $preco_unitario;
-                $descricao = "Compra/Reabastecimento do produto $nome";
-                $stmtFin->bind_param("isds", $loja_id, $descricao, $valor_saida, $data_compra);
-                $stmtFin->execute();
-                $stmtFin->close();
-
-                $msg = 'Compra registrada com sucesso!';
-            } else {
-                $msg = 'Erro na compra: ' . $stmt->error;
-            }
+            $stmt->execute();
             $stmt->close();
+
+            $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, usuario_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, ?, 'entrada', ?, 'Compra/Reabastecimento', ?)");
+            $stmtMov->bind_param("iiis", $produto_id, $usuario_id, $quantidade, $data_compra);
+            $stmtMov->execute();
+            $stmtMov->close();
+
+            $valor_saida = $quantidade * $preco_unitario;
+            $descricao_fin = "Compra/Reabastecimento do produto $nome";
+            $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, usuario_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, ?, 'Compra de Estoque', ?, 'saida', ?, ?)");
+            $stmtFin->bind_param("iissds", $loja_id, $usuario_id, $descricao_fin, $valor_saida, $data_compra);
+            $stmtFin->execute();
+            $stmtFin->close();
+
+            $msg = 'Compra registrada com sucesso!';
         }
     }
 }
-
 
 // ============================
 // LISTAR PRODUTOS

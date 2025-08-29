@@ -92,7 +92,7 @@ if ($tagVincResult) {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-        <button class="btn-novo">Novo item +</button>
+        <button class="btn-novo" onclick="window.location.href='../simulador.php'">Novo item +</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
             <option value="nome-asc">Nome (A-Z)</option>

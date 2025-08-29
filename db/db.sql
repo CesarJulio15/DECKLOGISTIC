@@ -124,3 +124,35 @@ CREATE TABLE transacoes_financeiras (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (loja_id) REFERENCES lojas(id)
 );
+
+-- alterações AP
+
+ALTER TABLE produtos ADD COLUMN usuario_id INT;
+ALTER TABLE tags ADD COLUMN usuario_id INT;
+ALTER TABLE vendas ADD COLUMN usuario_id INT;
+
+
+
+SELECT 'Tag Criada' AS tipo, t.nome AS item, t.cor AS detalhe, t.criado_em AS data, u.nome AS usuario
+FROM tags t
+JOIN usuarios u ON u.id = t.usuario_id
+ORDER BY t.criado_em DESC
+LIMIT 5;
+
+
+SELECT 'Tag Criada' AS tipo, t.nome AS item, t.cor AS detalhe, t.criado_em AS data, u.nome AS usuario
+FROM tags t
+JOIN usuarios u ON u.id = t.usuario_id
+
+
+ALTER TABLE produtos ADD COLUMN quantidade_inicial INT NOT NULL DEFAULT 0;
+
+
+ALTER TABLE tags 
+ADD COLUMN atualizado_em DATETIME NULL,
+ADD COLUMN usuario_atualizacao_id INT NULL;
+
+
+ALTER TABLE tags ADD COLUMN nome_antigo VARCHAR(255) NULL;
+
+ALTER TABLE tags ADD COLUMN nome_criado VARCHAR(255) AFTER nome;
