@@ -44,11 +44,11 @@ if ($tagVincResult) {
 <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/produtos.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/sidebar.css">
 </head>
 
 <body>
 <aside class="sidebar">
-    <link rel="stylesheet" href="../../../assets/sidebar.css">
     <div class="logo-area">
         <img src="../../../img/logoDecklogistic.webp" alt="Logo">
     </div>
@@ -133,8 +133,8 @@ if ($tagVincResult) {
     <tbody id="tabela-produtos">
     <?php while ($produto = mysqli_fetch_assoc($result)): ?>
         <tr>
-         <td style="display:flex; align-items:center; gap:10px;">
-    <div class="tag-dropdown" style="position:relative;">
+        <td style="display:flex; align-items:center; gap:10px;">
+    <div class="tag-dropdown" style="position:relative; display:flex; align-items:center; gap:5px;">
         <button class="btn-add" data-id="<?= $produto['id'] ?>">+</button>
         <div class="dropdown-content">
             <?php foreach ($tags as $tag): ?>
@@ -150,6 +150,11 @@ if ($tagVincResult) {
             <?php endforeach; ?>
         </div>
     </div>
+
+    <!-- Ícone da lixeira fora do dropdown -->
+    <i class="fa-solid fa-trash btn-delete" 
+       style="color:black; cursor:pointer;" 
+       data-id="<?= $produto['id'] ?>"></i>
 
     <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
       <?php if (isset($produtoTags[$produto['id']])): ?>
@@ -219,7 +224,6 @@ document.querySelectorAll('.tag-option').forEach(option => {
         }).then(res => res.text())
           .then(data => {
             if (data.trim() === "ok") {
-                // Verifica duplicidade depois da resposta
                 if (!container.querySelector(`[data-tag-id='${tagId}']`)) {
                     const iconElem = document.createElement('i');
                     iconElem.className = `fa-solid ${icone}`;
@@ -227,12 +231,6 @@ document.querySelectorAll('.tag-option').forEach(option => {
                     iconElem.style.marginLeft = "5px";
                     iconElem.dataset.tagId = tagId;
                     container.appendChild(iconElem);
-
-                    // Atualiza filtro se houver tag ativa
-                    const ativa = document.querySelector('.tags-area .tag-item.active');
-                    if (ativa) {
-                        filtrarPorTag(ativa.dataset.tagId);
-                    }
                 }
             }
         });
@@ -283,6 +281,28 @@ document.querySelector('.tags-area').addEventListener('click', function(e) {
     tag.classList.add('active');
 
     filtrarPorTag(tag.dataset.tagId);
+});
+
+document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const produtoId = this.dataset.id;
+        if (!confirm("Deseja realmente excluir este produto?")) return;
+
+        fetch('excluir_produto.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `produto_id=${produtoId}`
+        })
+        .then(res => res.text())
+        .then(data => {
+            if (data.trim() === "ok") {
+                // Remove a linha da tabela
+                this.closest('tr').remove();
+            } else {
+                alert("Erro ao excluir produto!");
+            }
+        });
+    });
 });
 </script>
 </body>
