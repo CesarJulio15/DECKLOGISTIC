@@ -22,11 +22,11 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
         if (password_verify($senha, $loja['senha_hash'])) {
             session_regenerate_id(true);
 
-            // 🔑 Agora guarda o id da empresa em 'loja_id'
-            $_SESSION['loja_id'] = $loja['id']; 
-            $_SESSION['id']      = $loja['id']; // se você usa em outros lugares, pode manter
-            $_SESSION['nome']    = $loja['nome'];
-            $_SESSION['email']   = $loja['email'];
+            // 🔑 padronização
+            $_SESSION['usuario_id'] = $loja['id'];
+            $_SESSION['nome']       = $loja['nome'];
+            $_SESSION['email']      = $loja['email'];
+            $_SESSION['tipo_login'] = 'empresa';
 
             header("Location: ../../../index.php");
             exit;

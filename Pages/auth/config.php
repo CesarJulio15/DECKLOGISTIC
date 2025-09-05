@@ -8,41 +8,48 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-$tipo_login = $_SESSION['tipo_login'] ?? 'funcionario'; // default funcionário
+$tipo_login = $_SESSION['tipo_login'] ?? 'funcionario'; // padrão funcionário
 
-// Pega dados reais da empresa se for funcionário
-$empresa = null;
-if ($tipo_login === 'funcionario') {
-    $stmt = $conn->prepare("SELECT nome, email FROM lojas WHERE id = ?");
-    $stmt->bind_param("i", $_SESSION['loja_id']);
+// Busca dados reais do usuário logado
+$dados_usuario = null;
+
+if ($tipo_login === 'empresa') {
+    $stmt = $conn->prepare("SELECT id, nome, email FROM lojas WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['usuario_id']);
     $stmt->execute();
-    $empresa = $stmt->get_result()->fetch_assoc();
-}
-
-// Função para mostrar valor correto
-function valor($tipo_login, $campo_empresa, $campo_sessao) {
-    return htmlspecialchars($tipo_login === 'empresa' ? ($campo_sessao ?? '') : ($campo_empresa ?? ''));
+    $dados_usuario = $stmt->get_result()->fetch_assoc();
+} else {
+    $stmt = $conn->prepare("SELECT id, nome, email FROM usuarios WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['usuario_id']);
+    $stmt->execute();
+    $dados_usuario = $stmt->get_result()->fetch_assoc();
 }
 
 // Processa alterações
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['alterar_nome'])) {
         $novo_nome = trim($_POST['nome']);
-        if ($tipo_login === 'empresa') {
-            $stmt = $conn->prepare("UPDATE lojas SET nome=? WHERE id=?");
+        if (!empty($novo_nome)) {
+            if ($tipo_login === 'empresa') {
+                $stmt = $conn->prepare("UPDATE lojas SET nome=? WHERE id=?");
+            } else {
+                $stmt = $conn->prepare("UPDATE usuarios SET nome=? WHERE id=?");
+            }
             $stmt->bind_param("si", $novo_nome, $_SESSION['usuario_id']);
             $stmt->execute();
-            $_SESSION['usuario_nome'] = $novo_nome;
         }
     }
 
     if (isset($_POST['alterar_email'])) {
         $novo_email = trim($_POST['email']);
-        if ($tipo_login === 'empresa') {
-            $stmt = $conn->prepare("UPDATE lojas SET email=? WHERE id=?");
+        if (!empty($novo_email)) {
+            if ($tipo_login === 'empresa') {
+                $stmt = $conn->prepare("UPDATE lojas SET email=? WHERE id=?");
+            } else {
+                $stmt = $conn->prepare("UPDATE usuarios SET email=? WHERE id=?");
+            }
             $stmt->bind_param("si", $novo_email, $_SESSION['usuario_id']);
             $stmt->execute();
-            $_SESSION['usuario_email'] = $novo_email;
         }
     }
 
@@ -53,13 +60,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
             if ($tipo_login === 'empresa') {
                 $stmt = $conn->prepare("UPDATE lojas SET senha_hash=? WHERE id=?");
-                $stmt->bind_param("si", $senha_hash, $_SESSION['usuario_id']);
-                $stmt->execute();
             } else {
                 $stmt = $conn->prepare("UPDATE usuarios SET senha_hash=? WHERE id=?");
-                $stmt->bind_param("si", $senha_hash, $_SESSION['usuario_id']);
-                $stmt->execute();
             }
+            $stmt->bind_param("si", $senha_hash, $_SESSION['usuario_id']);
+            $stmt->execute();
         }
     }
 
@@ -79,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="pagina">
 
-    <!-- Sidebar original -->
+    <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo-area">
             <img src="../../img/logoDecklogistic.webp" alt="Logo DeckLogistic">
@@ -112,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="caixa-conta">
             <div class="perfil">
                 <div class="icone-usuario"><img src="../../img/icon-user.svg" alt="Ícone usuário"></div>
-                <h2><?= valor($tipo_login, $empresa['nome'] ?? '', $_SESSION['usuario_nome'] ?? '') ?></h2>
+                <h2><?= htmlspecialchars($dados_usuario['nome'] ?? '') ?></h2>
             </div>
 
             <!-- Formulário Nome -->
@@ -120,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="linha-info">
                     <span class="icone"><img src="../../img/icon-name.svg" alt="Ícone Nome"></span>
                     <strong>Nome:</strong>
-                    <input type="text" name="nome" value="<?= valor($tipo_login, $empresa['nome'] ?? '', $_SESSION['usuario_nome'] ?? '') ?>">
+                    <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>">
                     <button type="submit" name="alterar_nome">Salvar</button>
                 </div>
             </form>
@@ -130,13 +135,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="linha-info">
                     <span class="icone"><img src="../../img/icon-email.svg" alt="Ícone Email"></span>
                     <strong>Email:</strong>
-                    <input type="email" name="email" value="<?= valor($tipo_login, $empresa['email'] ?? '', $_SESSION['usuario_email'] ?? '') ?>">
+                    <input type="email" name="email" value="<?= htmlspecialchars($dados_usuario['email'] ?? '') ?>">
                     <button type="submit" name="alterar_email">Salvar</button>
                 </div>
             </form>
 
-      <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
-
+            <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
 
             <!-- Botão de cadastrar funcionário (apenas empresa) -->
             <?php if ($tipo_login === 'empresa'): ?>
@@ -144,10 +148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- Logout -->
-            <a href="/Pages/auth/logout.php" class="btn-sair">Sair da conta</a>
+            <a href="../auth/logout.php" class="btn-sair">Sair da conta</a>
 
             <!-- Excluir conta -->
-            <form action="/logout.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
+            <form action="../auth/excluirConta.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
                 <button type="submit" class="btn-excluir">
                     <span>Excluir Conta</span>
                     <img src="../../img/icon-lixo.svg" alt="Excluir Conta">

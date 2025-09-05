@@ -16,11 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $usuario = $resultado->fetch_assoc();
 
         if (password_verify($senha, $usuario['senha_hash'])) {
-            // Salva dados na sessão
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-            $_SESSION['loja_id'] = $usuario['loja_id'];
-            $_SESSION['tipo_login'] = 'funcionario';
+            // Padronização de sessão
+            $_SESSION['usuario_id'] = $usuario['id'];   // id do usuário
+            $_SESSION['nome']       = $usuario['nome']; // nome do usuário
+            $_SESSION['email']      = $usuario['email'];
+            $_SESSION['loja_id']    = $usuario['loja_id']; // id da loja que ele pertence
+            $_SESSION['tipo_login'] = 'funcionario';      // tipo de login
 
             header("Location: ../../dashboard/financas.php");
             exit;

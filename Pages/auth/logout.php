@@ -7,7 +7,7 @@ $_SESSION = [];
 // Destrói a sessão
 session_destroy();
 
-// Redireciona para a página de login (ajuste o caminho se necessário)
+// Redireciona para a página de cadastro da loja
 header("Location: /DECKLOGISTIC/Pages/auth/lojas/cadastro.php");
 exit;
 ?>
