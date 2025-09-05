@@ -156,3 +156,19 @@ ADD COLUMN usuario_atualizacao_id INT NULL;
 ALTER TABLE tags ADD COLUMN nome_antigo VARCHAR(255) NULL;
 
 ALTER TABLE tags ADD COLUMN nome_criado VARCHAR(255) AFTER nome;
+
+ALTER TABLE produtos 
+ADD COLUMN deletado_em DATETIME DEFAULT NULL,
+ADD COLUMN usuario_exclusao_id INT DEFAULT NULL;
+
+
+CREATE TABLE historico_produtos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    produto_id INT,
+    nome VARCHAR(255),
+    quantidade INT,
+    lote VARCHAR(255),
+    usuario_id INT,
+    acao VARCHAR(50),
+    criado_em DATETIME
+);
