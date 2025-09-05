@@ -45,6 +45,11 @@ if ($tagVincResult) {
 <link rel="stylesheet" href="../../../assets/produtos.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../assets/sidebar.css">
+<style>
+.add-tag-square { width:24px; height:24px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; border-radius:6px; margin-left:5px; }
+.tag-dropdown { display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:4px; z-index:10; }
+.tag-option { padding:2px 5px; cursor:pointer; }
+</style>
 </head>
 <body>
 
@@ -57,14 +62,10 @@ if ($tagVincResult) {
             <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
             <ul class="nav-list top-section">
                 <li class="<?= ($currentPage=='financas.php') ? 'active' : '' ?>">
-                    <a href="../financas.php">
-                        <span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro
-                    </a>
+                    <a href="../financas.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a>
                 </li>
                 <li class="<?= ($currentPage=='estoque.php') ? 'active' : '' ?>">
-                    <a href="../estoque.php">
-                        <span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque
-                    </a>
+                    <a href="../estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a>
                 </li>
             </ul>
             <hr>
@@ -92,8 +93,7 @@ if ($tagVincResult) {
 <div class="acoes">
     <div class="botoes">
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
-            <input type="text" id="pesquisa" placeholder="Pesquisar produto..." 
-                   style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
+            <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
         <button class="btn-novo" onclick="window.location.href='../simulador.php'">Novo item +</button>
         <select id="ordenar">
@@ -111,17 +111,13 @@ if ($tagVincResult) {
 
     <div class="tags-area" style="display:flex; align-items:center; gap:10px;">
         <?php foreach ($tags as $tag): ?>
-            <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>" data-tag-id="<?= $tag['id'] ?>">
-                <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i> 
-                <?= htmlspecialchars($tag['nome']) ?>
+            <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>" data-tag-id="<?= $tag['id'] ?>" style="cursor:pointer;">
+                <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i> <?= htmlspecialchars($tag['nome']) ?>
             </div>
         <?php endforeach; ?>
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #000000ff;"></i>
         </button>
-        <button class="btn-nova-tag" onclick="window.location.href='../tag.php'">Nova Tag +</button>
-
-        <!-- Ícone de lixo ao lado de Nova Tag -->
         <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px;"></i>
         <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
     </div>
@@ -143,30 +139,26 @@ if ($tagVincResult) {
     <td class="multi-checkbox" style="display:none;">
         <input type="checkbox" class="chk-delete" data-id="<?= $produto['id'] ?>">
     </td>
-    <td style="display:flex; align-items:center; gap:10px;">
+    <td style="display:flex; align-items:center; gap:10px; position:relative;">
         <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
             <?php if (isset($produtoTags[$produto['id']])): ?>
                 <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
-                    <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" 
-                       style="color: <?= htmlspecialchars($tag['cor']) ?>;" 
-                       data-tag-id="<?= $tag['id'] ?>"></i>
+                    <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;" data-tag-id="<?= $tag['id'] ?>"></i>
                 <?php endforeach; ?>
             <?php endif; ?>
         </span>
 
         <span><?= htmlspecialchars($produto['nome']) ?></span>
 
-        <!-- Formulário para vincular tag -->
-        <div class="add-tag-square" data-produto-id="<?= $produto['id'] ?>" style="width:24px; height:24px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; border-radius:6px; margin-left:5px;">
-    +
-</div>
-<div class="tag-dropdown" id="tag-dropdown-<?= $produto['id'] ?>" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:4px; z-index:10;">
-    <?php foreach($tags as $tag): ?>
-        <div class="tag-option" data-tag-id="<?= $tag['id'] ?>" style="padding:2px 5px; cursor:pointer;">
-            <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i> <?= htmlspecialchars($tag['nome']) ?>
+        <!-- Quadrado preto (+) para vincular tag -->
+        <div class="add-tag-square" data-produto-id="<?= $produto['id'] ?>">+</div>
+        <div class="tag-dropdown" id="tag-dropdown-<?= $produto['id'] ?>">
+            <?php foreach($tags as $tag): ?>
+                <div class="tag-option" data-tag-id="<?= $tag['id'] ?>">
+                    <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i> <?= htmlspecialchars($tag['nome']) ?>
+                </div>
+            <?php endforeach; ?>
         </div>
-    <?php endforeach; ?>
-</div>
     </td>
     <td>R$ <?= number_format($produto['preco_unitario'], 2, ',', '.') ?></td>
     <td><?= intval($produto['quantidade_estoque']) ?></td>
@@ -177,19 +169,18 @@ if ($tagVincResult) {
 </table>
 
 <script>
-// Botão para ativar seleção em massa
+// Seleção múltipla
 document.getElementById('btn-multi-delete').addEventListener('click', function() {
     document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'table-cell');
     document.getElementById('multi-checkbox-header').style.display = 'table-cell';
     document.getElementById('confirm-delete').style.display = 'inline-block';
 });
 
-// Confirmar delete múltiplo
+// Confirmar exclusão
 document.getElementById('confirm-delete').addEventListener('click', function() {
     const checkboxes = document.querySelectorAll('.chk-delete:checked');
     if (checkboxes.length === 0) return alert("Selecione pelo menos um produto.");
     if (!confirm("Deseja realmente excluir os produtos selecionados?")) return;
-
     let ids = Array.from(checkboxes).map(chk => chk.dataset.id);
 
     fetch('excluir_produto.php', {
@@ -199,28 +190,114 @@ document.getElementById('confirm-delete').addEventListener('click', function() {
     })
     .then(res => res.text())
     .then(data => {
-        console.log(data);
-        if (data.trim() === "ok") {
+        if(data.trim() === 'ok'){
             checkboxes.forEach(chk => chk.closest('tr').remove());
             document.getElementById('confirm-delete').style.display = 'none';
             document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'none');
         } else {
-            alert("Erro ao excluir produtos!");
+            alert('Erro ao excluir produtos!');
         }
     });
 });
-// Abrir dropdown de tags
-document.querySelectorAll('.add-tag-square').forEach(square => {
-    square.addEventListener('click', function(e) {
-        const produtoId = this.dataset.produtoId;
-        const dropdown = document.getElementById('tag-dropdown-' + produtoId);
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        dropdown.style.top = e.target.getBoundingClientRect().bottom + window.scrollY + 'px';
-        dropdown.style.left = e.target.getBoundingClientRect().left + 'px';
+
+// Pesquisa
+document.getElementById('pesquisa').addEventListener('input', function() {
+    const termo = this.value.toLowerCase();
+    document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+        const nome = tr.querySelector('td:nth-child(2) span').innerText.toLowerCase();
+        tr.style.display = nome.includes(termo) ? '' : 'none';
     });
 });
 
-// Selecionar uma tag
+// Ordenação
+document.getElementById('ordenar').addEventListener('change', function() {
+    const tbody = document.getElementById('tabela-produtos');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const val = this.value;
+
+    rows.sort((a,b) => {
+        let aText, bText;
+        switch(val){
+            case 'nome-asc':
+                aText = a.querySelector('td:nth-child(2) span').innerText.toLowerCase();
+                bText = b.querySelector('td:nth-child(2) span').innerText.toLowerCase();
+                return aText.localeCompare(bText);
+            case 'nome-desc':
+                aText = a.querySelector('td:nth-child(2) span').innerText.toLowerCase();
+                bText = b.querySelector('td:nth-child(2) span').innerText.toLowerCase();
+                return bText.localeCompare(aText);
+            case 'preco-asc':
+                aText = parseFloat(a.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
+                bText = parseFloat(b.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
+                return aText - bText;
+            case 'preco-desc':
+                aText = parseFloat(a.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
+                bText = parseFloat(b.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
+                return bText - aText;
+            case 'quantidade-asc':
+                aText = parseInt(a.querySelector('td:nth-child(4)').innerText);
+                bText = parseInt(b.querySelector('td:nth-child(4)').innerText);
+                return aText - bText;
+            case 'quantidade-desc':
+                aText = parseInt(a.querySelector('td:nth-child(4)').innerText);
+                bText = parseInt(b.querySelector('td:nth-child(4)').innerText);
+                return bText - aText;
+            case 'lote-asc':
+                aText = a.querySelector('td:nth-child(5)').innerText.toLowerCase();
+                bText = b.querySelector('td:nth-child(5)').innerText.toLowerCase();
+                return aText.localeCompare(bText);
+            case 'lote-desc':
+                aText = a.querySelector('td:nth-child(5)').innerText.toLowerCase();
+                bText = b.querySelector('td:nth-child(5)').innerText.toLowerCase();
+                return bText.localeCompare(aText);
+            default: return 0;
+        }
+    });
+
+    rows.forEach(r => tbody.appendChild(r));
+});
+
+// Filtro por tag
+document.querySelectorAll('.tag-item').forEach(tag => {
+    tag.addEventListener('click', function() {
+        const tagId = this.dataset.tagId;
+        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+            const tagsProduto = Array.from(tr.querySelectorAll('.tags-vinculadas i')).map(i => i.dataset.tagId);
+            tr.style.display = tagsProduto.includes(tagId) ? '' : 'none';
+        });
+    });
+});
+
+function resetFiltro(){
+    document.querySelectorAll('#tabela-produtos tr').forEach(tr => tr.style.display = '');
+    document.getElementById('pesquisa').value = '';
+}
+
+// Dropdown de tags
+// Dropdown de tags - sempre abaixo do quadrado (+)
+// JS - abre dropdown abaixo do quadrado (+)
+document.querySelectorAll('.add-tag-square').forEach(square => {
+    const dropdown = square.nextElementSibling; // pega o .tag-dropdown logo depois
+    square.addEventListener('click', function(e) {
+        // fecha outros dropdowns
+        document.querySelectorAll('.tag-dropdown').forEach(dd => { if(dd !== dropdown) dd.style.display = 'none'; });
+
+        // alterna visibilidade
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+});
+
+// Fecha dropdown clicando fora
+document.addEventListener('click', function(e){
+    document.querySelectorAll('.tag-dropdown').forEach(dd => {
+        if(!dd.contains(e.target) && !dd.previousElementSibling.contains(e.target)){
+            dd.style.display = 'none';
+        }
+    });
+});
+
+
+
 document.querySelectorAll('.tag-option').forEach(option => {
     option.addEventListener('click', function() {
         const produtoId = this.closest('.tag-dropdown').id.split('-')[2];
@@ -234,7 +311,6 @@ document.querySelectorAll('.tag-option').forEach(option => {
         .then(res => res.text())
         .then(data => {
             if(data.trim() === 'ok'){
-                // Atualiza ícones da tag
                 const icon = this.querySelector('i').cloneNode(true);
                 const container = document.getElementById('tags-produto-' + produtoId);
                 container.appendChild(icon);
@@ -254,7 +330,6 @@ document.addEventListener('click', function(e){
         }
     });
 });
-
 </script>
 
 </div>
