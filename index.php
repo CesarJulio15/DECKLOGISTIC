@@ -1,33 +1,13 @@
 <?php
 require_once 'config.php';
-session_start(); // inicia a sessão
+session_start();
 
-if (!isset($_SESSION['id'])) {
-    header('Location: pages/auth/lojas/cadastro.php'); 
-    exit; 
+// Se o usuário estiver logado → redireciona para dashboard
+if (isset($_SESSION['usuario_id'])) {
+    header('Location: pages/dashboard/financas.php');
+    exit;
 }
 
-if (isset($_SESSION['id'])) {
-    header('Location: pages/dashboard/financas.php'); 
-    exit; 
-}
-?>
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="<?= ASSETS_PATH ?>/style.css">
-</head>
-<body>
-
-  <?php require_once PARTIALS_PATH . '/sidebar.php'; ?>
-
-  <main class="content">
-    <h1>Bem-vindo ao Dashboard</h1>
-    <p>Conteúdo principal aqui.</p>
-  </main>
-
-</body>
-</html>
+// Se não estiver logado → redireciona direto para cadastro
+header('Location: pages/auth/lojas/cadastro.php');
+exit;
