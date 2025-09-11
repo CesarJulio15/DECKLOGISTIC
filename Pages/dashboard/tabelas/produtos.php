@@ -117,6 +117,7 @@ if ($tagVincResult) {
         <?php endforeach; ?>
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #000000ff;"></i>
+        
         </button>
         <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px;"></i>
         <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
