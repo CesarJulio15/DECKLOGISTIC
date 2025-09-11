@@ -3,9 +3,10 @@ session_start();
 include __DIR__ . '/../../../conexao.php';
 
 // Garante que a empresa está logada
-if (!isset($_SESSION['loja_id'])) {
+if (!isset($_SESSION['usuario_id'])) {
     die("Acesso negado. Você precisa estar logado como empresa.");
 }
+
 
 // Se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,25 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST['senha'] ?? '';
     $senha2 = $_POST['senha2'] ?? '';
 
-    if ($nome && $email && $senha && $senha2) {
-        if ($senha !== $senha2) {
-            $msg = "As senhas não coincidem.";
-        } else {
-            $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-            $loja_id = $_SESSION['loja_id'];
-
-            $stmt = $conn->prepare("INSERT INTO usuarios (loja_id, nome, email, senha_hash) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("isss", $loja_id, $nome, $email, $senha_hash);
-
-            if ($stmt->execute()) {
-                $msg = "Funcionário cadastrado com sucesso!";
-            } else {
-                $msg = "Erro ao cadastrar: " . $stmt->error;
-            }
-        }
+  if ($nome && $email && $senha && $senha2) {
+    if ($senha !== $senha2) {
+        $msg = "As senhas não coincidem.";
     } else {
-        $msg = "Preencha todos os campos.";
+        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+        $loja_id = $_SESSION['usuario_id']; // ✅ aqui pegamos o ID do login correto
+
+        $stmt = $conn->prepare("INSERT INTO usuarios (loja_id, nome, email, senha_hash) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("isss", $loja_id, $nome, $email, $senha_hash);
+
+        if ($stmt->execute()) {
+            $msg = "Funcionário cadastrado com sucesso!";
+        } else {
+            $msg = "Erro ao cadastrar: " . $stmt->error;
+        }
     }
+} else {
+    $msg = "Preencha todos os campos.";
+}
+
 }
 ?>
 

@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Botão de cadastrar funcionário (apenas empresa) -->
             <?php if ($tipo_login === 'empresa'): ?>
-                <a href="/Pages/auth/funcionarios/cadastroFuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
+                <a href="funcionarios/cadastrofuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
             <?php endif; ?>
 
             <!-- Logout -->
