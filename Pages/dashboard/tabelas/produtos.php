@@ -97,7 +97,7 @@ if ($tagVincResult) {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-        <button class="btn-novo" onclick="window.location.href='../simulador.php'">Novo item +</button>
+        <button class="btn-novo" onclick="window.location.href='../gerenciamento_produtos.php'">Novo item +</button>
         <button class="btn-novo" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
@@ -174,10 +174,16 @@ if ($tagVincResult) {
 
 <script>
 // Seleção múltipla
-document.getElementById('btn-multi-delete').addEventListener('click', function() {
-    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'table-cell');
-    document.getElementById('multi-checkbox-header').style.display = 'table-cell';
-    document.getElementById('confirm-delete').style.display = 'inline-block';
+const btnMultiDelete = document.getElementById('btn-multi-delete');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+let multiDeleteActive = false;
+
+btnMultiDelete.addEventListener('click', function() {
+    multiDeleteActive = !multiDeleteActive;
+
+    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = multiDeleteActive ? 'table-cell' : 'none');
+    document.getElementById('multi-checkbox-header').style.display = multiDeleteActive ? 'table-cell' : 'none';
+    confirmDeleteBtn.style.display = multiDeleteActive ? 'inline-block' : 'none';
 });
 
 // Confirmar exclusão

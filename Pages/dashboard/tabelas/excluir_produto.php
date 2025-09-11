@@ -1,35 +1,24 @@
 <?php
-session_start();
 include '../../../conexao.php';
 
-if (isset($_POST['produto_ids'])) {
+if(!empty($_POST['produto_ids'])){
     $ids = explode(',', $_POST['produto_ids']);
-    $ids = array_map('intval', $ids);
-    $ids_str = implode(',', $ids);
-    
-    // Corrija para pegar o ID do usuário correto
-    $usuario_id = $_SESSION['usuario_id'] ?? null;
-    if (!$usuario_id) {
-        echo "erro: usuário não logado";
-        exit;
-    }
+    $ids = array_map('intval', $ids); // garante números inteiros
 
-    foreach ($ids as $id) {
-        $p = $conn->query("SELECT * FROM produtos WHERE id = $id")->fetch_assoc();
-        if ($p) {
-            $conn->query("
-                INSERT INTO historico_produtos
-                (produto_id, nome, quantidade, lote, usuario_id, acao, criado_em)
-                VALUES
-                ({$p['id']}, '{$p['nome']}', {$p['quantidade_estoque']}, '{$p['lote']}', $usuario_id, 'excluido', NOW())
-            ");
+    if(count($ids)){
+        // Remove tags vinculadas
+        $ids_str = implode(',', $ids);
+        $conn->query("DELETE FROM produto_tag WHERE produto_id IN ($ids_str)");
+
+        // Remove produtos
+        if($conn->query("DELETE FROM produtos WHERE id IN ($ids_str)")){
+            echo 'ok';
+        } else {
+            echo 'erro';
         }
+    } else {
+        echo 'erro';
     }
-
-    $conn->query("DELETE FROM movimentacoes_estoque WHERE produto_id IN ($ids_str)");
-    echo $conn->query("DELETE FROM produtos WHERE id IN ($ids_str)") ? "ok" : "erro";
-    exit;
+} else {
+    echo 'erro';
 }
-
-echo "erro";
-
