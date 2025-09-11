@@ -2,7 +2,7 @@
 include '../../../conexao.php'; 
 
 // Definir a quantidade de itens por página
-$itensPorPagina = 12;
+$itensPorPagina = 15;
 $paginaAtual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
 $offset = ($paginaAtual - 1) * $itensPorPagina;
 
@@ -210,6 +210,7 @@ if ($tagVincResult) {
     <div class="paginacao" style="text-align:center; margin-top:20px;">
         <!-- Botão para ir à página anterior -->
         <?php if ($paginaAtual > 1): ?>
+            <a href="?pagina=<?= $paginaAtual - 1 ?>" class="page-link">← Anterior</a>
         <?php endif; ?>
 
         <!-- Exibe os números das páginas -->
@@ -219,6 +220,7 @@ if ($tagVincResult) {
 
         <!-- Botão para ir à próxima página -->
         <?php if ($paginaAtual < $totalPaginas): ?>
+            <a href="?pagina=<?= $paginaAtual + 1 ?>" class="page-link">Próxima →</a>
         <?php endif; ?>
     </div>
 <?php endif; ?>
