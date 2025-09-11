@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+var_dump($_SESSION);
 header('Content-Type: application/json; charset=utf-8');
 
 // Ajuste este caminho se necessário

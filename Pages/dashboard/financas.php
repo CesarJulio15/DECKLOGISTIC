@@ -1,10 +1,11 @@
 <?php
 session_start();
-
+var_dump($_SESSION); 
 // Verifique a chave correta da sessão
 if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
     echo json_encode(["error" => "Loja não autenticada"]);
     exit;
+    
 }
 
 $lojaId = $_SESSION['loja_id'];
