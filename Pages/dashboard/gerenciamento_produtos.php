@@ -2,9 +2,9 @@
 session_start();
 include __DIR__ . '/../../conexao.php';
 
-$loja_id = $_SESSION['loja_id'] ?? 0;
-$usuario_id = $_SESSION['usuario_id'] ?? 0;
-if (!$loja_id || !$usuario_id) {
+$lojaId = $_SESSION['loja_id'] ?? 0;
+$usuarioId = $_SESSION['usuario_id'] ?? 0;
+if (!$lojaId || !$usuarioId) {
     die('Faça login para acessar o gerenciamento.');
 }
 
@@ -22,8 +22,8 @@ if (isset($_POST['acao'])) {
         $preco = floatval($_POST['preco']);
         $estoque = intval($_POST['estoque']);
 
-    $stmt = $conn->prepare("INSERT INTO produtos (loja_id, usuario_id, nome, preco_unitario, quantidade_estoque) VALUES (?,?,?,?,?)");
-$stmt->bind_param("iisdi", $loja_id, $usuario_id, $nome, $preco, $estoque);
+        $stmt = $conn->prepare("INSERT INTO produtos (loja_id, usuario_id, nome, preco_unitario, quantidade_estoque) VALUES (?,?,?,?,?)");
+        $stmt->bind_param("iisdi", $lojaId, $usuarioId, $nome, $preco, $estoque);
         $msg = $stmt->execute() ? "✅ Produto cadastrado com sucesso!" : "❌ Erro: ".$stmt->error;
         $stmt->close();
     }
@@ -36,34 +36,34 @@ $stmt->bind_param("iisdi", $loja_id, $usuario_id, $nome, $preco, $estoque);
         $estoque = intval($_POST['estoque']);
 
         $stmt = $conn->prepare("UPDATE produtos SET nome=?, preco_unitario=?, quantidade_estoque=? WHERE id=? AND loja_id=?");
-        $stmt->bind_param("sdiii", $nome, $preco, $estoque, $id, $loja_id);
+        $stmt->bind_param("sdiii", $nome, $preco, $estoque, $id, $lojaId);
         $msg = $stmt->execute() ? "✏️ Produto atualizado!" : "❌ Erro: ".$stmt->error;
         $stmt->close();
     }
 
     // ---------- APAGAR PRODUTO ----------
-if ($acao === 'apagar_produto') {
-    $id = intval($_POST['produto_id']);
+    if ($acao === 'apagar_produto') {
+        $id = intval($_POST['produto_id']);
 
-    // Apaga primeiro as tags ligadas ao produto
-    $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $stmt->close();
+        // Apaga primeiro as tags ligadas ao produto
+        $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
 
-    // Agora pode apagar o produto
-    $stmt = $conn->prepare("DELETE FROM produtos WHERE id=? AND loja_id=?");
-    $stmt->bind_param("ii", $id, $loja_id);
-    $msg = $stmt->execute() ? "🗑️ Produto apagado!" : "❌ Erro: ".$stmt->error;
-    $stmt->close();
-}
+        // Agora pode apagar o produto
+        $stmt = $conn->prepare("DELETE FROM produtos WHERE id=? AND loja_id=?");
+        $stmt->bind_param("ii", $id, $lojaId);
+        $msg = $stmt->execute() ? "🗑️ Produto apagado!" : "❌ Erro: ".$stmt->error;
+        $stmt->close();
+    }
 
     // ---------- COMPRAR (ENTRADA DE ESTOQUE) ----------
     if ($acao === 'comprar_produto') {
         $id = intval($_POST['produto_id']);
         $qtd = intval($_POST['quantidade']);
         $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
-        $stmt->bind_param("iii", $qtd, $id, $loja_id);
+        $stmt->bind_param("iii", $qtd, $id, $lojaId);
         $msg = $stmt->execute() ? "📥 Compra registrada (+$qtd)" : "❌ Erro: ".$stmt->error;
         $stmt->close();
     }
@@ -72,9 +72,9 @@ if ($acao === 'apagar_produto') {
     if ($acao === 'vender_produto') {
         $id = intval($_POST['produto_id']);
         $qtd = intval($_POST['quantidade']);
-       $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? 
+        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? 
     WHERE id=? AND loja_id=? AND quantidade_estoque >= ?");
-$stmt->bind_param("iiii", $qtd, $id, $loja_id, $qtd);
+        $stmt->bind_param("iiii", $qtd, $id, $lojaId, $qtd);
         $msg = $stmt->execute() ? "📤 Venda registrada (-$qtd)" : "❌ Estoque insuficiente ou erro!";
         $stmt->close();
     }
@@ -84,7 +84,7 @@ $stmt->bind_param("iiii", $qtd, $id, $loja_id, $qtd);
    LISTAR PRODUTOS
    ====================================================== */
 $produtos = [];
-$res = $conn->query("SELECT * FROM produtos WHERE loja_id = $loja_id ORDER BY id DESC");
+$res = $conn->query("SELECT * FROM produtos WHERE loja_id = $lojaId ORDER BY id DESC");
 while ($row = $res->fetch_assoc()) {
     $produtos[] = $row;
 }
