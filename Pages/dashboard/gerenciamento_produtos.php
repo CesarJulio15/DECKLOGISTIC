@@ -244,5 +244,15 @@ while ($row = $res->fetch_assoc()) {
     </section>
 </main>
 
+<script>
+    // Passando valores do PHP para JS
+    const usuarioId = <?= json_encode($_SESSION['usuario_id'] ?? 0) ?>;
+    const lojaId = <?= json_encode($_SESSION['loja_id'] ?? 0) ?>;
+
+    console.log("👤 Usuário logado ID:", usuarioId);
+    console.log("🏬 Loja logada ID:", lojaId);
+</script>
+
+
 </body>
 </html>
