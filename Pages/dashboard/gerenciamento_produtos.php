@@ -41,7 +41,6 @@ $stmt->bind_param("iisdi", $loja_id, $usuario_id, $nome, $preco, $estoque);
         $stmt->close();
     }
 
-    // ---------- APAGAR PRODUTO ----------
 // ---------- APAGAR PRODUTO ----------
 if ($acao === 'apagar_produto') {
     $id = intval($_POST['produto_id']);
@@ -75,6 +74,7 @@ if ($acao === 'comprar_produto') {
     $qtd = intval($_POST['quantidade']);
     $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
 
+    // Atualiza estoque
     $stmt = $conn->prepare("
         UPDATE produtos 
         SET quantidade_estoque = quantidade_estoque + ? 
@@ -83,15 +83,16 @@ if ($acao === 'comprar_produto') {
     $stmt->bind_param("iii", $qtd, $id, $loja_id);
 
     if ($stmt->execute()) {
+        // Registra movimentação
         $stmt2 = $conn->prepare("
-            INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id) 
+            INSERT INTO movimentacoes_estoque 
+            (produto_id, tipo, quantidade, data_movimentacao, usuario_id) 
             VALUES (?, 'entrada', ?, ?, ?)
         ");
         $stmt2->bind_param("iisi", $id, $qtd, $data, $usuario_id);
-
-        $stmt2->bind_param("iis", $id, $qtd, $data);
         $stmt2->execute();
         $stmt2->close();
+
         $msg = "📥 Compra registrada (+$qtd) em $data";
     } else {
         $msg = "❌ Erro ao registrar compra!";
@@ -105,6 +106,7 @@ if ($acao === 'vender_produto') {
     $qtd = intval($_POST['quantidade']);
     $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
 
+    // Atualiza estoque
     $stmt = $conn->prepare("
         UPDATE produtos 
         SET quantidade_estoque = quantidade_estoque - ? 
@@ -113,15 +115,16 @@ if ($acao === 'vender_produto') {
     $stmt->bind_param("iiii", $qtd, $id, $loja_id, $qtd);
 
     if ($stmt->execute()) {
+        // Registra movimentação
         $stmt2 = $conn->prepare("
-            INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id) 
+            INSERT INTO movimentacoes_estoque 
+            (produto_id, tipo, quantidade, data_movimentacao, usuario_id) 
             VALUES (?, 'saida', ?, ?, ?)
         ");
         $stmt2->bind_param("iisi", $id, $qtd, $data, $usuario_id);
-
-        $stmt2->bind_param("iis", $id, $qtd, $data);
         $stmt2->execute();
         $stmt2->close();
+
         $msg = "📤 Venda registrada (-$qtd) em $data";
     } else {
         $msg = "❌ Estoque insuficiente ou erro!";
