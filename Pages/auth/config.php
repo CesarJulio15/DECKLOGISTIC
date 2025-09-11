@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header("Location: conta.php");
+    header("Location: config.php");
     exit;
 }
 ?>
