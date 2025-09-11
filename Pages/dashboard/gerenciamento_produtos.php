@@ -2,7 +2,7 @@
 session_start();
 include __DIR__ . '/../../conexao.php';
 
-$loja_id = $_SESSION['loja_id'] ?? 0;
+$loja_id = $_SESSION['usuario_id'] ?? 0;
 $usuario_id = $_SESSION['usuario_id'] ?? 0;
 if (!$loja_id || !$usuario_id) {
     die('Faça login para acessar o gerenciamento.');
@@ -42,49 +42,107 @@ $stmt->bind_param("iisdi", $loja_id, $usuario_id, $nome, $preco, $estoque);
     }
 
     // ---------- APAGAR PRODUTO ----------
+// ---------- APAGAR PRODUTO ----------
 if ($acao === 'apagar_produto') {
     $id = intval($_POST['produto_id']);
 
-    // Apaga primeiro as tags ligadas ao produto
+    // Remove tags associadas
     $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
 
-    // Agora pode apagar o produto
-    $stmt = $conn->prepare("DELETE FROM produtos WHERE id=? AND loja_id=?");
-    $stmt->bind_param("ii", $id, $loja_id);
-    $msg = $stmt->execute() ? "🗑️ Produto apagado!" : "❌ Erro: ".$stmt->error;
+    // Marca como excluído
+    $stmt = $conn->prepare("
+        UPDATE produtos 
+        SET deletado_em = NOW(), usuario_exclusao_id = ? 
+        WHERE id = ? AND loja_id = ?
+    ");
+    $stmt->bind_param("iii", $usuario_id, $id, $loja_id);
+
+    if ($stmt->execute()) {
+        $msg = "🗑️ Produto apagado!";
+    } else {
+        $msg = "❌ Erro: " . $stmt->error;
+    }
     $stmt->close();
 }
 
-    // ---------- COMPRAR (ENTRADA DE ESTOQUE) ----------
-    if ($acao === 'comprar_produto') {
-        $id = intval($_POST['produto_id']);
-        $qtd = intval($_POST['quantidade']);
-        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
-        $stmt->bind_param("iii", $qtd, $id, $loja_id);
-        $msg = $stmt->execute() ? "📥 Compra registrada (+$qtd)" : "❌ Erro: ".$stmt->error;
-        $stmt->close();
-    }
 
-    // ---------- VENDER (SAÍDA DE ESTOQUE) ----------
-    if ($acao === 'vender_produto') {
-        $id = intval($_POST['produto_id']);
-        $qtd = intval($_POST['quantidade']);
-       $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? 
-    WHERE id=? AND loja_id=? AND quantidade_estoque >= ?");
-$stmt->bind_param("iiii", $qtd, $id, $loja_id, $qtd);
-        $msg = $stmt->execute() ? "📤 Venda registrada (-$qtd)" : "❌ Estoque insuficiente ou erro!";
-        $stmt->close();
+// ---------- COMPRAR (ENTRADA DE ESTOQUE) ----------
+if ($acao === 'comprar_produto') {
+    $id = intval($_POST['produto_id']);
+    $qtd = intval($_POST['quantidade']);
+    $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
+
+    $stmt = $conn->prepare("
+        UPDATE produtos 
+        SET quantidade_estoque = quantidade_estoque + ? 
+        WHERE id=? AND loja_id=?
+    ");
+    $stmt->bind_param("iii", $qtd, $id, $loja_id);
+
+    if ($stmt->execute()) {
+        $stmt2 = $conn->prepare("
+            INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id) 
+            VALUES (?, 'entrada', ?, ?, ?)
+        ");
+        $stmt2->bind_param("iisi", $id, $qtd, $data, $usuario_id);
+
+        $stmt2->bind_param("iis", $id, $qtd, $data);
+        $stmt2->execute();
+        $stmt2->close();
+        $msg = "📥 Compra registrada (+$qtd) em $data";
+    } else {
+        $msg = "❌ Erro ao registrar compra!";
     }
+    $stmt->close();
+}
+
+// ---------- VENDER (SAÍDA DE ESTOQUE) ----------
+if ($acao === 'vender_produto') {
+    $id = intval($_POST['produto_id']);
+    $qtd = intval($_POST['quantidade']);
+    $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
+
+    $stmt = $conn->prepare("
+        UPDATE produtos 
+        SET quantidade_estoque = quantidade_estoque - ? 
+        WHERE id=? AND loja_id=? AND quantidade_estoque >= ?
+    ");
+    $stmt->bind_param("iiii", $qtd, $id, $loja_id, $qtd);
+
+    if ($stmt->execute()) {
+        $stmt2 = $conn->prepare("
+            INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id) 
+            VALUES (?, 'saida', ?, ?, ?)
+        ");
+        $stmt2->bind_param("iisi", $id, $qtd, $data, $usuario_id);
+
+        $stmt2->bind_param("iis", $id, $qtd, $data);
+        $stmt2->execute();
+        $stmt2->close();
+        $msg = "📤 Venda registrada (-$qtd) em $data";
+    } else {
+        $msg = "❌ Estoque insuficiente ou erro!";
+    }
+    $stmt->close();
+}
+
+
 }
 
 /* ======================================================
    LISTAR PRODUTOS
    ====================================================== */
 $produtos = [];
-$res = $conn->query("SELECT * FROM produtos WHERE loja_id = $loja_id ORDER BY id DESC");
+$res = $conn->query("
+    SELECT * 
+    FROM produtos 
+    WHERE loja_id = $loja_id 
+      AND deletado_em IS NULL
+    ORDER BY id DESC
+");
 while ($row = $res->fetch_assoc()) {
     $produtos[] = $row;
 }
@@ -152,6 +210,7 @@ while ($row = $res->fetch_assoc()) {
                                 <input type="hidden" name="acao" value="comprar_produto">
                                 <input type="hidden" name="produto_id" value="<?= $p['id'] ?>">
                                 <input type="number" name="quantidade" placeholder="Qtd" min="1" required>
+                                <input type="date" name="data_movimentacao" value="<?= date('Y-m-d') ?>" required>
                                 <button type="submit" class="btn">📥</button>
                             </form>
 
@@ -160,8 +219,10 @@ while ($row = $res->fetch_assoc()) {
                                 <input type="hidden" name="acao" value="vender_produto">
                                 <input type="hidden" name="produto_id" value="<?= $p['id'] ?>">
                                 <input type="number" name="quantidade" placeholder="Qtd" min="1" required>
+                                <input type="date" name="data_movimentacao" value="<?= date('Y-m-d') ?>" required>
                                 <button type="submit" class="btn">📤</button>
                             </form>
+
 
                             <!-- Apagar -->
                             <form method="POST" class="inline-form">

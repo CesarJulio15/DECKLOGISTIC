@@ -11,6 +11,7 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background: #f5f7fa;
 }
+
 .dashboard h1 {
   font-size: 2rem;
   font-weight: 700;
@@ -72,18 +73,19 @@ body {
 .nav-list li a {
   display: flex;
   align-items: center;
-  gap: 0px; /* ajuste conforme quiser */
+  gap: 0px;
 }
 
 .nav-list li a span {
-    margin-right: 4px; /* espaço entre ícone e texto */
+  margin-right: 4px;
 }
 
 .nav-list li a span img {
-    width: 14px;   /* tamanho menor */
-    height: 14px;  /* tamanho menor */
-    object-fit: contain;
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
 }
+
 .nav-list li a:hover {
   background-color: #222;
 }
@@ -139,7 +141,7 @@ hr {
   margin-left: 220px;
   padding: 30px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   width: calc(100% - 220px);
 }
@@ -151,9 +153,9 @@ hr {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  height: 400px;
   transition: transform 0.3s, box-shadow 0.3s;
   overflow: hidden;
+  min-height: 250px;
 }
 
 .card:hover {
@@ -162,11 +164,9 @@ hr {
 }
 
 .card h3 {
-  margin-left: 20px;
-  margin-top: 20px;
   font-size: 1rem;
   color: #374151;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -180,6 +180,21 @@ hr {
 /* cores dos cards */
 #estoque { color: #24b12f; }
 #chartEstoque, #chartReceitaDespesa { color: #3b82f6; }
+
+/* Cards especiais */
+.card.reabastecidos {
+  grid-column: 1 / -1; /* ocupa toda a largura do grid */
+  height: auto;
+  max-width: 810px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Para gráficos ocupar todo espaço do card */
+.card > div[id^="chart"] {
+  flex: 1;
+  min-height: 200px;
+}
 
 /* ====================== */
 /* Tabelas                */
@@ -215,27 +230,19 @@ hr {
   background-color: #f9fafb;
 }
 
-/* Mobile Tabelas */
-@media (max-width: 768px) {
-  .card table thead, .card table tbody, .card table th, .card table td, .card table tr {
-    display: block;
-  }
-  .card table thead tr { display: none; }
-  .card table tbody tr {
-    margin-bottom: 15px;
-    border-bottom: 2px solid #e5e7eb;
-  }
-  .card table tbody td {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px;
-    text-align: left;
-  }
-  .card table tbody td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #374151;
-  }
+/* Tabela reabastecidos */
+#tabelaReabastecidos table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 15px;
+  margin: 0;
+}
+
+#tabelaReabastecidos th,
+#tabelaReabastecidos td {
+  padding: 0 0 8px 0;
+  text-align: left;
+  border: 1px solid #ddd;
 }
 
 /* ====================== */
@@ -275,50 +282,51 @@ hr {
   #chartBruto, #chartLiquido, #chartMargem, #chartEstoque {
     display: none;
   }
+
+  .card.reabastecidos {
+    grid-column: auto;
+  }
+
+  /* Mobile Tabelas */
+  .card table thead, .card table tbody, .card table th, .card table td, .card table tr {
+    display: block;
+  }
+  .card table thead tr { display: none; }
+  .card table tbody tr {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  .card table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    text-align: left;
+  }
+  .card table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #374151;
+  }
 }
 
+/* ====================== */
+/* Botão ver mais         */
+/* ====================== */
 #btnVerMais {
   margin-top: 190px;
-  background: #111;        /* fundo preto */
-  color: #fff;             /* texto branco */
-  border: none;            /* sem borda */
-  border-radius: 8px;      /* cantos arredondados */
-  padding: 10px 18px;      /* espaçamento interno */
-  font-size: 14px;         /* tamanho da fonte */
-  font-weight: 600;        /* texto mais forte */
-  cursor: pointer;         /* mãozinha ao passar o mouse */
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
 #btnVerMais:hover {
-  background: #000000;     /* verde ao passar o mouse */
+  background: #000;
   color: #fff;
-  transform: translateY(-2px); /* leve efeito de elevação */
-}
-
-.card.reabastecidos {
-    margin-top: 20px;
-    width: auto;
-    max-width: 810px;
-    padding: 0;          /* remove padding interno */
-    box-sizing: border-box;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    margin-left: 250px;
-    height: auto;
-}
-
-#tabelaReabastecidos table {
-    border-collapse: collapse; /* remove espaçamento interno da tabela */
-    border-spacing: 0;         /* garante que não exista gap */
-    font-size: 15px;
-    margin: 0;                 /* remove margens */
-}
-
-#tabelaReabastecidos th,
-#tabelaReabastecidos td {
-    padding: 0 0 8px 0;    /* só padding-bottom */
-    text-align: left;
-    border: 1px solid #ddd;
+  transform: translateY(-2px);
 }

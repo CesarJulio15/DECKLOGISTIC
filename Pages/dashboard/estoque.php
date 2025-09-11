@@ -7,7 +7,7 @@ $lojaId = $_SESSION['id'] ?? 0;
 <head>
   <meta charset="UTF-8">
   <title>Estoque - Decklogistic</title>
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
   <link rel="stylesheet" href="../../assets/estoque.css?v=2">
   <link rel="stylesheet" href="../../assets/sidebar.css">
 </head>
@@ -51,7 +51,46 @@ $lojaId = $_SESSION['id'] ?? 0;
       <h3>Total Estoque</h3>
       <div class="value" id="estoque">...</div>
       <div id="chartMiniEstoque"></div>
-      <button id="btnVerMais">Ver mais</button>
+      <!-- Botão estilizado -->
+      <button id="btnHistorico" style="
+          background: #4f46e5;
+          color: #fff;
+          padding: 10px 16px;
+          font-size: 14px;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          margin-top: 12px;
+          transition: 0.2s;
+      " onmouseover="this.style.background='#3730a3';" 
+         onmouseout="this.style.background='#4f46e5';">
+        Ver histórico 6 meses
+      </button>
+    </div>
+
+    <!-- Popup modal -->
+    <div id="modalHistorico" style="
+        display:none;
+        position:fixed;
+        top:0; left:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.5);
+        justify-content:center;
+        align-items:center;
+    ">
+      <div style="
+          background:#fff;
+          padding:20px;
+          border-radius:8px;
+          width:90%; max-width:600px;
+          position:relative;
+      ">
+        <button id="btnFecharModal" style="
+            position:absolute; top:10px; right:10px;
+            font-size:16px; cursor:pointer;
+        ">✖</button>
+        <h3>Histórico Estoque - Últimos 6 Meses</h3>
+        <div id="chartHistorico" style="height:300px;"></div>
+      </div>
     </div>
 
     <!-- Produtos em Falta -->
@@ -62,47 +101,43 @@ $lojaId = $_SESSION['id'] ?? 0;
 
     <!-- Estoque Parado -->
     <div class="card">
-      <h3>Estoque Parado</h3>
       <div id="chartEstoqueParado" style="height:300px; margin-top:10px;"></div>
     </div>
 
     <!-- Entrada x Saída -->
     <div class="card">
-      <h3>Entrada x Saída de Produtos</h3>
       <div id="chartEntradaSaida" style="height:300px; margin-top:10px;"></div>
     </div>
 
+    <!-- Produtos Reabastecidos Recentemente -->
+<!-- Produtos Reabastecidos Recentemente -->
+<div class="card reabastecidos">
+  <h3>Produtos Reabastecidos Recentemente</h3>
+
+  <!-- Filtro -->
+  <div style="margin-bottom:10px;">
+    <input type="text" id="filtroReabastecidos" placeholder="Pesquisar por produto..." style="padding:6px 10px; font-size:14px; border-radius:10px; width:200px;">
+    <button id="btnFiltrar" style="padding:6px 12px; font-size:14px; margin-left:5px; cursor:pointer;">Filtrar</button>
   </div>
 
-  <!-- Produtos Reabastecidos Recentemente -->
-  <div class="card reabastecidos">
-    <h3>Produtos Reabastecidos Recentemente</h3>
+  <div class="table-responsive" id="tabelaReabastecidos"></div>
+</div>
 
-    <!-- Filtro -->
-    <div style="margin-left:26px; margin-bottom:10px;">
-      <input type="text" id="filtroReabastecidos" placeholder="Pesquisar por produto..." style="padding:6px 10px; font-size:14px; border-radius:10px;">
-      <button id="btnFiltrar" style="padding:6px 12px; font-size:14px; margin-left:5px; cursor:pointer;">Filtrar</button>
-    </div>
-
-    <div id="tabelaReabastecidos"></div>
   </div>
 </div>
 
 <script>
 const lojaId = <?= $lojaId ?>;
 
-document.getElementById("btnVerMais").addEventListener("click", () => {
-  // Redireciona para produtos.php
-  window.location.href = "../dashboard/tabelas/produtos.php";
-});
 // ===================
 // Funções de dados
 // ===================
 async function loadEstoqueTotal() {
   try {
     const data = await fetch(`/DECKLOGISTIC/api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
-    document.querySelector("#estoque").textContent = parseFloat(data.total || 0).toFixed(2);
-  } catch(e) { console.error(e); document.querySelector("#estoque").textContent = "Erro"; }
+    const estoqueEl = document.querySelector("#estoque");
+    if(estoqueEl) estoqueEl.textContent = parseFloat(data.total || 0).toFixed(2);
+  } catch(e) { console.error(e); }
 }
 
 async function loadProdutosFalta() {
@@ -110,7 +145,6 @@ async function loadProdutosFalta() {
     const data = await fetch(`/DECKLOGISTIC/api/produtos_falta.php`).then(r => r.json());
     const tabelaContainer = document.querySelector("#tabelaProdutosFalta");
     if(!Array.isArray(data) || data.length === 0) { tabelaContainer.innerHTML = "<p>Nenhum produto em falta.</p>"; return; }
-
     let tabela = `<table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:14px;">
       <thead style="background:#f3f4f6; text-align:left;"><tr><th>Produto</th><th>Quantidade</th></tr></thead><tbody>`;
     data.forEach(p => { tabela += `<tr style="background:${p.quantidade_estoque <= 0 ? '#ddd' : '#fff'};">
@@ -122,76 +156,63 @@ async function loadProdutosFalta() {
 
 async function loadEstoqueProdutos() {
   try {
-    const data = await fetch('/DECKLOGISTIC/api/teste_estoque.php').then(r => r.json());
-    if(!Array.isArray(data)) { document.querySelector("#chartEstoqueParado").innerHTML = "<p>Dados inválidos</p>"; return; }
-
-    const produtos = data.map(d => d.produto);
-    const quantidades = data.map(d => parseInt(d.qtd));
-
-    new ApexCharts(document.querySelector("#chartEstoqueParado"), {
-      chart: { type: 'bar', height: 300 },
-      series: [{ name: 'Estoque Parado', data: quantidades }],
-      xaxis: { categories: produtos },
-      colors: ['#10b981'],
-      dataLabels: { enabled: true }
-    }).render();
-  } catch(e) { console.error(e); document.querySelector("#chartEstoqueParado").innerHTML = "<p>Erro ao carregar gráfico</p>"; }
+    const data = await fetch('/DECKLOGISTIC/api/produtos_parados.php').then(r => r.json());
+    const container = document.querySelector("#chartEstoqueParado");
+    if(!Array.isArray(data)) { container.innerHTML = "<p style='color:red;'>Erro ao carregar dados</p>"; return; }
+    if(data.length === 0) {
+      container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:18px;color:#6b7280;font-weight:500;background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;">Nenhum produto parado nos últimos 30 dias</div>`;
+      return;
+    }
+    const dataPoints = data.map(d => ({ label: d.nome, y: parseInt(d.quantidade_estoque) }));
+    new CanvasJS.Chart(container, { animationEnabled:true, theme:"light2", title:{text:"Estoque Parado"}, axisY:{title:"Quantidade"}, data:[{type:"column", dataPoints}]}).render();
+  } catch(e) { console.error(e); document.querySelector("#chartEstoqueParado").innerHTML = "<p style='color:red;'>Erro ao carregar gráfico</p>"; }
 }
 
 async function loadEntradaSaidaProdutos() {
   try {
-    const data = await fetch('/DECKLOGISTIC/api/teste_entrada_saida.php').then(r => r.json());
-    if(!Array.isArray(data) || data.length === 0) { document.querySelector("#chartEntradaSaida").innerHTML = "<p>Dados inválidos</p>"; return; }
-
-    const labels = data.map(d => d.data_movimentacao);
-    const entrada = data.map(d => parseInt(d.entrada || 0));
-    const saida = data.map(d => parseInt(d.saida || 0));
-
-    new ApexCharts(document.querySelector("#chartEntradaSaida"), {
-      chart: { type: 'line', height: 300 },
-      series: [{ name: 'Entrada', data: entrada }, { name: 'Saída', data: saida }],
-      xaxis: { categories: labels },
-      stroke: { curve: 'smooth' },
-      colors: ['#10b981', '#ef4444']
-    }).render();
-  } catch(e) { console.error(e); document.querySelector("#chartEntradaSaida").innerHTML = "<p>Erro ao carregar gráfico</p>"; }
+    const data = await fetch('/DECKLOGISTIC/api/entrada_saida.php').then(r => r.json());
+    const container = document.querySelector("#chartEntradaSaida");
+    if(!Array.isArray(data) || data.length === 0) { 
+      container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:16px;color:#6b7280;font-weight:500;background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;">Nenhuma movimentação registrada</div>`; 
+      return; 
+    }
+    const entrada = data.map(d => ({ label: d.data_movimentacao, y: d.entrada }));
+    const saida   = data.map(d => ({ label: d.data_movimentacao, y: d.saida }));
+    new CanvasJS.Chart(container, { animationEnabled:true, theme:"light2", title:{text:"Entrada x Saída"}, axisY:{title:"Quantidade"}, data:[{type:"line", name:"Entrada", showInLegend:true, dataPoints:entrada},{type:"line", name:"Saída", showInLegend:true, dataPoints:saida}]}).render();
+  } catch(e) { console.error(e); document.querySelector("#chartEntradaSaida").innerHTML = "<p style='color:red;'>Erro ao carregar gráfico</p>"; }
 }
 
-async function loadMiniEstoque() {
-  try {
-    const data = await fetch(`/DECKLOGISTIC/api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
-    const total = parseFloat(data.total || 0);
-    new ApexCharts(document.querySelector("#chartMiniEstoque"), {
-      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-      stroke: { curve: 'smooth', width: 2 },
-      fill: { opacity: 0.3 },
-      series: [{ data: [total, total * 0.9, total * 1.1, total] }],
-      colors: ['#10b981']
-    }).render();
-  } catch(e) { console.error("Erro mini gráfico:", e); }
-}
-
-// Produtos Reabastecidos Recentemente
+// Função para carregar produtos reabastecidos
 async function loadProdutosReabastecidos() {
   try {
     const data = await fetch('/DECKLOGISTIC/api/produtos_reabastecidos.php').then(r => r.json());
     const tabelaContainer = document.querySelector("#tabelaReabastecidos");
-    if(!Array.isArray(data) || data.length === 0) { tabelaContainer.innerHTML = "<p>Nenhum produto reabastecido recentemente.</p>"; return; }
+    if(!Array.isArray(data) || data.length === 0) { 
+        tabelaContainer.innerHTML = "<p>Nenhum produto reabastecido recentemente.</p>"; 
+        return; 
+    }
 
-    let tabela = `<table border="1" cellpadding="8" cellspacing="0" 
-      style="width:95%; font-size:15px; margin-left:26px; margin-bottom:50px;">
+    let tabela = `<table border="1" cellpadding="8" cellspacing="0" style="width:95%; font-size:15px; margin-left:26px; margin-bottom:50px;">
       <thead style="background:#f3f4f6; text-align:left;">
       <tr><th>Lote</th><th>Produto</th><th>Data de Reabastecimento</th></tr></thead><tbody>`;
 
-    data.forEach(p => { tabela += `<tr><td>${p.lote}</td><td>${p.nome}</td><td>${p.data_reabastecimento}</td></tr>`; });
+    data.forEach(p => {
+        tabela += `<tr>
+            <td>${p.lote}</td>
+            <td>${p.nome}</td>
+            <td>${p.data_reabastecimento}</td>
+        </tr>`;
+    });
+
     tabela += `</tbody></table>`;
     tabelaContainer.innerHTML = tabela;
-  } catch(e) { console.error("Erro ao carregar reabastecidos:", e); tabelaContainer.innerHTML = "<p>Erro ao carregar dados</p>"; }
+  } catch(e) {
+    console.error("Erro ao carregar reabastecidos:", e);
+    document.querySelector("#tabelaReabastecidos").innerHTML = "<p>Erro ao carregar dados</p>";
+  }
 }
 
-// ===================
-// Botão de filtro
-// ===================
+// Filtro da tabela
 const btnFiltrar = document.getElementById("btnFiltrar");
 const filtroInput = document.getElementById("filtroReabastecidos");
 
@@ -207,15 +228,38 @@ btnFiltrar.addEventListener("click", () => {
   });
 });
 
-// ===================
-// Carregar todos os dados
-// ===================
-loadMiniEstoque();
-loadEstoqueTotal();
-loadProdutosFalta();
-loadEstoqueProdutos();
-loadEntradaSaidaProdutos();
-loadProdutosReabastecidos();
+// Chamar no carregamento
+document.addEventListener("DOMContentLoaded", () => {
+  loadProdutosReabastecidos();
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadEstoqueTotal();
+  loadProdutosFalta();
+  loadEstoqueProdutos();
+  loadEntradaSaidaProdutos();
+    loadProdutosReabastecidos();
+
+});
+
+// Modal histórico
+const btnHistorico = document.getElementById("btnHistorico");
+const modalHistorico = document.getElementById("modalHistorico");
+const btnFecharModal = document.getElementById("btnFecharModal");
+
+btnHistorico.addEventListener("click", async () => {
+  modalHistorico.style.display = "flex";
+  try {
+    const data = await fetch(`/DECKLOGISTIC/api/historico_estoque_6meses.php?loja_id=${lojaId}`).then(r=>r.json());
+    if(!Array.isArray(data) || data.length === 0) { document.querySelector("#chartHistorico").innerHTML = "<p>Nenhum dado disponível</p>"; return; }
+    const dataPoints = data.map(d => ({ label: d.mes, y: parseInt(d.total || 0) }));
+    new CanvasJS.Chart("chartHistorico", { animationEnabled:true, theme:"light2", axisY:{title:"Quantidade total"}, data:[{type:"column", dataPoints}]}).render();
+  } catch(e) { console.error(e); document.querySelector("#chartHistorico").innerHTML = "<p>Erro ao carregar gráfico</p>"; }
+});
+
+btnFecharModal.addEventListener("click", () => { modalHistorico.style.display = "none"; });
+
 </script>
 </body>
 </html>
