@@ -10,7 +10,7 @@ if (!$result) {
 
 // Busca todas as tags
 $tags = [];
-$tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL ORDER BY criado_em DESC");
+// $tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL ORDER BY criado_em DESC");
 if ($tagResult) {
     while ($row = $tagResult->fetch_assoc()) {
         $tags[] = $row;
@@ -45,6 +45,8 @@ if ($tagVincResult) {
 <link rel="stylesheet" href="../../../assets/produtos.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../assets/sidebar.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
 .add-tag-square { width:24px; height:24px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; border-radius:6px; margin-left:5px; }
 .tag-dropdown { display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:4px; z-index:10; }
@@ -96,6 +98,7 @@ if ($tagVincResult) {
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
         <button class="btn-novo" onclick="window.location.href='../simulador.php'">Novo item +</button>
+        <button class="btn-novo" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
             <option value="nome-asc">Nome (A-Z)</option>
@@ -336,5 +339,146 @@ document.addEventListener('click', function(e){
 </div>
 </div>
 </main>
+<!-- Modal Importação -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-body p-0">
+        <!-- Aqui entra o conteúdo do importador -->
+        <div class="container-fluid py-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+
+                    <div class="card">
+                        <div class="card-header text-center py-3">
+                            <h2><i class="fas fa-file-import me-2"></i>Importador de Produtos</h2>
+                            <p class="mb-0">Faça upload de planilhas Excel para importar dados para o banco de dados</p>
+                        </div>
+                        <div class="card-body">
+                            <!-- Upload -->
+                            <div class="mb-4">
+                                <h4><span class="step-number">1</span>Selecione o arquivo Excel</h4>
+                                <div class="instructions mb-3">
+                                    <p><i class="fas fa-info-circle me-2"></i>Formatos suportados: .xlsx, .xls</p>
+                                    <p><i class="fas fa-info-circle me-2"></i>O arquivo deve seguir a estrutura da tabela de produtos</p>
+                                </div>
+                                <form id="uploadForm" enctype="multipart/form-data">
+                                    <input class="form-control mb-3" type="file" id="formFile" name="excel_file" accept=".xlsx, .xls" required>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload me-2"></i>Fazer Upload e Importar
+                                    </button>
+                                </form>
+                            </div>
+
+                            <hr>
+
+                            <!-- Resultado -->
+                            <div id="importResult" class="d-none">
+                                <h4><span class="step-number">2</span>Resultado da Importação</h4>
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <span id="successMessage">Dados importados com sucesso!</span>
+                                </div>
+
+                                <h5 class="mt-4">Dados Importados:</h5>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-striped table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>Descrição</th>
+                                                <th>Lote</th>
+                                                <th>Estoque</th>
+                                                <th>Preço</th>
+                                                <th>Custo</th>
+                                                <th>Data Reabastecimento</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="importedData"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Template download -->
+                    <div class="template-download mt-3 p-3 bg-light border rounded">
+                        <h5><i class="fas fa-download me-2"></i>Template de Planilha</h5>
+                        <p>Baixe nosso template para garantir que sua planilha tenha o formato correto.</p>
+                        <a href="template_produtos.xlsx" class="btn btn-outline-success">
+                            <i class="fas fa-file-excel me-2"></i>Baixar Template
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('uploadForm');
+    const importResult = document.getElementById('importResult');
+    const importedData = document.getElementById('importedData');
+    const successMessage = document.getElementById('successMessage');
+
+    if(uploadForm){
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Importando...';
+            submitBtn.disabled = true;
+
+            fetch('importacao.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    successMessage.textContent = `${data.imported} registros importados com sucesso!`;
+                    displayImportedData(data.data);
+                    importResult.classList.remove('d-none');
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(err => alert('Erro na importação: ' + err.message))
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    function displayImportedData(data) {
+        importedData.innerHTML = '';
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.nome}</td>
+                <td>${row.descricao}</td>
+                <td>${row.lote}</td>
+                <td>${row.quantidade_estoque}</td>
+                <td>R$ ${parseFloat(row.preco_unitario).toFixed(2)}</td>
+                <td>R$ ${parseFloat(row.custo_unitario).toFixed(2)}</td>
+                <td>${row.data_reabastecimento}</td>
+            `;
+            importedData.appendChild(tr);
+        });
+    }
+});
+</script>
+
+
 </body>
 </html>
