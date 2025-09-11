@@ -35,12 +35,6 @@
         </div>
         <button type="submit" class="btn">Continuar</button>
       </form>
-
-      <div class="divider">Ou</div>
-      <button class="google-btn">
-        <img src="../../../img/google.webp" alt="Google">
-        Continuar com o Google
-      </button>
     </div>
   </div>
 </div>
