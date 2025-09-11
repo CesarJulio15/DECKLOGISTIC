@@ -98,14 +98,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </ul>
                 <hr>
                 <ul class="nav-list middle-section">
-                    <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-                    <li><a href="/Pages/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+                    <li><a href="/DECKLOGISTIC/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+                    <li><a href="/DECKLOGISTIC/Pages/dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
                     <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
                     <li><a href="../dashboard/tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
                 </ul>
             </div>
             <div class="bottom-links">
-                <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+                <a href="/DECKLOGISTIC/pages/auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
                 <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
             </div>
         </nav>
