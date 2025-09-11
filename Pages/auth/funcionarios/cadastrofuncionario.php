@@ -3,9 +3,10 @@ session_start();
 include __DIR__ . '/../../../conexao.php';
 
 // Garante que a empresa está logada
-if (!isset($_SESSION['usuario_id'])) {
-    die("Acesso negado. Você precisa estar logado como empresa.");
+if (!isset($_SESSION['usuario_id']) || $_SESSION['tipo_login'] !== 'empresa') {
+    die("Acesso negado. Apenas empresas podem cadastrar funcionários.");
 }
+
 
 
 // Se o formulário foi enviado
