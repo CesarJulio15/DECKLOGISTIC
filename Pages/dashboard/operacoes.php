@@ -10,16 +10,16 @@ $paginaAtual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
 
 // Query completa de operações
 $sql = "
-    SELECT 
-        'Produto Adicionado' AS tipo,
-        p.nome AS item,
-        '' AS icone,
-        '' AS cor,
-        CONCAT('Qtd Inicial: ', COALESCE(p.quantidade_inicial,0)) AS detalhe,
-        p.criado_em AS data,
-        COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
-    FROM produtos p
-    LEFT JOIN usuarios u ON u.id = p.usuario_id
+  SELECT 
+    'Produto Adicionado' AS tipo,
+    p.nome AS item,
+    '' AS icone,
+    '' AS cor,
+    CONCAT('Qtd Inicial: ', COALESCE(p.quantidade_estoque, 0)) AS detalhe,  -- Correção
+    p.criado_em AS data,
+    COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
+FROM produtos p
+LEFT JOIN usuarios u ON u.id = p.usuario_id
 
     UNION ALL
 
