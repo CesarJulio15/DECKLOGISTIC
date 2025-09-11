@@ -22,8 +22,8 @@ if (isset($_POST['acao'])) {
         $preco = floatval($_POST['preco']);
         $estoque = intval($_POST['estoque']);
 
-        $stmt = $conn->prepare("INSERT INTO produtos (loja_id, nome, preco_unitario, quantidade_estoque) VALUES (?,?,?,?)");
-        $stmt->bind_param("isdi", $loja_id, $nome, $preco, $estoque);
+    $stmt = $conn->prepare("INSERT INTO produtos (loja_id, usuario_id, nome, preco_unitario, quantidade_estoque) VALUES (?,?,?,?,?)");
+$stmt->bind_param("iisdi", $loja_id, $usuario_id, $nome, $preco, $estoque);
         $msg = $stmt->execute() ? "✅ Produto cadastrado com sucesso!" : "❌ Erro: ".$stmt->error;
         $stmt->close();
     }
