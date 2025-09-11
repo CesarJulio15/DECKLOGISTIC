@@ -2,19 +2,23 @@
 header('Content-Type: application/json; charset=utf-8');
 require_once '../conexao.php';
 
-$lojaId = (int)($_GET['loja_id'] ?? 0);
-if (!$lojaId) { echo json_encode([]); exit; }
+$usuarioId = (int)($_GET['usuario_id'] ?? 0);
+if (!$usuarioId) { 
+    echo json_encode([]); 
+    exit; 
+}
 
 $res = mysqli_query($conn, "
-    SELECT DATE_FORMAT(m.data_movimentacao, '%Y-%m') AS mes,
-           SUM(CASE WHEN m.tipo='entrada' THEN m.quantidade ELSE 0 END) AS entrada,
-           SUM(CASE WHEN m.tipo='saida' THEN m.quantidade ELSE 0 END) AS saida
-    FROM movimentacoes_estoque m
-    INNER JOIN produtos p ON p.id = m.produto_id
-    WHERE p.loja_id = $lojaId
-    GROUP BY mes
-    ORDER BY mes DESC
-    LIMIT 6
+SELECT 
+    p.id,
+    p.nome,
+    p.quantidade_estoque
+FROM produtos p
+JOIN movimentacoes_estoque m ON p.id = m.produto_id
+WHERE m.usuario_id = 19
+ORDER BY m.data_movimentacao DESC
+LIMIT 1;
+
 ");
 
 $dados = [];
@@ -26,7 +30,5 @@ while($row = mysqli_fetch_assoc($res)) {
     ];
 }
 
-// Ordem cronológica
 $dados = array_reverse($dados);
-
 echo json_encode($dados);
