@@ -1,7 +1,9 @@
-CREATE SCHEMA `decklog_db` ;
+CREATE SCHEMA `decklog_db`;
 USE decklog_db;
 
+-- ========================
 -- Tabela lojas
+-- ========================
 CREATE TABLE lojas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cod_estabelecimento VARCHAR(50),
@@ -30,7 +32,9 @@ CREATE TABLE lojas (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ========================
 -- Tabela usuarios
+-- ========================
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     loja_id INT,
@@ -41,7 +45,9 @@ CREATE TABLE usuarios (
     FOREIGN KEY (loja_id) REFERENCES lojas(id)
 );
 
+-- ========================
 -- Tabela produtos
+-- ========================
 CREATE TABLE produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     loja_id INT,
@@ -49,25 +55,42 @@ CREATE TABLE produtos (
     descricao TEXT,
     lote VARCHAR(50),
     quantidade_estoque INT,
+    quantidade_inicial INT NOT NULL DEFAULT 0,
     preco_unitario DECIMAL(10,2),
     custo_unitario DECIMAL(10,2),
     data_reabastecimento DATE,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (loja_id) REFERENCES lojas(id)
+    usuario_id INT,
+    deletado_em DATETIME DEFAULT NULL,
+    usuario_exclusao_id INT DEFAULT NULL,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (usuario_exclusao_id) REFERENCES usuarios(id)
 );
 
+-- ========================
 -- Tabela tags
+-- ========================
 CREATE TABLE tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
     loja_id INT,
     nome VARCHAR(100),
+    nome_criado VARCHAR(255),
+    nome_antigo VARCHAR(255) NULL,
     cor VARCHAR(20),
     icone VARCHAR(100),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (loja_id) REFERENCES lojas(id)
+    atualizado_em DATETIME NULL,
+    usuario_id INT,
+    usuario_atualizacao_id INT NULL,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (usuario_atualizacao_id) REFERENCES usuarios(id)
 );
 
+-- ========================
 -- Relacionamento produto_tag (N:N)
+-- ========================
 CREATE TABLE produto_tag (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT,
@@ -76,7 +99,9 @@ CREATE TABLE produto_tag (
     FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
+-- ========================
 -- Tabela vendas
+-- ========================
 CREATE TABLE vendas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     loja_id INT,
@@ -84,10 +109,14 @@ CREATE TABLE vendas (
     valor_total DECIMAL(12,2),
     custo_total DECIMAL(12,2),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (loja_id) REFERENCES lojas(id)
+    usuario_id INT,
+    FOREIGN KEY (loja_id) REFERENCES lojas(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
+-- ========================
 -- Itens da venda
+-- ========================
 CREATE TABLE itens_venda (
     id INT AUTO_INCREMENT PRIMARY KEY,
     venda_id INT,
@@ -100,7 +129,9 @@ CREATE TABLE itens_venda (
     FOREIGN KEY (produto_id) REFERENCES produtos(id)
 );
 
+-- ========================
 -- Movimentações de estoque
+-- ========================
 CREATE TABLE movimentacoes_estoque (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT,
@@ -109,10 +140,14 @@ CREATE TABLE movimentacoes_estoque (
     motivo VARCHAR(255),
     data_movimentacao DATE,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (produto_id) REFERENCES produtos(id)
+    usuario_id INT,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
+-- ========================
 -- Transações financeiras
+-- ========================
 CREATE TABLE transacoes_financeiras (
     id INT AUTO_INCREMENT PRIMARY KEY,
     loja_id INT,
@@ -125,43 +160,9 @@ CREATE TABLE transacoes_financeiras (
     FOREIGN KEY (loja_id) REFERENCES lojas(id)
 );
 
--- alterações AP
-
-ALTER TABLE produtos ADD COLUMN usuario_id INT;
-ALTER TABLE tags ADD COLUMN usuario_id INT;
-ALTER TABLE vendas ADD COLUMN usuario_id INT;
-
-
-
-SELECT 'Tag Criada' AS tipo, t.nome AS item, t.cor AS detalhe, t.criado_em AS data, u.nome AS usuario
-FROM tags t
-JOIN usuarios u ON u.id = t.usuario_id
-ORDER BY t.criado_em DESC
-LIMIT 5;
-
-
-SELECT 'Tag Criada' AS tipo, t.nome AS item, t.cor AS detalhe, t.criado_em AS data, u.nome AS usuario
-FROM tags t
-JOIN usuarios u ON u.id = t.usuario_id
-
-
-ALTER TABLE produtos ADD COLUMN quantidade_inicial INT NOT NULL DEFAULT 0;
-
-
-ALTER TABLE tags 
-ADD COLUMN atualizado_em DATETIME NULL,
-ADD COLUMN usuario_atualizacao_id INT NULL;
-
-
-ALTER TABLE tags ADD COLUMN nome_antigo VARCHAR(255) NULL;
-
-ALTER TABLE tags ADD COLUMN nome_criado VARCHAR(255) AFTER nome;
-
-ALTER TABLE produtos 
-ADD COLUMN deletado_em DATETIME DEFAULT NULL,
-ADD COLUMN usuario_exclusao_id INT DEFAULT NULL;
-
-
+-- ========================
+-- Histórico de produtos
+-- ========================
 CREATE TABLE historico_produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     produto_id INT,
@@ -170,5 +171,7 @@ CREATE TABLE historico_produtos (
     lote VARCHAR(255),
     usuario_id INT,
     acao VARCHAR(50),
-    criado_em DATETIME
+    criado_em DATETIME,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );

@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header("Location: conta.php");
+    header("Location: config.php");
     exit;
 }
 ?>
@@ -116,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>Minha Conta</h1>
         <div class="caixa-conta">
             <div class="perfil">
-                <div class="icone-usuario"><img src="../../img/icon-user.svg" alt="Ícone usuário"></div>
                 <h2><?= htmlspecialchars($dados_usuario['nome'] ?? '') ?></h2>
             </div>
 
