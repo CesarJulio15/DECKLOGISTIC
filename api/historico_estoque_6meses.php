@@ -1,19 +1,34 @@
 <?php
-session_start();
+header('Content-Type: application/json; charset=utf-8');
 require_once '../conexao.php';
 
-// Supondo que você guardou o id do usuário na sessão
-$usuarioId = $_SESSION['usuario_id'] ?? 0;
-
-if (!$usuarioId) {
-    echo "Usuário não logado";
-    exit;
+$usuarioId = (int)($_GET['usuario_id'] ?? 0);
+if (!$usuarioId) { 
+    echo json_encode([]); 
+    exit; 
 }
 
-// Pega a loja_id do usuário logado
-$res = mysqli_query($conn, "SELECT loja_id FROM usuarios WHERE id = $usuarioId LIMIT 1");
-$row = mysqli_fetch_assoc($res);
+$res = mysqli_query($conn, "
+SELECT 
+    p.id,
+    p.nome,
+    p.quantidade_estoque
+FROM produtos p
+JOIN movimentacoes_estoque m ON p.id = m.produto_id
+WHERE m.usuario_id = 19
+ORDER BY m.data_movimentacao DESC
+LIMIT 1;
 
-$lojaIdAtual = $row['loja_id'] ?? null;
+");
 
-echo "Loja ID atual: " . $lojaIdAtual;
+$dados = [];
+while($row = mysqli_fetch_assoc($res)) {
+    $dados[] = [
+        'mes' => $row['mes'],
+        'entrada' => (int)$row['entrada'],
+        'saida' => (int)$row['saida']
+    ];
+}
+
+$dados = array_reverse($dados);
+echo json_encode($dados);
