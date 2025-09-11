@@ -2,9 +2,28 @@
 session_start();
 include __DIR__ . '/../../conexao.php';
 
-$loja_id = $_SESSION['loja_id'] ?? 0; // id da loja
-$usuario_id = $_SESSION['usuario_id'] ?? 0;   // id do usuário logado
-if (!$loja_id || !$usuario_id) die('Faça login para acessar a simulação.');
+// ============================
+// BLOQUEAR ACESSO SEM LOGIN
+// ============================
+$usuario_id = $_SESSION['usuario_id'] ?? 0;
+$tipo_login = $_SESSION['tipo_login'] ?? '';
+
+if (!$usuario_id || !$tipo_login) {
+    header("Location: ../lojas/loginLoja.php");
+    exit;
+}
+
+if ($tipo_login === 'empresa') {
+    // Empresa logada → loja_id é o próprio usuário
+    $loja_id = $usuario_id;
+} else {
+    // Funcionário logado → loja_id vem da sessão
+    $loja_id = $_SESSION['loja_id'] ?? 0;
+    if (!$loja_id) {
+        header("Location: ../lojas/loginLoja.php");
+        exit;
+    }
+}
 
 $msg = '';
 
@@ -19,35 +38,41 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'adicionar_produto'){
     $quantidade_estoque = intval($_POST['quantidade_estoque'] ?? 0);
     $lote = $_POST['lote'] ?? '';
     $data_reabastecimento = $_POST['data_reabastecimento'] ?? date('Y-m-d');
-
+}
     if(!$nome || !$preco_unitario || !$custo_unitario){
         $msg = 'Campos obrigatórios faltando.';
     } else {
-   $stmt = $conn->prepare("
-    INSERT INTO produtos 
-    (loja_id, usuario_id, nome, descricao, preco_unitario, custo_unitario, quantidade_estoque, quantidade_inicial, lote, data_reabastecimento) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-");
-$stmt->bind_param("iissddisss", $loja_id, $usuario_id, $nome, $descricao, $preco_unitario, $custo_unitario, $quantidade_estoque, $quantidade_estoque, $lote, $data_reabastecimento);
+        $stmt = $conn->prepare("
+            INSERT INTO produtos 
+            (loja_id, usuario_id, nome, descricao, preco_unitario, custo_unitario, quantidade_estoque, quantidade_inicial, lote, data_reabastecimento) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->bind_param("iissddiiss", $loja_id, $usuario_id, $nome, $descricao, $preco_unitario, $custo_unitario, $quantidade_estoque, $quantidade_estoque, $lote, $data_reabastecimento);
 
         if($stmt->execute()){
             $produto_id = $stmt->insert_id;
 
             if($quantidade_estoque > 0){
                 // Movimentação de estoque
-                $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, usuario_id, tipo, quantidade, motivo, data_movimentacao) VALUES (?, ?, 'entrada', ?, 'Reabastecimento inicial', ?)");
-                $stmtMov->bind_param("iiis", $produto_id, $usuario_id, $quantidade_estoque, $data_reabastecimento);
-                $stmtMov->execute();
-                $stmtMov->close();
+$stmtMov = $conn->prepare("
+    INSERT INTO movimentacoes_estoque 
+    (produto_id, quantidade, data_movimentacao, tipo, motivo) 
+    VALUES (?, ?, ?, 'entrada', 'Reabastecimento inicial')
+");
+$stmtMov->bind_param("iis", $produto_id, $quantidade_estoque, $data_reabastecimento);
+$stmtMov->execute();
+$stmtMov->close();
 
-                // Transação financeira
-                $valor_saida = $quantidade_estoque * $custo_unitario;
-                $descricao_fin = "Compra inicial do produto $nome";
-                $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, usuario_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, ?, 'Compra de Estoque', ?, 'saida', ?, ?)");
-                $stmtFin->bind_param("iissds", $loja_id, $usuario_id, $descricao_fin, $valor_saida, $data_reabastecimento);
-                $stmtFin->execute();
-                $stmtFin->close();
-            }
+$stmtFin = $conn->prepare("
+    INSERT INTO transacoes_financeiras 
+    (loja_id, categoria, descricao, tipo, valor, data_transacao) 
+    VALUES (?, ?, 'Compra de Estoque', 'saida', ?, ?)
+");
+$stmtFin->bind_param("isds", $loja_id, $categoria, $valor_saida, $data_reabastecimento);
+
+$stmtFin->execute();
+$stmtFin->close();
+
 
             $msg = 'Produto adicionado com sucesso!';
         } else {
@@ -91,7 +116,7 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
                 $custo_total  = $quantidade * $custo_unitario;
 
                 $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, usuario_id, data_venda, valor_total, custo_total) VALUES (?, ?, ?, ?, ?)");
-                $stmtVenda->bind_param("iissd", $loja_id, $usuario_id, $data_venda, $valor_total, $custo_total);
+                $stmtVenda->bind_param("iisdd", $loja_id, $usuario_id, $data_venda, $valor_total, $custo_total);
                 $stmtVenda->execute();
                 $venda_id = $stmtVenda->insert_id;
                 $stmtVenda->close();
@@ -103,7 +128,7 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'vender_produto'){
 
                 $descricao_fin = "Venda do produto $nome";
                 $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, usuario_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, ?, 'Venda', ?, 'entrada', ?, ?)");
-                $stmtFin->bind_param("iissds", $loja_id, $usuario_id, $descricao_fin, $valor_total, $data_venda);
+                $stmtFin->bind_param("iisdss", $loja_id, $usuario_id, $descricao_fin, $valor_total, $data_venda);
                 $stmtFin->execute();
                 $stmtFin->close();
 
@@ -145,12 +170,29 @@ if(isset($_POST['acao']) && $_POST['acao'] === 'comprar_produto'){
             $valor_saida = $quantidade * $preco_unitario;
             $descricao_fin = "Compra/Reabastecimento do produto $nome";
             $stmtFin = $conn->prepare("INSERT INTO transacoes_financeiras (loja_id, usuario_id, categoria, descricao, tipo, valor, data_transacao) VALUES (?, ?, 'Compra de Estoque', ?, 'saida', ?, ?)");
-            $stmtFin->bind_param("iissds", $loja_id, $usuario_id, $descricao_fin, $valor_saida, $data_compra);
+            $stmtFin->bind_param("iisdss", $loja_id, $usuario_id, $descricao_fin, $valor_saida, $data_compra);
             $stmtFin->execute();
             $stmtFin->close();
 
             $msg = 'Compra registrada com sucesso!';
         }
+    }
+}
+
+// ============================
+// APAGAR PRODUTO
+// ============================
+if(isset($_POST['acao']) && $_POST['acao'] === 'apagar_produto'){
+    $produto_id = intval($_POST['produto_id'] ?? 0);
+    if($produto_id){
+        $stmt = $conn->prepare("DELETE FROM produtos WHERE id = ? AND loja_id = ?");
+        $stmt->bind_param("ii", $produto_id, $loja_id);
+        if($stmt->execute()){
+            $msg = "Produto apagado com sucesso!";
+        } else {
+            $msg = "Erro ao apagar produto: " . $stmt->error;
+        }
+        $stmt->close();
     }
 }
 
