@@ -109,19 +109,7 @@ if ($tagVincResult) {
         </select>
     </div>
 
-    <div class="tags-area" style="display:flex; align-items:center; gap:10px;">
-        <?php foreach ($tags as $tag): ?>
-            <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>" data-tag-id="<?= $tag['id'] ?>" style="cursor:pointer;">
-                <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i> <?= htmlspecialchars($tag['nome']) ?>
-            </div>
-        <?php endforeach; ?>
-        <button class="btn-reset-filtro" onclick="resetFiltro()">
-            <i class="fa-solid fa-xmark" style="color: #000000ff;"></i>
-        
-        </button>
-        <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px;"></i>
-        <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
-    </div>
+
 </div>
 
 <table>
