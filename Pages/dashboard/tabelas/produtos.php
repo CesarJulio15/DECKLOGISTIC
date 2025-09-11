@@ -174,10 +174,16 @@ if ($tagVincResult) {
 
 <script>
 // Seleção múltipla
-document.getElementById('btn-multi-delete').addEventListener('click', function() {
-    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'table-cell');
-    document.getElementById('multi-checkbox-header').style.display = 'table-cell';
-    document.getElementById('confirm-delete').style.display = 'inline-block';
+const btnMultiDelete = document.getElementById('btn-multi-delete');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+let multiDeleteActive = false;
+
+btnMultiDelete.addEventListener('click', function() {
+    multiDeleteActive = !multiDeleteActive;
+
+    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = multiDeleteActive ? 'table-cell' : 'none');
+    document.getElementById('multi-checkbox-header').style.display = multiDeleteActive ? 'table-cell' : 'none';
+    confirmDeleteBtn.style.display = multiDeleteActive ? 'inline-block' : 'none';
 });
 
 // Confirmar exclusão
