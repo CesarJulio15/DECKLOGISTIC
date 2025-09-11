@@ -6,6 +6,7 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
     $email = trim($_POST['email']);
     $senha = $_POST['senha'];
 
+    // Prepara a consulta
     $stmt = $conn->prepare("
         SELECT id, nome, email, senha_hash 
         FROM lojas 
@@ -19,17 +20,20 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
     if ($result && $result->num_rows > 0) {
         $loja = $result->fetch_assoc();
 
-        if (password_verify($senha, $loja['senha_hash'])) {
-            session_regenerate_id(true);
+        // Verifica senha
+      if (password_verify($senha, $loja['senha_hash'])) {
+    session_regenerate_id(true);
 
-            // 🔑 padronização
-            $_SESSION['usuario_id'] = $loja['id'];
-            $_SESSION['nome']       = $loja['nome'];
-            $_SESSION['email']      = $loja['email'];
-            $_SESSION['tipo_login'] = 'empresa';
+    $_SESSION['usuario_id'] = $loja['id'];
+    $_SESSION['loja_id']    = $loja['id']; // <-- ADICIONE ESTA LINHA
+    $_SESSION['nome']       = $loja['nome'];
+    $_SESSION['email']      = $loja['email'];
+    $_SESSION['tipo_login'] = 'empresa';
 
-            header("Location: ../../../index.php");
-            exit;
+    header("Location: ../../../index.php");
+    exit;
+}
+    
         } else {
             $_SESSION['erro_login'] = "Senha incorreta.";
             header("Location: loginLoja.php");
@@ -40,9 +44,5 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
         header("Location: loginLoja.php");
         exit;
     }
-} else {
-    $_SESSION['erro_login'] = "Preencha e-mail e senha.";
-    header("Location: loginLoja.php");
-    exit;
-}
+
 ?>

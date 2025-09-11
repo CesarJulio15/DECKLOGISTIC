@@ -67,6 +67,28 @@
     margin-bottom: 15px;
 }
 
+.paginacao a {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #000;
+    margin: 0 5px;
+}
+
+.paginacao a.active {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+}
+
+.paginacao a:hover {
+    background-color: #ddd;
+}
 /* Barra de ações */
 .acoes {
     display: flex;
