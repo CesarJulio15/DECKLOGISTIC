@@ -83,7 +83,7 @@ try {
         
         try {
             // Inserir no banco de dados
-            $sql = "INSERT INTO produto (nome, descricao, lote, quantidade_estoque, preco_unitario, custo_unitario, data_reabastecimento) 
+            $sql = "INSERT INTO produtos (nome, descricao, lote, quantidade_estoque, preco_unitario, custo_unitario, data_reabastecimento) 
                     VALUES (?, ?, ?, ?, ?, ?, ?)";
             
             $stmt = $conn->prepare($sql);

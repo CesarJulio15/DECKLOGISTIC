@@ -10,7 +10,7 @@ if (!$result) {
 
 // Busca todas as tags
 $tags = [];
-// $tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL ORDER BY criado_em DESC");
+ $tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL ORDER BY criado_em DESC");
 if ($tagResult) {
     while ($row = $tagResult->fetch_assoc()) {
         $tags[] = $row;
