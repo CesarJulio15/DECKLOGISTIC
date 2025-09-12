@@ -214,7 +214,9 @@ document.getElementById('confirm-delete').addEventListener('click', function() {
 document.getElementById('pesquisa').addEventListener('input', function() {
     const termo = this.value.toLowerCase();
     document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-        const nome = tr.querySelector('td:nth-child(2) span').innerText.toLowerCase();
+        // pega o último span dentro da 2ª coluna (o nome do produto)
+        const spans = tr.querySelectorAll('td:nth-child(2) span');
+        const nome = spans.length ? spans[spans.length - 1].textContent.toLowerCase() : '';
         tr.style.display = nome.includes(termo) ? '' : 'none';
     });
 });
