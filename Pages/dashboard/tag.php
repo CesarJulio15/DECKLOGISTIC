@@ -3,8 +3,8 @@
 session_start();
 include __DIR__ . '/../../conexao.php';
 
-$usuarioId = $_SESSION['usuario_id'] ?? null;
-if (!$usuarioId) {
+$loja_id = $_SESSION['loja_id'] ?? null;
+if (!$loja_id) {
     die("Usuário não está logado.");
 }
 
