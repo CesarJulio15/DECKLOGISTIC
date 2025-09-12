@@ -154,7 +154,7 @@ if ($tagVincResult) {
 
         <span><?= htmlspecialchars($produto['nome']) ?></span>
 
-        <!-- Quadrado preto (+) para vincular tag -->
+     
         <div class="add-tag-square" data-produto-id="<?= $produto['id'] ?>">+</div>
         <div class="tag-dropdown" id="tag-dropdown-<?= $produto['id'] ?>">
             <?php foreach($tags as $tag): ?>
@@ -212,62 +212,68 @@ document.getElementById('confirm-delete').addEventListener('click', function() {
 
 // Pesquisa
 document.getElementById('pesquisa').addEventListener('input', function() {
-    const termo = this.value.toLowerCase();
+    const termo = this.value.toLowerCase();  // Converte o termo de pesquisa para minúsculo
     document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-        const nome = tr.querySelector('td:nth-child(2) span').innerText.toLowerCase();
-        tr.style.display = nome.includes(termo) ? '' : 'none';
+        const nomeProduto = tr.querySelector('td:nth-child(2) span');
+        if (nomeProduto) {
+            const nome = nomeProduto.textContent.toLowerCase();  // Acessa o nome do produto e converte para minúsculo
+            tr.style.display = nome.includes(termo) ? '' : 'none';  // Exibe ou esconde a linha com base na pesquisa
+        }
     });
 });
 
+// Ordenação
 // Ordenação
 document.getElementById('ordenar').addEventListener('change', function() {
     const tbody = document.getElementById('tabela-produtos');
     const rows = Array.from(tbody.querySelectorAll('tr'));
     const val = this.value;
 
-    rows.sort((a,b) => {
+    rows.sort((a, b) => {
         let aText, bText;
         switch(val){
             case 'nome-asc':
-                aText = a.querySelector('td:nth-child(2) span').innerText.toLowerCase();
-                bText = b.querySelector('td:nth-child(2) span').innerText.toLowerCase();
-                return aText.localeCompare(bText);
+                aText = a.querySelector('td:nth-child(2) span') ? a.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
+                bText = b.querySelector('td:nth-child(2) span') ? b.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
+                return aText.localeCompare(bText);  // Comparação alfabética
             case 'nome-desc':
-                aText = a.querySelector('td:nth-child(2) span').innerText.toLowerCase();
-                bText = b.querySelector('td:nth-child(2) span').innerText.toLowerCase();
-                return bText.localeCompare(aText);
+                aText = a.querySelector('td:nth-child(2) span') ? a.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
+                bText = b.querySelector('td:nth-child(2) span') ? b.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
+                return bText.localeCompare(aText);  // Comparação alfabética inversa
             case 'preco-asc':
-                aText = parseFloat(a.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
-                bText = parseFloat(b.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
+                aText = parseFloat(a.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
+                bText = parseFloat(b.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
                 return aText - bText;
             case 'preco-desc':
-                aText = parseFloat(a.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
-                bText = parseFloat(b.querySelector('td:nth-child(3)').innerText.replace('R$ ','').replace(',','.'));
+                aText = parseFloat(a.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
+                bText = parseFloat(b.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
                 return bText - aText;
             case 'quantidade-asc':
-                aText = parseInt(a.querySelector('td:nth-child(4)').innerText);
-                bText = parseInt(b.querySelector('td:nth-child(4)').innerText);
+                aText = parseInt(a.querySelector('td:nth-child(4)').textContent);
+                bText = parseInt(b.querySelector('td:nth-child(4)').textContent);
                 return aText - bText;
             case 'quantidade-desc':
-                aText = parseInt(a.querySelector('td:nth-child(4)').innerText);
-                bText = parseInt(b.querySelector('td:nth-child(4)').innerText);
+                aText = parseInt(a.querySelector('td:nth-child(4)').textContent);
+                bText = parseInt(b.querySelector('td:nth-child(4)').textContent);
                 return bText - aText;
             case 'lote-asc':
-                aText = a.querySelector('td:nth-child(5)').innerText.toLowerCase();
-                bText = b.querySelector('td:nth-child(5)').innerText.toLowerCase();
+                aText = a.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
+                bText = b.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
                 return aText.localeCompare(bText);
             case 'lote-desc':
-                aText = a.querySelector('td:nth-child(5)').innerText.toLowerCase();
-                bText = b.querySelector('td:nth-child(5)').innerText.toLowerCase();
+                aText = a.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
+                bText = b.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
                 return bText.localeCompare(aText);
             default: return 0;
         }
     });
 
-    rows.forEach(r => tbody.appendChild(r));
+    rows.forEach(r => tbody.appendChild(r)); // Reorganiza as linhas na tabela
 });
 
-// Filtro por tag
+
+
+
 document.querySelectorAll('.tag-item').forEach(tag => {
     tag.addEventListener('click', function() {
         const tagId = this.dataset.tagId;
@@ -283,21 +289,19 @@ function resetFiltro(){
     document.getElementById('pesquisa').value = '';
 }
 
-// Dropdown de tags
-// Dropdown de tags - sempre abaixo do quadrado (+)
-// JS - abre dropdown abaixo do quadrado (+)
+
 document.querySelectorAll('.add-tag-square').forEach(square => {
-    const dropdown = square.nextElementSibling; // pega o .tag-dropdown logo depois
+    const dropdown = square.nextElementSibling; 
     square.addEventListener('click', function(e) {
-        // fecha outros dropdowns
+        
         document.querySelectorAll('.tag-dropdown').forEach(dd => { if(dd !== dropdown) dd.style.display = 'none'; });
 
-        // alterna visibilidade
+       
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     });
 });
 
-// Fecha dropdown clicando fora
+
 document.addEventListener('click', function(e){
     document.querySelectorAll('.tag-dropdown').forEach(dd => {
         if(!dd.contains(e.target) && !dd.previousElementSibling.contains(e.target)){
