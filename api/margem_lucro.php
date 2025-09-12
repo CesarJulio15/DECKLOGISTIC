@@ -5,11 +5,11 @@ header('Content-Type: application/json; charset=utf-8');
 // Ajuste este caminho se necessário
 require_once __DIR__ . '/../conexao.php';
 
-if (!isset($_SESSION['id']) || !is_numeric($_SESSION['id'])) {
+$lojaId = $_SESSION['loja_id'] ?? 0;
+if ($lojaId == 0) {
     echo json_encode(["error" => "Loja não autenticada"]);
     exit;
 }
-$lojaId = (int) $_SESSION['id'];
 
 // --------- período ----------
 $periodo = $_GET['periodo'] ?? 'mes'; // 'mes' | '30d' | 'ano'

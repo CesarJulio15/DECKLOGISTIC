@@ -212,13 +212,10 @@ document.getElementById('confirm-delete').addEventListener('click', function() {
 
 // Pesquisa
 document.getElementById('pesquisa').addEventListener('input', function() {
-    const termo = this.value.toLowerCase();  // Converte o termo de pesquisa para minúsculo
+    const termo = this.value.toLowerCase();
     document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-        const nomeProduto = tr.querySelector('td:nth-child(2) span');
-        if (nomeProduto) {
-            const nome = nomeProduto.textContent.toLowerCase();  // Acessa o nome do produto e converte para minúsculo
-            tr.style.display = nome.includes(termo) ? '' : 'none';  // Exibe ou esconde a linha com base na pesquisa
-        }
+        const nome = tr.querySelector('td:nth-child(2) span').innerText.toLowerCase();
+        tr.style.display = nome.includes(termo) ? '' : 'none';
     });
 });
 

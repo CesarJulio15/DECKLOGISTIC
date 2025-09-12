@@ -2,10 +2,17 @@
 require_once '../conexao.php';
 
 // Total atual de estoque
-$res = mysqli_query($conn, "SELECT SUM(quantidade_estoque) AS total FROM produtos");
+$res = mysqli_query($conn, "SELECT SUM(quantidade_estoque) AS total FROM produtos WHERE deletado_em IS NULL");
 $total = 0;
 if ($row = mysqli_fetch_assoc($res)) {
     $total = (int)$row['total'];
+}
+
+// Total de produtos distintos
+$resProd = mysqli_query($conn, "SELECT COUNT(*) AS total_produtos FROM produtos WHERE deletado_em IS NULL");
+$total_produtos = 0;
+if ($row = mysqli_fetch_assoc($resProd)) {
+    $total_produtos = (int)$row['total_produtos'];
 }
 
 // Histórico diário (últimos 30 dias) baseado em movimentações de estoque
@@ -35,5 +42,6 @@ while ($row = mysqli_fetch_assoc($resSeries)) {
 header('Content-Type: application/json');
 echo json_encode([
     'total' => $total,
+    'total_produtos' => $total_produtos,
     'series' => $temp
 ]);

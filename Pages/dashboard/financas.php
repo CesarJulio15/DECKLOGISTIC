@@ -1,8 +1,14 @@
 <?php
 session_start();
+var_dump($_SESSION); 
+// Verifique a chave correta da sessão
+if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
+    echo json_encode(["error" => "Loja não autenticada"]);
+    exit;
+    
+}
 
-// ID da loja logada na sessão
-$lojaId = $_SESSION['id'] ?? 0;
+$lojaId = $_SESSION['loja_id'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -193,9 +199,9 @@ $lojaId = $_SESSION['id'] ?? 0;
     document.getElementById('margemLucro').innerText = `${margemVal}%`;
 
     // Séries históricas
-    const brutoSeries = bruto.series.map(item => item.valor);
-    const liquidoSeries = liquido.series.map(item => item.valor);
-    const margemSeries = margem.series.map(item => item.valor);
+const brutoSeries = (bruto.series || []).map(item => item.valor || 0);
+const liquidoSeries = (liquido.series || []).map(item => item.valor || 0);
+const margemSeries = (margem.series || []).map(item => item.valor || 0);
 
     // Sparkline Lucro Bruto
     new ApexCharts(document.querySelector("#chartBruto"), {
@@ -256,6 +262,39 @@ document.getElementById('btnLucroBruto').addEventListener('click', () => {
 document.getElementById('btnLucroMargem').addEventListener('click', () => {
     window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/margem.php';
 });
+
+async function loadLucros() {
+  try {
+    const periodo = 'mes';
+    const [bruto, liquido, margem] = await Promise.all([
+      fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+      fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+      fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
+    ]);
+
+    if (bruto.error || liquido.error || margem.error) {
+      console.error("Erro API:", bruto.error || liquido.error || margem.error);
+      return;
+    }
+
+    const lucroBrutoVal = parseFloat(bruto.total || 0).toFixed(2);
+    const lucroLiquidoVal = parseFloat(liquido.total || 0).toFixed(2);
+    const margemVal = parseFloat(margem.total || 0).toFixed(2);
+
+    document.getElementById('lucroBruto').innerText = `R$ ${lucroBrutoVal}`;
+    document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
+    document.getElementById('margemLucro').innerText = `${margemVal}%`;
+
+    const brutoSeries = (bruto.series || []).map(item => item.valor || 0);
+    const liquidoSeries = (liquido.series || []).map(item => item.valor || 0);
+    const margemSeries = (margem.series || []).map(item => item.valor || 0);
+
+    // Render ApexCharts...
+  } catch(err) {
+    console.error("Erro ao carregar lucros:", err);
+  }
+}
+
   // Chamada inicial das funções
   loadLucros();
   loadReceitaDespesa();

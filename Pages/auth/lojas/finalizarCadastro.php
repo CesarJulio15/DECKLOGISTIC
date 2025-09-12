@@ -1,14 +1,18 @@
 <?php
 require_once '../../../conexao.php';
-
+echo "<pre>";
+print_r($_POST);
+print_r($_GET);
+echo "</pre>";
+exit;
 function limpar($conn, $valor) {
     return mysqli_real_escape_string($conn, trim($valor));
 }
 
-// Pega o ID da loja que foi criada na etapa 1 (deve vir na URL ou no POST)
 $loja_id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+
 if ($loja_id <= 0) {
-    die("ID da loja inválido.");
+    die("⚠️ Erro: ID da loja não foi recebido.");
 }
 
 // Limpa e recebe os dados do formulário
