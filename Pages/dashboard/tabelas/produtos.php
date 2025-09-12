@@ -1,28 +1,41 @@
 <?php 
 include '../../../conexao.php'; 
 
-// Busca produtos
-$sql = "SELECT id, nome, preco_unitario, quantidade_estoque, lote FROM produtos";
-$result = mysqli_query($conn, $sql);
+// Verifica se o usuário está logado e a sessão contém o 'loja_id'
+session_start();
+if (!isset($_SESSION['loja_id'])) {
+    header("Location: login.php"); // Redireciona caso a sessão de loja não exista
+    exit;
+}
+
+$lojaId = $_SESSION['loja_id']; // Obtém o 'loja_id' da sessão
+
+// Busca produtos da loja logada
+$sql = "SELECT id, nome, preco_unitario, quantidade_estoque, lote FROM produtos WHERE loja_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $lojaId);
+$stmt->execute();
+$result = $stmt->get_result();
 if (!$result) {
     die("Erro na consulta: " . mysqli_error($conn));
 }
 
 // Busca todas as tags
 $tags = [];
- $tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL ORDER BY criado_em DESC");
+$tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL ORDER BY criado_em DESC");
 if ($tagResult) {
     while ($row = $tagResult->fetch_assoc()) {
         $tags[] = $row;
     }
 }
 
-// Busca tags já vinculadas a cada produto
+// Busca tags já vinculadas a cada produto da loja logada
 $produtoTags = [];
 $tagVincResult = $conn->query("
     SELECT produto_tag.produto_id, produto_tag.tag_id, tags.icone, tags.cor 
     FROM produto_tag 
     JOIN tags ON produto_tag.tag_id = tags.id
+    WHERE produto_tag.produto_id IN (SELECT id FROM produtos WHERE loja_id = $lojaId)
 ");
 if ($tagVincResult) {
     while ($row = $tagVincResult->fetch_assoc()) {
@@ -120,7 +133,6 @@ if ($tagVincResult) {
         <?php endforeach; ?>
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #000000ff;"></i>
-        
         </button>
         <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px;"></i>
         <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
@@ -154,7 +166,6 @@ if ($tagVincResult) {
 
         <span><?= htmlspecialchars($produto['nome']) ?></span>
 
-     
         <div class="add-tag-square" data-produto-id="<?= $produto['id'] ?>">+</div>
         <div class="tag-dropdown" id="tag-dropdown-<?= $produto['id'] ?>">
             <?php foreach($tags as $tag): ?>
@@ -214,14 +225,12 @@ document.getElementById('confirm-delete').addEventListener('click', function() {
 document.getElementById('pesquisa').addEventListener('input', function() {
     const termo = this.value.toLowerCase();
     document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-        // pega o último span dentro da 2ª coluna (o nome do produto)
         const spans = tr.querySelectorAll('td:nth-child(2) span');
         const nome = spans.length ? spans[spans.length - 1].textContent.toLowerCase() : '';
         tr.style.display = nome.includes(termo) ? '' : 'none';
     });
 });
 
-// Ordenação
 // Ordenação
 document.getElementById('ordenar').addEventListener('change', function() {
     const tbody = document.getElementById('tabela-produtos');
@@ -269,89 +278,12 @@ document.getElementById('ordenar').addEventListener('change', function() {
 
     rows.forEach(r => tbody.appendChild(r)); // Reorganiza as linhas na tabela
 });
-
-
-
-
-document.querySelectorAll('.tag-item').forEach(tag => {
-    tag.addEventListener('click', function() {
-        const tagId = this.dataset.tagId;
-        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-            const tagsProduto = Array.from(tr.querySelectorAll('.tags-vinculadas i')).map(i => i.dataset.tagId);
-            tr.style.display = tagsProduto.includes(tagId) ? '' : 'none';
-        });
-    });
-});
-
-function resetFiltro(){
-    document.querySelectorAll('#tabela-produtos tr').forEach(tr => tr.style.display = '');
-    document.getElementById('pesquisa').value = '';
-}
-
-
-document.querySelectorAll('.add-tag-square').forEach(square => {
-    const dropdown = square.nextElementSibling; 
-    square.addEventListener('click', function(e) {
-        
-        document.querySelectorAll('.tag-dropdown').forEach(dd => { if(dd !== dropdown) dd.style.display = 'none'; });
-
-       
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-});
-
-
-document.addEventListener('click', function(e){
-    document.querySelectorAll('.tag-dropdown').forEach(dd => {
-        if(!dd.contains(e.target) && !dd.previousElementSibling.contains(e.target)){
-            dd.style.display = 'none';
-        }
-    });
-});
-
-
-document.querySelectorAll('.tag-option').forEach(option => {
-    option.addEventListener('click', function() {
-        const produtoId = this.closest('.tag-dropdown').id.split('-')[2];
-        const tagId = this.dataset.tagId;
-
-        // Primeiro, vamos remover todas as tags associadas ao produto
-        const tagsProdutoContainer = document.getElementById('tags-produto-' + produtoId);
-        tagsProdutoContainer.innerHTML = '';  // Limpa as tags atuais
-
-        // Agora, faz a requisição para vincular a nova tag
-        fetch('vincular_tag.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `produto_id=${produtoId}&tag_id=${tagId}`
-        })
-        .then(res => res.text())
-        .then(data => {
-            if (data.trim() === 'ok') {
-                const icon = this.querySelector('i').cloneNode(true);  // Clona o ícone da tag
-                tagsProdutoContainer.appendChild(icon);  // Adiciona a nova tag
-            } else {
-                alert('Erro ao vincular tag!');
-            }
-            this.closest('.tag-dropdown').style.display = 'none';  // Fecha o dropdown
-        });
-    });
-});
-
-
-// Fecha dropdown clicando fora
-document.addEventListener('click', function(e){
-    document.querySelectorAll('.tag-dropdown').forEach(dd => {
-        if(!dd.contains(e.target) && !document.querySelector('.add-tag-square[data-produto-id="'+dd.id.split('-')[2]+'"]').contains(e.target)){
-            dd.style.display = 'none';
-        }
-    });
-});
 </script>
 
 </div>
 </div>
 </main>
+
 <!-- Modal Importação -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -417,12 +349,11 @@ document.addEventListener('click', function(e){
                     <!-- Template download -->
                     <div class="template-download mt-3 p-3 bg-light border rounded">
                         <h5><i class="fas fa-download me-2"></i>Template de Planilha</h5>
-                        <p>Baixe nosso template para garantir que sua planilha tenha o formato correto.</p>
-                        <a href="template_produtos.xlsx" class="btn btn-outline-success">
-                            <i class="fas fa-file-excel me-2"></i>Baixar Template
+                        <p>Baixe nosso template para garantir que sua planilha tenha o formato correto para importação</p>
+                        <a href="../../../assets/templates/ProdutoTemplate.xlsx" class="btn btn-success" download>
+                            <i class="fas fa-download me-2"></i>Baixar Template
                         </a>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -430,68 +361,6 @@ document.addEventListener('click', function(e){
     </div>
   </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const uploadForm = document.getElementById('uploadForm');
-    const importResult = document.getElementById('importResult');
-    const importedData = document.getElementById('importedData');
-    const successMessage = document.getElementById('successMessage');
-
-    if(uploadForm){
-        uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Importando...';
-            submitBtn.disabled = true;
-
-            fetch('importacao.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    successMessage.textContent = `${data.imported} registros importados com sucesso!`;
-                    displayImportedData(data.data);
-                    importResult.classList.remove('d-none');
-                } else {
-                    alert('Erro: ' + data.message);
-                }
-            })
-            .catch(err => alert('Erro na importação: ' + err.message))
-            .finally(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
-        });
-    }
-
-    function displayImportedData(data) {
-        importedData.innerHTML = '';
-        data.forEach(row => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${row.nome}</td>
-                <td>${row.descricao}</td>
-                <td>${row.lote}</td>
-                <td>${row.quantidade_estoque}</td>
-                <td>R$ ${parseFloat(row.preco_unitario).toFixed(2)}</td>
-                <td>R$ ${parseFloat(row.custo_unitario).toFixed(2)}</td>
-                <td>${row.data_reabastecimento}</td>
-            `;
-            importedData.appendChild(tr);
-        });
-    }
-});
-</script>
-
 
 </body>
 </html>
