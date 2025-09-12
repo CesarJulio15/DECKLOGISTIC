@@ -3,7 +3,7 @@ session_start();
 include __DIR__ . '/../../conexao.php';
 
 $loja_id = $_SESSION['usuario_id'] ?? 0;
-$usuario_id = $_SESSION['usuario_id'] ?? 0;
+//$usuario_id = $_SESSION['usuario_id'] ?? 0;
 if (!$loja_id || !$usuario_id) {
     die('Faça login para acessar o gerenciamento.');
 }
