@@ -37,16 +37,19 @@ body {
 }
 
 .logo-area {
-  padding: 15px;
+  padding: 0;
   text-align: center;
   border-bottom: 1px solid #333;
 }
 
 .logo-area img {
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  height: auto; 
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
 }
+
 
 .nav-section {
   display: flex;
@@ -141,9 +144,11 @@ hr {
   margin-left: 220px;
   padding: 30px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* 4 colunas fixas */
   gap: 20px;
   width: calc(100% - 220px);
+  align-items: start; /* mantém os cards alinhados no topo */
+  align-items: stretch;
 }
 
 .card {
@@ -181,13 +186,13 @@ hr {
 #estoque { color: #24b12f; }
 #chartEstoque, #chartReceitaDespesa { color: #3b82f6; }
 
-/* Cards especiais */
+/* Card tabela reabastecidos */
 .card.reabastecidos {
-  grid-column: 1 / -1; /* ocupa toda a largura do grid */
-  height: auto;
-  max-width: 810px;
-  margin: 0 auto;
+  grid-column: span 2; /* ocupa 2 colunas no grid */
+  width: 100%;
+  margin: 0;
   padding: 20px;
+  height: auto;
 }
 
 /* Para gráficos ocupar todo espaço do card */
@@ -285,6 +290,7 @@ hr {
 
   .card.reabastecidos {
     grid-column: auto;
+    width: 100%;
   }
 
   /* Mobile Tabelas */

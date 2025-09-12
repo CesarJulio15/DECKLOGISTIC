@@ -4,7 +4,7 @@ session_start();
 
 // Se o usuário estiver logado → redireciona para dashboard
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: pages/dashboard/financas.php');
+    header('Location: pages/dashboard/estoque.php');
     exit;
 }
 

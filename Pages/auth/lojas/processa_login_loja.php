@@ -17,32 +17,34 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result && $result->num_rows > 0) {
+    // Verifica se encontrou a loja
+    if ($result && $result->num_rows === 1) {
         $loja = $result->fetch_assoc();
 
-        // Verifica senha
-      if (password_verify($senha, $loja['senha_hash'])) {
-    session_regenerate_id(true);
+        // Confere senha
+        if (password_verify($senha, $loja['senha_hash'])) {
+            session_regenerate_id(true);
 
-    $_SESSION['usuario_id'] = $loja['id'];
-    $_SESSION['loja_id']    = $loja['id']; // <-- ADICIONE ESTA LINHA
-    $_SESSION['nome']       = $loja['nome'];
-    $_SESSION['email']      = $loja['email'];
-    $_SESSION['tipo_login'] = 'empresa';
+            $_SESSION['usuario_id'] = $loja['id'];
+            $_SESSION['loja_id']    = $loja['id']; 
+            $_SESSION['nome']       = $loja['nome'];
+            $_SESSION['email']      = $loja['email'];
+            
+            // Apenas loja por enquanto
+            // $_SESSION['tipo_login'] = 'empresa'; 
 
-    header("Location: ../../../index.php");
-    exit;
-}
-    
-        } else {
-            $_SESSION['erro_login'] = "Senha incorreta.";
-            header("Location: loginLoja.php");
+            header("Location: ../../../index.php");
             exit;
         }
-    } else {
-        $_SESSION['erro_login'] = "E-mail não cadastrado.";
-        header("Location: loginLoja.php");
-        exit;
     }
 
-?>
+    // Se chegou até aqui, deu erro (senha ou email inválido)
+    $_SESSION['erro_login'] = "E-mail ou senha incorretos.";
+    header("Location: loginLoja.php");
+    exit;
+
+} else {
+    $_SESSION['erro_login'] = "Preencha todos os campos.";
+    header("Location: loginLoja.php");
+    exit;
+}

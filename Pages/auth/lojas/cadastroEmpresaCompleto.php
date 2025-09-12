@@ -7,56 +7,97 @@
   <link rel="stylesheet" href="../../../assets/cadastroEmpresa.css">
   <title>Cadastro da Empresa</title>
   <script>
-    // Criptografia
+    // ===============================
+    // Funções de Criptografia
+    // ===============================
     function criptografar(valor) {
-      return btoa(valor);
+      return btoa(valor); // Base64
     }
+
+    // Remove máscara e criptografa campos sensíveis
     function criptografarCamposSigilosos() {
       let cnpj = document.getElementById("cnpj");
-      let ie = document.getElementById("inscricao_estadual");
-      let nir = document.getElementById("nir");
+      let ie   = document.getElementById("inscricao_estadual");
+      let nir  = document.getElementById("nir");
 
-      cnpj.value = criptografar(cnpj.value);
-      ie.value = criptografar(ie.value);
-      nir.value = criptografar(nir.value);
+      cnpj.value = criptografar(cnpj.value.replace(/\D/g, "")); 
+      ie.value   = criptografar(ie.value.replace(/\D/g, "")); 
+      nir.value  = criptografar(nir.value.replace(/\D/g, "")); 
     }
 
-  // Função para aplicar máscara de CNPJ
-  function formatarCNPJ(cnpj) {
-    return cnpj
-      .replace(/\D/g, "") // remove tudo que não é número
-      .replace(/^(\d{2})(\d)/, "$1.$2") // 2 primeiros -> 99.
-      .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3") // depois -> 99.999.
-      .replace(/\.(\d{3})(\d)/, ".$1/$2") // depois -> 99.999.999/9
-      .replace(/(\d{4})(\d)/, "$1-$2") // depois -> 99.999.999/9999-99
-      .substring(0, 18); // limita ao tamanho máximo
-  }
+    // ===============================
+    // Máscaras
+    // ===============================
+    function formatarCNPJ(cnpj) {
+      return cnpj
+        .replace(/\D/g, "")
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1/$2")
+        .replace(/(\d{4})(\d)/, "$1-$2")
+        .substring(0, 18);
+    }
 
-  // Aplicar máscara dinamicamente
-  document.addEventListener("DOMContentLoaded", () => {
-    const cnpjInput = document.getElementById("cnpj");
-    cnpjInput.addEventListener("input", (e) => {
-      e.target.value = formatarCNPJ(e.target.value);
+    function formatarNIR(nir) {
+      return nir
+        .replace(/\D/g, "")
+        .replace(/^(\d{4})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1-$2")
+        .substring(0, 12);
+    }
+
+    function formatarIE(ie) {
+      return ie
+        .replace(/\D/g, "")
+        .replace(/^(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1-$2")
+        .substring(0, 15);
+    }
+
+    // ===============================
+    // Eventos ao digitar
+    // ===============================
+    document.addEventListener("DOMContentLoaded", () => {
+      // CNPJ
+      document.getElementById("cnpj").addEventListener("input", (e) => {
+        e.target.value = formatarCNPJ(e.target.value);
+      });
+
+      // NIRC
+      document.getElementById("nir").addEventListener("input", (e) => {
+        e.target.value = formatarNIR(e.target.value);
+      });
+
+      // Inscrição Estadual
+      document.getElementById("inscricao_estadual").addEventListener("input", (e) => {
+        e.target.value = formatarIE(e.target.value);
+      });
+
+      // CEP
+      document.getElementById("cep").addEventListener("input", (e) => {
+        e.target.value = e.target.value
+          .replace(/\D/g, "")
+          .replace(/^(\d{5})(\d)/, "$1-$2")
+          .substring(0, 9);
+      });
+
+      // Telefone
+      const telefoneInput = document.querySelector("input[name='fone']");
+      telefoneInput.addEventListener("input", (e) => {
+        let v = e.target.value.replace(/\D/g, "");
+        if (v.length > 11) v = v.substring(0, 11); // limita a 11 dígitos
+        if (v.length <= 10) {
+          e.target.value = v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+        } else {
+          e.target.value = v.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+        }
+      });
     });
 
-    const cepInput = document.getElementById("cep");
-    cepInput.addEventListener("input", (e) => {
-      e.target.value = e.target.value.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").substring(0, 9);
-    });
-
-    const telefoneInput = document.querySelector("input[name='fone']");
-    telefoneInput.addEventListener("input", (e) => {
-      let v = e.target.value.replace(/\D/g, "");
-      if (v.length <= 10) {
-        e.target.value = v.replace(/(\d{2})(\d{4})(\d)/, "($1) $2-$3");
-      } else {
-        e.target.value = v.replace(/(\d{2})(\d{5})(\d)/, "($1) $2-$3");
-      }
-    });
-  });
-
-
-    // Consulta CEP
+    // ===============================
+    // Consulta CEP (via ViaCEP)
+    // ===============================
     function consultarCEP() {
       const cep = document.getElementById("cep").value.replace(/\D/g, '');
       if (cep.length === 8) {
@@ -87,13 +128,14 @@
         <input type="text" name="razao" placeholder="Razão" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
         <input type="text" name="fantasia" placeholder="Fantasia" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
       </div>
+
       <div class="form-group">
-        <!-- CEP com evento para buscar dados -->
         <input type="text" name="cep" id="cep" placeholder="CEP" required onblur="consultarCEP()">
         <input type="text" name="endereco" id="endereco" placeholder="Endereço" maxlength="120" required>
         <input type="number" name="numero" placeholder="Número" required min="1" max="99999">
         <input type="text" name="complemento" placeholder="Complemento" maxlength="50">
       </div>
+
       <div class="form-group">
         <input type="text" name="bairro" id="bairro" placeholder="Bairro" maxlength="60" required>
         <select name="uf" id="uf" required>
@@ -110,10 +152,12 @@
           <option>Paraguai</option>
         </select>
       </div>
+
       <div class="form-group">
         <input type="tel" name="fone" placeholder="Fone" required>
       </div>
       <hr><br>
+
       <div class="form-group">
         <select name="regime_federal" required>
           <option value="">Regime Federal</option>
@@ -122,6 +166,7 @@
         <input type="text" name="cnpj" placeholder="CNPJ" id="cnpj" required>
         <input type="text" name="cnae_f" placeholder="CNAE-F" maxlength="20">
       </div>
+
       <div class="form-group">
         <select name="regime_estadual" required>
           <option value="">Regime Estadual</option>
@@ -134,6 +179,7 @@
         </select>
         <input type="text" name="inscricao_estadual" placeholder="Inscrição Estadual" id="inscricao_estadual">
       </div>
+
       <div class="form-group">
         <input type="date" name="data_nir" placeholder="Data NIRC">
         <input type="number" name="area_construida" placeholder="Área construída m²">
@@ -154,8 +200,6 @@
       </div>
 
       <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? (int) $_GET['id'] : 0; ?>">
-
-
     </form>
   </div>
 </body>

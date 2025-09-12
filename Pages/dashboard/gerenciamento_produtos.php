@@ -6,11 +6,9 @@ ini_set('display_errors', 1);
 // Ajuste: caminho relativo para sua conexão
 include __DIR__ . '/../../conexao.php';
 
-// Variáveis de sessão corretas
-$lojaId = (int)($_SESSION['loja_id'] ?? 0);
-$usuarioId = (int)($_SESSION['usuario_id'] ?? 0);
-if (!$lojaId || !$usuarioId) {
-    // Redireciona para login (ou exibe mensagem)
+$loja_id = $_SESSION['usuario_id'] ?? 0;
+//$usuario_id = $_SESSION['usuario_id'] ?? 0;
+if (!$loja_id || !$usuario_id) {
     die('Faça login para acessar o gerenciamento.');
 }
 
