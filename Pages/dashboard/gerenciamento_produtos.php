@@ -22,22 +22,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // --- ADICIONAR PRODUTO ---
     if ($acao === 'adicionar_produto') {
-        $nome = trim($_POST['nome'] ?? '');
-        $preco = floatval($_POST['preco'] ?? 0);
-        $estoque = intval($_POST['estoque'] ?? 0);
+    $nome = trim($_POST['nome'] ?? '');
+    $preco = floatval($_POST['preco'] ?? 0);
+    $estoque = intval($_POST['estoque'] ?? 0);
 
-        $stmt = $conn->prepare(
-            "INSERT INTO produtos (loja_id, usuario_id, nome, preco_unitario, quantidade_estoque, quantidade_inicial, criado_em)
-             VALUES (?, ?, ?, ?, ?, ?, NOW())"
-        );
-        $stmt->bind_param("iisdii", $lojaId, $usuarioId, $nome, $preco, $estoque, $estoque);
-        if ($stmt->execute()) {
-            $msg = "✅ Produto cadastrado com sucesso!";
-        } else {
-            $msg = "❌ Erro: " . $stmt->error;
-        }
-        $stmt->close();
+    // Corrigindo a variável de loja_id
+    $stmt = $conn->prepare(
+        "INSERT INTO produtos (loja_id, usuario_id, nome, preco_unitario, quantidade_estoque, quantidade_inicial, criado_em)
+         VALUES (?, ?, ?, ?, ?, ?, NOW())"
+    );
+    
+    // Usando a variável correta para loja_id e usuario_id
+    $stmt->bind_param("iisdii", $loja_id, $usuario_id, $nome, $preco, $estoque, $estoque);
+    
+    if ($stmt->execute()) {
+        $msg = "✅ Produto cadastrado com sucesso!";
+    } else {
+        $msg = "❌ Erro: " . $stmt->error;
     }
+    $stmt->close();
+}
 
     // --- EDITAR PRODUTO ---
     if ($acao === 'editar_produto') {
