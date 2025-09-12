@@ -310,12 +310,16 @@ document.addEventListener('click', function(e){
 });
 
 
-
 document.querySelectorAll('.tag-option').forEach(option => {
     option.addEventListener('click', function() {
         const produtoId = this.closest('.tag-dropdown').id.split('-')[2];
         const tagId = this.dataset.tagId;
 
+        // Primeiro, vamos remover todas as tags associadas ao produto
+        const tagsProdutoContainer = document.getElementById('tags-produto-' + produtoId);
+        tagsProdutoContainer.innerHTML = '';  // Limpa as tags atuais
+
+        // Agora, faz a requisição para vincular a nova tag
         fetch('vincular_tag.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -323,17 +327,17 @@ document.querySelectorAll('.tag-option').forEach(option => {
         })
         .then(res => res.text())
         .then(data => {
-            if(data.trim() === 'ok'){
-                const icon = this.querySelector('i').cloneNode(true);
-                const container = document.getElementById('tags-produto-' + produtoId);
-                container.appendChild(icon);
+            if (data.trim() === 'ok') {
+                const icon = this.querySelector('i').cloneNode(true);  // Clona o ícone da tag
+                tagsProdutoContainer.appendChild(icon);  // Adiciona a nova tag
             } else {
                 alert('Erro ao vincular tag!');
             }
-            this.closest('.tag-dropdown').style.display = 'none';
+            this.closest('.tag-dropdown').style.display = 'none';  // Fecha o dropdown
         });
     });
 });
+
 
 // Fecha dropdown clicando fora
 document.addEventListener('click', function(e){

@@ -141,9 +141,10 @@ hr {
   margin-left: 220px;
   padding: 30px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, 1fr); /* 4 colunas fixas */
   gap: 20px;
   width: calc(100% - 220px);
+  align-items: start; /* mantém os cards alinhados no topo */
 }
 
 .card {
@@ -181,13 +182,13 @@ hr {
 #estoque { color: #24b12f; }
 #chartEstoque, #chartReceitaDespesa { color: #3b82f6; }
 
-/* Cards especiais */
+/* Card tabela reabastecidos */
 .card.reabastecidos {
-  grid-column: 1 / -1; /* ocupa toda a largura do grid */
-  height: auto;
-  max-width: 810px;
-  margin: 0 auto;
+  grid-column: span 2; /* ocupa 2 colunas no grid */
+  width: 100%;
+  margin: 0;
   padding: 20px;
+  height: auto;
 }
 
 /* Para gráficos ocupar todo espaço do card */
@@ -285,6 +286,7 @@ hr {
 
   .card.reabastecidos {
     grid-column: auto;
+    width: 100%;
   }
 
   /* Mobile Tabelas */
