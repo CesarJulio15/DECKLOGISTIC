@@ -1,73 +1,37 @@
 <?php
-require_once '../../../conexao.php';
-echo "<pre>";
-print_r($_POST);
-print_r($_GET);
-echo "</pre>";
-exit;
-function limpar($conn, $valor) {
-    return mysqli_real_escape_string($conn, trim($valor));
-}
+session_start();
+include '../../../conexao.php';
 
-$loja_id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Pega dados do formulário
+    $usuario_id = isset($_POST['usuario_id']) ? intval($_POST['usuario_id']) : 0;
+    $loja_id    = isset($_POST['loja_id']) ? intval($_POST['loja_id']) : 0;
+    $nome       = trim($_POST['nome'] ?? '');
+    $email      = trim($_POST['email'] ?? '');
+    $tipo_login = trim($_POST['tipo_login'] ?? '');
 
-if ($loja_id <= 0) {
-    die("⚠️ Erro: ID da loja não foi recebido.");
-}
+    if ($usuario_id > 0 && $loja_id > 0 && $nome !== '' && $email !== '') {
+        // Atualiza no banco
+        $sql = "
+            UPDATE lojas
+            SET nome = ?, email = ?, tipo_login = ?
+            WHERE id = ? AND usuario_id = ?
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssii", $nome, $email, $tipo_login, $loja_id, $usuario_id);
 
-// Limpa e recebe os dados do formulário
-$razao_social = limpar($conn, $_POST['razao']);
-$nome = limpar($conn, $_POST['fantasia']);
-$cep = limpar($conn, $_POST['cep']);
-$endereco = limpar($conn, $_POST['endereco']);
-$numero = (int) $_POST['numero'];
-$complemento = limpar($conn, $_POST['complemento']);
-$bairro = limpar($conn, $_POST['bairro']);
-$uf = limpar($conn, $_POST['uf']);
-$municipio = limpar($conn, $_POST['municipio']);
-$pais = limpar($conn, $_POST['pais']);
-$telefone = limpar($conn, $_POST['fone']);
-$regime_federal = limpar($conn, $_POST['regime_federal']);
-$cnpj = limpar($conn, $_POST['cnpj']);
-$cnae = limpar($conn, $_POST['cnae_f']);
-$regime_estadual = limpar($conn, $_POST['regime_estadual']);
-$nir = limpar($conn, $_POST['nir']);
-$centralizacao_escrituracao = limpar($conn, $_POST['escrituracao_centralizada']);
-$inscricao_estadual = limpar($conn, $_POST['inscricao_estadual']);
-$data_nirc = limpar($conn, $_POST['data_nir']);
-$area_construida_m2 = (int) $_POST['area_construida'];
-$cod_estabelecimento = limpar($conn, $_POST['cod_estabelecimento']);
+        if ($stmt->execute()) {
+            $_SESSION['msg'] = "Loja atualizada com sucesso!";
+        } else {
+            $_SESSION['msg'] = "Erro ao atualizar: " . $stmt->error;
+        }
 
-// Query UPDATE — só atualiza os campos extras
-$sql = "UPDATE lojas SET 
-    razao_social = '$razao_social',
-    nome = '$nome',
-    cep = '$cep',
-    endereco = '$endereco',
-    numero = $numero,
-    complemento = '$complemento',
-    bairro = '$bairro',
-    uf = '$uf',
-    municipio = '$municipio',
-    pais = '$pais',
-    telefone = '$telefone',
-    regime_federal = '$regime_federal',
-    cnpj = '$cnpj',
-    cnae = '$cnae',
-    regime_estadual = '$regime_estadual',
-    nir = '$nir',
-    centralizacao_escrituracao = '$centralizacao_escrituracao',
-    inscricao_estadual = '$inscricao_estadual',
-    data_nirc = '$data_nirc',
-    area_construida_m2 = $area_construida_m2,
-    cod_estabelecimento = '$cod_estabelecimento'
-WHERE id = $loja_id";
+        $stmt->close();
+    } else {
+        $_SESSION['msg'] = "Preencha todos os campos obrigatórios!";
+    }
 
-if (mysqli_query($conn, $sql)) {
+    // Redireciona para a página inicial
     header("Location: ../../../index.php");
-    exit();
-} else {
-    echo "Erro: " . mysqli_error($conn);
+    exit;
 }
-
-mysqli_close($conn);
