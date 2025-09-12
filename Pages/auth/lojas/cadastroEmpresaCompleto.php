@@ -153,7 +153,9 @@
         <button type="submit" style="width: 200px;">Prosseguir</button>
       </div>
 
-      <input type="hidden" name="id" value="<?= htmlspecialchars($_GET['id'] ?? '') ?>">
+      <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? (int) $_GET['id'] : 0; ?>">
+
+
     </form>
   </div>
 </body>

@@ -20,6 +20,10 @@
       border: none;
       border-radius: 4px;
   }
+  #btn-multi-delete {
+    position: relative; /* garante que fique acima do fundo */
+    z-index: 20;
+}
   /* CSS */
 .add-tag-square { position: relative; z-index: 20; }
 .tag-dropdown { 
