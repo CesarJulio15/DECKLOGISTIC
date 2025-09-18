@@ -2,178 +2,162 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     display: flex;
+    background: #1b1b1b; /* fundo preto elegante */
+    color: #e5e5e5;      /* texto claro */
 }
 
 .main {
     flex: 1;
-    padding: 30px 30px 30px 300px; /* antes 260px */
-}
-
-.icon-grid-wrapper {
-    margin-left: 50px; /* antes 120px */
-    max-height: 400px;
-    overflow-y: auto;
-    width: max-content;
-    box-sizing: content-box;
+    padding: 30px 30px 30px 300px;
+    background: #1b1b1b; /* efeito translúcido */
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
 }
 
 h1 {
-    margin-left: -30px;
-    margin-bottom: 60px;
-    margin-top: 30px;
+    margin-bottom: 20px;
 }
 
-input[type="text"], input[type="color"] {
-    padding: 10px;
-    font-size: 16px;
-    width: 600px;
-    border: 1px solid #000000;
-    border-radius: 20px;
-    margin-bottom: 50px;
-    margin-left: 50px; 
+/* Inputs de texto e busca */
+input[type="text"], .search {
+    padding: 16px;
+    font-size: 18px;
+    height: 56px;
+    width: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    background: rgba(30, 30, 30, 0.6);
+    color: #f5f5f5;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+/* Dropdown de Tags */
+.tag-dropdown {
+    display: none;                /* inicialmente escondido */
+    position: absolute;
+    top: 100%;                    /* logo abaixo do botão */
+    left: 0;
+    background: #1a1a1a;          /* fundo escuro */
+    border: 1px solid #333;       /* borda sutil escura */
+    border-radius: 10px;          /* cantos arredondados */
+    padding: 8px 0;
+    min-width: 160px;             /* largura mínima */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6); /* sombra suave */
+    z-index: 50;
+    transition: all 0.2s ease;
 }
 
-input[name="tag_name"] {
-    height: 50px;
-    width: 600px; /* ajustado */
+/* Mostrar dropdown */
+.tag-dropdown.show {
+    display: block;
 }
 
-.search {
-    padding: 8px;
-    margin: 15px 0;
-    width: 800px;
-    border: 1px solid #ccc;
+/* Itens do dropdown */
+.tag-dropdown .tag-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e0e0e0;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+    border-left: 3px solid transparent; /* efeito de seleção */
+}
+
+.tag-dropdown .tag-option:hover {
+    background: rgba(255,153,0,0.15); /* hover laranja suave */
+    border-left: 3px solid #ff9900;   /* barra laranja à esquerda */
+    color: #fff;
+}
+
+/* Ícones dentro do dropdown */
+.tag-dropdown .tag-option i {
+    width: 20px;
+    text-align: center;
+    color: #ff9900; /* laranja futurista */
+}
+/* Input de cor separado */
+input[type="color"] {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    border: none;
     border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
 }
 
+input[type="text"]:focus, .search:focus {
+    border-color: #ff9900; /* laranja quente */
+    box-shadow: 0 0 12px rgba(255, 200, 0, 0.7); /* brilho amarelado */
+    outline: none;
+}
+
+/* Ícones */
 .icon-grid {
     display: grid;
-    grid-template-columns: repeat(12, 60px); /* 12 colunas */
-    grid-template-rows: repeat(10, 60px);   /* 10 linhas */
-    gap: 15px;
-    margin-top: 10px;
-    width: max-content;
-    height: max-content;
+    grid-template-columns: repeat(12, 50px);
+    gap: 12px;
+    margin-bottom: 20px;
 }
 
 .icon-item {
     text-align: center;
-    font-size: 28px;
+    font-size: 22px;
     cursor: pointer;
     border: 2px solid transparent;
-    border-radius: 8px;
-    padding: 10px;
-    transition: 0.2s;
+    border-radius: 10px;
+    padding: 8px;
+    background: rgba(40,40,40,0.5);
+    transition: 0.25s;
 }
 .icon-item:hover {
-    background: #f0f0f0;
+    background: rgba(60,60,60,0.6);
+    transform: scale(1.05);
 }
 .icon-item.selected {
-    border-color: #000;
-    background: #e0e0e0;
+    border-color: #ff9900; /* laranja */
+    background: rgba(255, 153, 0, 0.15); /* fundo alaranjado suave */
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin-top: 15px;
-    cursor: pointer;
-}
-
-p {
-    margin-left: 50px; /* antes 130px */
-    margin-top: 50px;
-    font-size: 23px;
-    color: #222;
-    font-weight: bold;
-}
-
-input[type="color"] {
-    margin-left: 50px; /* antes 130px */
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    border: none;
-    border-radius: 8px;
-    background: none;
-    cursor: pointer;
-}
-
-.search-wrapper {
-    position: relative;
-    display: inline-block;
-}
-
-.search-wrapper i {
-    position: absolute;
-    top: 33%;
-    right: 20px;
-    transform: translateY(-50%);
-    color: #777;
-    font-size: 18px;
-    pointer-events: none;
-}
-
-.search-wrapper .search {
-    padding-left: 40px;
-    height: 40px;
-    box-sizing: border-box;
-}
-.nav-list li a {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  color: #fff;
-  text-decoration: none;
-  font-size: 15px;
-  transition: background 0.2s;
-  box-shadow: none;
-  outline: none;
-}
-.rep {
-    margin-top: -20px;
-    font-size: 25px;
-    color: #222;
-    font-weight: bold;
-}
-.rep{
-    margin-left: 60px; /* antes 120px */
-}
-
+/* Botão principal */
 .pronto {
-    margin-top: -110px;
-    margin-left: 750px; /* antes 180px */
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 200px;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #000000;
+    color: #fff;
+    width: 150px;
+    padding: 14px;
+    border: none;
+    background: linear-gradient(135deg, rgba(255,153,0,0.9), rgba(255,200,0,0.8));
+    backdrop-filter: blur(6px);
     cursor: pointer;
-    margin-bottom: 15px;
+    transition: 0.3s;
+}
+.pronto:hover {
+    background: linear-gradient(135deg, rgba(255,153,0,1), rgba(255,200,0,1));
+    transform: scale(1.01);
+    box-shadow: 0 0 16px rgba(255,180,0,0.8);
 }
 
+/* Tags criadas */
 .tags-sidebar {
     position: fixed;
     top: 0;
     right: 0;
-    width: 250px;
+    width: 260px;
     height: 100%;
-    background: #f9f9f9;
-    border-left: 2px solid #ccc;
-    padding: 20px;
-    box-sizing: border-box;
-    overflow-y: auto;
+    background: rgba(15,15,15,0.7);
+    backdrop-filter: blur(15px);
+    border-left: 2px solid rgba(255,255,255,0.1);
+    color: #f1f1f1;
 }
 
 .tags-sidebar h2 {
-    margin-top: 0;
     font-size: 20px;
-    margin-bottom: 15px;
+    font-weight: bold;
+    color: #ffb300; /* amarelo/laranja vibrante */
+    margin: 20px 0 15px 10px; /* espaçamento */
+    border-bottom: 2px solid rgba(255,179,0,0.4); /* linha sutil */
+    padding-bottom: 6px;
 }
 
 .tag-item {
@@ -181,73 +165,49 @@ input[type="color"] {
     align-items: center;
     font-size: 16px;
     margin-bottom: 10px;
-    padding: 5px 8px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
     cursor: pointer;
     transition: 0.2s;
 }
-
-.tag-item i {
-    margin-right: 8px;
-}
-
 .tag-item:hover {
-    background: #e0e0e0;
+    background: rgba(255,153,0,0.15); /* hover laranja suave */
 }
 
-.input-wrapper {
-    position: relative;
-    display: inline-block;
-    margin-left: 50px; 
-}
-
-.input-wrapper input[name="tag_name"] {
-    height: 45px;
-    width: 800px; 
-    padding-right: 50px;
-    box-sizing: border-box;
-    margin-left: 0px;
-}
-
-.input-wrapper .check-icon {
-    position: absolute;
-    right: 5px;
-    top: 25%;
-    transform: translateY(-50%);
-    width: 100px;
-    height: 30px;
-    background-color: #000000;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    font-size: 16px;
-}
-
+/* Menu de contexto */
 .context-menu {
-    display: none;
-    position: absolute;
-    z-index: 1000;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    width: 150px;
+    background: rgba(25,25,25,0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
 }
-
-.context-menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 5px 0;
-}
-
 .context-menu li {
     padding: 10px;
-    cursor: pointer;
-    transition: background 0.2s;
+    color: #000;
+}
+.context-menu li:hover {
+    background: rgba(255,200,0,0.2);
+    color: #ff9900;
 }
 
-.context-menu li:hover {
-    background: #f0f0f0;
+.search-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 50%; /* mesma largura do input */
+}
+
+.search-wrapper .search {
+    width: 100%;
+    padding-right: 45px; /* espaço para o ícone */
+}
+
+.search-wrapper .search-icon {
+    position: absolute;
+ margin-top: 30px;
+    right: 12px; /* distância da borda direita */
+    transform: translateY(-50%);
+    color: #ccc;
+    pointer-events: none; /* não atrapalha digitar */
+    font-size: 13px;
 }

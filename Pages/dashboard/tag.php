@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rename_tag_id'], $_PO
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tag_name'], $_POST['icon'])) {
     $tagName = trim($_POST['tag_name']);
     $icon = trim($_POST['icon']);
-    $color = $_POST['color'] ?? '#000000';
+    $color = $_POST['color'] ?? '#000000ff';
     if ($tagName && $icon) {
         $stmt = $conn->prepare("
             INSERT INTO tags (nome, nome_criado, cor, icone, usuario_id, loja_id, criado_em)
@@ -133,11 +133,13 @@ $stmt->close();
     <input type="text" name="tag_name" placeholder="Nome da Tag" required>
 </div>
 
-        <p>Escolha um ícone que represente a sua tag:</p>
-        <div class="search-wrapper">
-            <input type="text" id="search" class="search" placeholder="Procurar ícone...">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </div>
+        <p style="margin-left:0px; margin-bottom: 10px;">Escolha um ícone que represente a sua tag:</p>
+      <div class="search-wrapper">
+    <input type="text" id="search" class="search" placeholder="Procurar ícone...">
+    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+</div>
+      
+
 
         <div class="icon-grid-wrapper">
             <div class="icon-grid" id="iconGrid">
@@ -154,7 +156,7 @@ $stmt->close();
         <input type="hidden" name="icon" id="selectedIcon">
 
         <p>Escolha a cor do seu ícone</p>
-        <input type="color" name="color" id="colorPicker" value="#000000">
+        <input type="color" name="color" id="colorPicker" value="#ffffff">
 
         <br><br>
         <button type="submit" class="pronto">Pronto</button>
@@ -166,7 +168,7 @@ $stmt->close();
             <?php foreach ($tags as $tag): ?>
                 <div class="tag-item" data-id="<?= $tag['id'] ?>">
                     <span class="tag-icon">
-                      <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor'] ?: '#000000') ?>;"></i>
+                      <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor'] ?: '#ffffffff') ?>;"></i>
                     </span>
                     <span class="tag-name"><?= htmlspecialchars($tag['nome']) ?></span>
                 </div>
