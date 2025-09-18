@@ -124,6 +124,10 @@
     <h1>Finalize o cadastro da sua empresa</h1>
 
     <form onsubmit="criptografarCamposSigilosos()" action="finalizarCadastro.php" method="POST">
+
+
+
+
       <div class="form-group">
         <input type="text" name="razao" placeholder="Razão" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
         <input type="text" name="fantasia" placeholder="Fantasia" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
@@ -200,6 +204,12 @@
       </div>
 
       <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? (int) $_GET['id'] : 0; ?>">
+
+<input type="hidden" name="nome_empresa" value="<?php echo $_SESSION['cadastro']['nome']; ?>">
+<input type="hidden" name="email" value="<?php echo $_SESSION['cadastro']['email']; ?>">
+<input type="hidden" name="senha" value="<?php echo $_SESSION['cadastro']['senha']; ?>">
+
+
     </form>
   </div>
 </body>
