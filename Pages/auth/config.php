@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="bottom-links">
                 <a href="/DECKLOGISTIC/pages/auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
-                <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+                <a href="dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
             </div>
         </nav>
     </div>
