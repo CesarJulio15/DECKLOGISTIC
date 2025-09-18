@@ -1,3 +1,30 @@
+<?php
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validação mínima
+    $nome = trim($_POST['nome'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $senha = $_POST['senha'] ?? '';
+    $senha2 = $_POST['senha2'] ?? '';
+
+    if ($nome && $email && $senha && $senha === $senha2) {
+        // Armazena os dados na sessão
+        $_SESSION['cadastro'] = [
+            'nome' => $nome,
+            'email' => $email,
+            'senha' => password_hash($senha, PASSWORD_DEFAULT) // hash da senha
+        ];
+        // Redireciona para a página completa
+        header('Location: cadastroEmpresaCompleto.php');
+        exit;
+    } else {
+        $erro = "Preencha todos os campos corretamente.";
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -16,7 +43,7 @@
       <div class="form-container">
         <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
         <h1>Bem-Vindo!</h1>
-          <form action="cadastroEmpresa.php" method="POST">
+          <form action="" method="POST">
             <input type="text" name="nome" placeholder="Nome da Empresa" required>
               <input type="email" name="email" placeholder="Endereço de e-mail" required>
               <input type="password" name="senha" placeholder="Insira sua Senha" required>
