@@ -9,13 +9,39 @@ if (!isset($_SESSION['loja_id'])) {
 }
 
 $lojaId = $_SESSION['loja_id']; // Obtém o 'loja_id' da sessão
+$linhasPorPagina = 14;
+$paginaAtual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
 
-// Busca produtos da loja logada
-$sql = "SELECT id, nome, preco_unitario, quantidade_estoque, lote FROM produtos WHERE loja_id = ?";
+// Total de produtos da loja
+$totalProdutosResult = $conn->prepare("SELECT COUNT(*) as total FROM produtos WHERE loja_id = ?");
+$totalProdutosResult->bind_param("i", $lojaId);
+$totalProdutosResult->execute();
+$totalProdutosResult = $totalProdutosResult->get_result();
+$totalProdutos = $totalProdutosResult->fetch_assoc()['total'];
+
+$totalPaginas = ceil($totalProdutos / $linhasPorPagina);
+$inicio = ($paginaAtual - 1) * $linhasPorPagina;
+
+// Busca produtos da página atual
+$sql = "SELECT id, nome, preco_unitario, quantidade_estoque, lote 
+        FROM produtos 
+        WHERE loja_id = ? 
+        LIMIT ?, ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $lojaId);
+$stmt->bind_param("iii", $lojaId, $inicio, $linhasPorPagina);
 $stmt->execute();
 $result = $stmt->get_result();
+
+// Busca produtos da loja logada
+$sql = "SELECT id, nome, preco_unitario, quantidade_estoque, lote 
+        FROM produtos 
+        WHERE loja_id = ? 
+        LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("iii", $lojaId, $inicio, $linhasPorPagina);
+$stmt->execute();
+$result = $stmt->get_result();
+
 if (!$result) {
     die("Erro na consulta: " . mysqli_error($conn));
 }
@@ -32,10 +58,11 @@ if ($tagResult) {
 // Busca tags já vinculadas a cada produto da loja logada
 $produtoTags = [];
 $tagVincResult = $conn->query("
-    SELECT produto_tag.produto_id, produto_tag.tag_id, tags.icone, tags.cor 
-    FROM produto_tag 
-    JOIN tags ON produto_tag.tag_id = tags.id
-    WHERE produto_tag.produto_id IN (SELECT id FROM produtos WHERE loja_id = $lojaId)
+    SELECT pt.produto_id, pt.tag_id, t.icone, t.cor 
+    FROM produto_tag pt
+    JOIN tags t ON pt.tag_id = t.id
+    WHERE pt.produto_id IN (SELECT id FROM produtos WHERE loja_id = $lojaId)
+      AND t.deletado_em IS NULL
 ");
 if ($tagVincResult) {
     while ($row = $tagVincResult->fetch_assoc()) {
@@ -46,6 +73,7 @@ if ($tagVincResult) {
         ];
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -182,6 +210,17 @@ if ($tagVincResult) {
 <?php endwhile; ?>
 </tbody>
 </table>
+<?php if ($totalPaginas > 1): ?>
+<div class="paginacao" style="margin-top:10px; display:flex; justify-content:center; gap:5px;">
+    <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+        <a href="?pagina=<?= $i ?>" class="<?= ($i == $paginaAtual) ? 'active' : '' ?>"
+           style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; 
+                  border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#000;">
+            <?= $i ?>
+        </a>
+    <?php endfor; ?>
+</div>
+<?php endif; ?>
 
 <script>
 // Seleção múltipla
@@ -279,6 +318,62 @@ document.getElementById('ordenar').addEventListener('change', function() {
     rows.forEach(r => tbody.appendChild(r)); // Reorganiza as linhas na tabela
 });
 </script>
+<script>
+// Abrir/fechar dropdown ao clicar no "+"
+document.querySelectorAll('.add-tag-square').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        const produtoId = this.dataset.produtoId;
+        const dropdown = document.getElementById('tag-dropdown-' + produtoId);
+
+        // Fecha outros dropdowns
+        document.querySelectorAll('.tag-dropdown').forEach(d => {
+            if (d !== dropdown) d.style.display = 'none';
+        });
+
+        // Alterna visibilidade
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+});
+
+// Selecionar uma tag no dropdown
+document.querySelectorAll('.tag-option').forEach(opt => {
+    opt.addEventListener('click', function() {
+        const tagId = this.dataset.tagId;
+        const produtoId = this.closest('.tag-dropdown').id.replace('tag-dropdown-', '');
+
+        fetch('vincular_tag.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `produto_id=${produtoId}&tag_id=${tagId}`
+        })
+        .then(res => res.text())
+        .then(data => {
+            if (data.trim() === 'ok') {
+                // Pega o container de tags do produto
+                const container = document.getElementById('tags-produto-' + produtoId);
+
+                // Remove qualquer tag anterior
+                container.innerHTML = '';
+
+                // Adiciona a nova tag
+                const icone = this.querySelector('i').cloneNode(true);
+                container.appendChild(icone);
+
+                // Fecha o dropdown
+                this.closest('.tag-dropdown').style.display = 'none';
+            } else {
+                alert('Erro ao vincular tag: ' + data);
+            }
+        });
+    });
+});
+// Fecha dropdowns ao clicar fora
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.add-tag-square') && !e.target.closest('.tag-dropdown')) {
+        document.querySelectorAll('.tag-dropdown').forEach(d => d.style.display = 'none');
+    }
+});
+</script>
 
 </div>
 </div>
@@ -361,6 +456,33 @@ document.getElementById('ordenar').addEventListener('change', function() {
     </div>
   </div>
 </div>
+<script>
+// Filtro por tag
+document.querySelectorAll('.tag-item').forEach(tag => {
+    tag.addEventListener('click', function() {
+        const tagId = this.dataset.tagId;
 
+        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+            const icones = tr.querySelectorAll('.tags-vinculadas i');
+            let possuiTag = false;
+
+            icones.forEach(icon => {
+                if (icon.dataset.tagId === tagId) {
+                    possuiTag = true;
+                }
+            });
+
+            tr.style.display = possuiTag ? '' : 'none';
+        });
+    });
+});
+
+// Resetar filtro
+function resetFiltro() {
+    document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+        tr.style.display = '';
+    });
+}
+</script>
 </body>
 </html>

@@ -23,11 +23,11 @@ LEFT JOIN usuarios u ON u.id = p.usuario_id
 
     UNION ALL
 
-     SELECT 
+SELECT 
     'Produto Excluído' AS tipo,
     h.nome AS item,
-    '' AS icone,
-    '' AS cor,
+    'fa-trash' AS icone,
+    '#000' AS cor,  -- cor preta
     CONCAT('Qtd: ', h.quantidade, ' | Lote: ', h.lote) AS detalhe,
     h.criado_em AS data,
     COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
