@@ -6,7 +6,7 @@
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
-    background: #bfbfbf;
+    background: #f5f5f5;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding-top: 40px;
 }
@@ -25,9 +25,10 @@
 
 .conteudo h1 {
     font-size: 36px;
-    margin-bottom: 30px;
     color: #333;
     text-align: center;
+    margin-top: 80px;
+    margin-left: 6px;
 }
 
 /* ======================
@@ -35,11 +36,12 @@
 ====================== */
 .caixa-conta {
     width: 100%;
-    background: #f5f5f5;
+    background: #b3b3b3;
     border-radius: 12px;
     padding: 35px 50px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 70px;
 }
 
 .caixa-conta:hover {
@@ -54,15 +56,15 @@
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .perfil h2 {
     font-size: 24px;
-    color: #444;
+    color: #000000;
 }
 
-.icone-usuario {
+.icone-usuario {    
     font-size: 50px;
     color: #666;
 }
@@ -80,7 +82,7 @@
 
 .linha-info strong {
     min-width: 90px;
-    color: #555;
+    color: #000000;
 }
 
 /* Inputs */
@@ -96,7 +98,7 @@
 }
 
 .linha-info input:focus {
-    border-color: #999;
+    border-color: #000000;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     outline: none;
 }
@@ -106,7 +108,7 @@
     padding: 8px 15px;
     border-radius: 6px;
     border: none;
-    background: #007bff;
+    background: #000000;
     color: #fff;
     cursor: pointer;
     font-size: 14px;
@@ -114,7 +116,7 @@
 }
 
 .linha-info button:hover {
-    background: #0056b3;
+    background: #666666;
 }
 
 /* ======================
@@ -138,16 +140,16 @@
 }
 
 .btn-sair {
-    background: #b3b3b3;
+    background: #3f3e3e;
     color: #fff;
 }
 
 .btn-sair:hover {
-    background: #999;
+    background: #817e7e;
 }
 
 .btn-excluir {
-    background: #b30000;
+    background: #680101;
     color: #fff;
 }
 
@@ -156,12 +158,12 @@
 }
 
 .btn-cadastrar {
-    background: #007bff;
+    background: #000000;
     color: #fff;
 }
 
 .btn-cadastrar:hover {
-    background: #0056b3;
+    background: #817e7e;
 }
 
 .btn-alterar-senha {
@@ -170,7 +172,7 @@
 }
 
 .btn-alterar-senha:hover {
-    background: #b1a796;
+    background: #817e7e;
 }
 
 /* Ícones dentro dos botões */
@@ -196,7 +198,7 @@
 }
 
 .btn-salvar:hover {
-    background: #1e7e34;
+    background: #303030;
 }
 
 /* ======================

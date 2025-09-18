@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </ul>
             </div>
             <div class="bottom-links">
-                <a href="/DECKLOGISTIC/pages/auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+                <li class="active"><a href="/DECKLOGISTIC/pages/auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a></li>
                 <a href="dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
             </div>
         </nav>
