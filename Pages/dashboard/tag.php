@@ -1,5 +1,4 @@
 
-
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
@@ -35,16 +34,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rename_tag_id'], $_PO
 // CRIAR NOVA TAG
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tag_name'], $_POST['icon'])) {
     $tagName = trim($_POST['tag_name']);
-    $icon = $_POST['icon'];
+    $icon = trim($_POST['icon']);
     $color = $_POST['color'] ?? '#000000';
     if ($tagName && $icon) {
         $stmt = $conn->prepare("
             INSERT INTO tags (nome, nome_criado, cor, icone, usuario_id, loja_id, criado_em)
             VALUES (?, ?, ?, ?, ?, ?, NOW())
         ");
-        $stmt->bind_param("sssiii", $tagName, $tagName, $color, $icon, $usuario_id, $loja_id);
+     $stmt->bind_param("ssssii", $tagName, $tagName, $color, $icon, $usuario_id, $loja_id);
+
         $stmt->execute();
         $stmt->close();
+        header("Location: tag.php");
+        exit;
     }
 }
 
@@ -66,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 }
 
 // BUSCAR TAGS DA LOJA LOGADA
-// Buscar todas as tags da loja logada
 $tags = [];
 $stmt = $conn->prepare("
     SELECT * 
@@ -81,7 +82,6 @@ while ($row = $result->fetch_assoc()) {
     $tags[] = $row;
 }
 $stmt->close();
-
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +94,6 @@ $stmt->close();
 <link rel="stylesheet" href="../../assets/tag.css">
 <link rel="stylesheet" href="../../assets/sidebar.css">
 <style>
-/* MENU DE CONTEXTO */
 .context-menu { display:none; position:absolute; z-index:1000; background:#fff; border:1px solid #ccc; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2); width:150px; }
 .context-menu ul { list-style:none; margin:0; padding:5px 0; }
 .context-menu li { padding:10px; cursor:pointer; transition:background 0.2s; }
@@ -129,9 +128,10 @@ $stmt->close();
 <div class="main">
     <form method="POST" style="flex:1;">
         <h1>Nova Tag</h1>
-        <div class="input-wrapper">
-            <input type="text" name="tag_name" placeholder="Nome da Tag" required>
-        </div>
+    <div class="input-wrapper">
+    <p style="margin-left:0px; margin-bottom: 10px;">Escolha o nome da sua tag:</p>
+    <input type="text" name="tag_name" placeholder="Nome da Tag" required>
+</div>
 
         <p>Escolha um ícone que represente a sua tag:</p>
         <div class="search-wrapper">
@@ -142,9 +142,9 @@ $stmt->close();
         <div class="icon-grid-wrapper">
             <div class="icon-grid" id="iconGrid">
                 <?php
-                      $icons = [
+                 $icons = [
          'fa-laptop'=>'Eletrônicos','fa-desktop'=>'Computadores','fa-tv'=>'TV e Áudio', 'fa-mobile'=>'Celulares','fa-tablet'=>'Tablets','fa-headphones'=>'Acessórios Eletrônicos', 'fa-headset'=>'Headsets','fa-camera'=>'Câmeras','fa-video'=>'Filmadoras', 'fa-microchip'=>'Hardware e Peças','fa-plug'=>'Energia e Carregadores', 'fa-microphone'=>'Áudio e Música','fa-satellite-dish'=>'Satélites e Comunicação', 'fa-server'=>'Servidores','fa-keyboard'=>'Teclados','fa-mouse'=>'Mouses','fa-burger'=>'Alimentos','fa-apple-alt'=>'Frutas','fa-carrot'=>'Legumes', 'fa-drumstick-bite'=>'Carnes','fa-fish'=>'Peixes','fa-bread-slice'=>'Padaria', 'fa-cheese'=>'Laticínios','fa-wine-glass'=>'Bebidas','fa-beer'=>'Cervejas', 'fa-cocktail'=>'Drinks','fa-wine-bottle'=>'Vinhos','fa-cookie'=>'Confeitaria', 'fa-ice-cream'=>'Sorvetes','fa-mug-hot'=>'Café e Chás','fa-seedling'=>'Orgânicos', 'fa-hotdog'=>'Lanches','fa-pizza-slice'=>'Pizzas','fa-couch'=>'Móveis','fa-bed'=>'Cama e Colchão','fa-chair'=>'Cadeiras', 'fa-bath'=>'Banheiro e Higiene','fa-lightbulb'=>'Iluminação','fa-paint-roller'=>'Decoração e Pintura', 'fa-blender'=>'Eletrodomésticos','fa-fan'=>'Climatização','fa-recycle'=>'Sustentabilidade', 'fa-box'=>'Embalagens','fa-door-open'=>'Portas','fa-sink'=>'Cozinha e Pias', 'fa-shirt'=>'Roupas','fa-tshirt'=>'Moda Casual','fa-shoe-prints'=>'Calçados', 'fa-gem'=>'Acessórios e Joias','fa-hat-cowboy'=>'Chapéus e Bonés','fa-glasses'=>'Óculos', 'fa-ring'=>'Anéis','fa-socks'=>'Meias','fa-soap'=>'Sabonetes e Limpeza', 'fa-heart'=>'Beleza e Cuidados','fa-spa'=>'Relaxamento & Spa', 'fa-stethoscope'=>'Equipamentos Médicos','fa-pills'=>'Medicamentos', 'fa-hospital'=>'Saúde','fa-syringe'=>'Vacinas','fa-dna'=>'Exames e Biotecnologia', 'fa-baby'=>'Bebês','fa-gamepad'=>'Brinquedos','fa-book'=>'Livros', 'fa-puzzle-piece'=>'Jogos Educativos','fa-school'=>'Material Escolar',  'fa-dog'=>'Pet','fa-cat'=>'Gatos','fa-bone'=>'Petiscos','fa-paw'=>'Acessórios Pets',  'fa-football'=>'Esportes','fa-basketball-ball'=>'Basquete','fa-running'=>'Fitness', 'fa-bicycle'=>'Bicicletas','fa-motorcycle'=>'Motos','fa-swimmer'=>'Natação', 'fa-dumbbell'=>'Academia','fa-futbol'=>'Futebol','fa-campground'=>'Camping', 'fa-hiking'=>'Trilhas','fa-fish'=>'Pesca','fa-golf-ball'=>'Golfe','fa-car'=>'Automotivo','fa-bus'=>'Ônibus e Passagens','fa-train'=>'Transportes', 'fa-plane'=>'Viagens','fa-ship'=>'Náutica','fa-truck'=>'Entrega e Caminhões', 'fa-gas-pump'=>'Combustível','fa-charging-station'=>'Carros Elétricos', 'fa-tools'=>'Oficinas','fa-warehouse'=>'Estoque e Garagem',  'fa-wrench'=>'Ferramentas','fa-hammer'=>'Construção','fa-screwdriver'=>'Pequenos Reparos', 'fa-hard-hat'=>'EPI e Segurança','fa-toolbox'=>'Caixa de Ferramentas','fa-ruler-combined'=>'Medidas', 'fa-ticket-alt'=>'Eventos e Ingressos','fa-theater-masks'=>'Teatro e Cultura', 'fa-film'=>'Cinema','fa-music'=>'Música','fa-guitar'=>'Instrumentos Musicais', 'fa-camera-retro'=>'Fotografia','fa-book-open'=>'Livros Abertos','fa-newspaper'=>'Jornais',  'fa-map'=>'Mapas e Turismo','fa-suitcase'=>'Mala e Bagagem','fa-hotel'=>'Hotelaria', 'fa-passport'=>'Documentação','fa-compass'=>'Exploração', 'fa-wallet'=>'Carteiras','fa-credit-card'=>'Cartões e Pagamentos', 'fa-money-bill'=>'Dinheiro','fa-coins'=>'Moedas','fa-university'=>'Banco', 'fa-percent'=>'Ofertas e Descontos','fa-star'=>'Promoções','fa-gift'=>'Presentes','fa-robot'=>'Robótica','fa-vr-cardboard'=>'Realidade Virtual', 'fa-space-shuttle'=>'Espaço e Astronomia', 'fa-brain'=>'IA & Machine Learning','fa-network-wired'=>'Redes', 'fa-cloud'=>'Nuvem','fa-code'=>'Programação' ];
-                foreach($icons as $class => $label) {
+                foreach($icons as $class => $label){
                     echo "<div class='icon-item' data-icon='$class' title='$label'><i class='fa-solid $class'></i></div>";
                 }
                 ?>
@@ -166,7 +166,7 @@ $stmt->close();
             <?php foreach ($tags as $tag): ?>
                 <div class="tag-item" data-id="<?= $tag['id'] ?>">
                     <span class="tag-icon">
-                        <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i>
+                      <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor'] ?: '#000000') ?>;"></i>
                     </span>
                     <span class="tag-name"><?= htmlspecialchars($tag['nome']) ?></span>
                 </div>
@@ -175,7 +175,6 @@ $stmt->close();
     </div>
 </div>
 
-<!-- Formulários ocultos -->
 <form id="deleteForm" method="POST" style="display:none;">
     <input type="hidden" name="delete_id" id="delete_id">
 </form>
@@ -196,7 +195,6 @@ $stmt->close();
 const icons = document.querySelectorAll('.icon-item');
 const selectedInput = document.getElementById('selectedIcon');
 const searchInput = document.getElementById('search');
-const colorInput = document.getElementById('colorPicker');
 
 icons.forEach(icon => {
     icon.addEventListener('click', () => {
