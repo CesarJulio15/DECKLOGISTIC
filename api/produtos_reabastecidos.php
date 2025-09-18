@@ -3,7 +3,7 @@ session_start();
 header('Content-Type: application/json; charset=utf-8');
 require_once '../conexao.php';
 
-$lojaId = $_SESSION['id'] ?? 0;
+$lojaId = $_SESSION['usuario_id'] ?? 0;
 if (!$lojaId) {
     echo json_encode([]);
     exit;

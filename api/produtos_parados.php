@@ -3,7 +3,7 @@ header('Content-Type: application/json; charset=utf-8');
 session_start();
 require_once __DIR__ . '/../conexao.php';
 
-$lojaId = $_SESSION['id'] ?? 0; // usar a mesma chave de sessão da loja
+$lojaId = $_SESSION['usuario_id'] ?? 0; // usar a mesma chave de sessão da loja
 
 if (!$lojaId) {
     echo json_encode([]);
