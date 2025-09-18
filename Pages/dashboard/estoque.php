@@ -69,30 +69,153 @@ $lojaId = $_SESSION['id'] ?? 0;
       </button>
     </div>
 
-    <!-- Popup modal -->
-    <div id="modalHistorico" style="
-        display:none;
-        position:fixed;
-        top:0; left:0; width:100%; height:100%;
-        background:rgba(0,0,0,0.5);
-        justify-content:center;
-        align-items:center;
-    ">
-      <div style="
-          background:#fff;
-          padding:20px;
-          border-radius:8px;
-          width:90%; max-width:600px;
-          position:relative;
-      ">
-        <button id="btnFecharModal" style="
-            position:absolute; top:10px; right:10px;
-            font-size:16px; cursor:pointer;
-        ">✖</button>
-        <h3>Histórico Estoque - Últimos 6 Meses</h3>
-        <div id="chartHistorico" style="height:300px;"></div>
-      </div>
-    </div>
+<!-- Popup modal -->
+<div id="modalHistorico" style="
+    display:none;
+    position:fixed;
+    top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5);
+    justify-content:center;
+    align-items:center;
+">
+  <div style="
+      background:#fff;
+      padding:20px;
+      border-radius:8px;
+      width:90%; max-width:600px;
+      position:relative;
+  ">
+    <button id="btnFecharModal" style="
+        position:absolute; top:10px; right:10px;
+        font-size:16px; cursor:pointer;
+    ">✖</button>
+    <h3>Histórico Estoque - Últimos 6 Meses</h3>
+    <div id="chartHistorico" style="height:300px;"></div>
+  </div>
+</div>
+
+<script>
+const lojaId = <?= $lojaId ?>;
+
+// ===================
+// Função para carregar gráfico histórico no modal
+// ===================
+async function loadHistoricoEstoque() {
+  try {
+    // Realiza a requisição para obter os dados do histórico de estoque
+    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+
+    // Verifica se a resposta contém dados
+    if (!Array.isArray(data.series) || data.series.length === 0) {
+      document.querySelector("#chartHistorico").innerHTML = "<p>Nenhum dado disponível</p>";
+      return;
+    }
+
+    // Prepara os dados para o gráfico
+    const dataPoints = data.series.map(d => ({
+      label: d.mes, 
+      y: parseInt(d.total || 0)
+    }));
+
+    // Cria o gráfico de barras no modal com os dados
+    new CanvasJS.Chart("chartHistorico", {
+      animationEnabled: true,
+      theme: "light2",
+      title: {
+        text: "Histórico de Estoque (últimos 6 meses)"
+      },
+      axisY: {
+        title: "Quantidade Total de Produtos"
+      },
+      data: [{
+        type: "column", 
+        dataPoints: dataPoints
+      }]
+    }).render();
+  } catch (e) {
+    console.error(e);
+    document.querySelector("#chartHistorico").innerHTML = "<p>Erro ao carregar gráfico</p>";
+  }
+}
+
+// ===================
+// Funções de dados principais
+// ===================
+async function loadEstoqueTotal() {
+  try {
+    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+    const estoqueEl = document.querySelector("#estoque");
+    if (estoqueEl) estoqueEl.textContent = parseFloat(data.total || 0).toFixed(2);
+  } catch(e) { console.error(e); }
+}
+
+async function loadProdutosFalta() {
+  try {
+    const data = await fetch(`/DECKLOGISTIC/api/produtos_falta.php`).then(r => r.json());
+    const tabelaContainer = document.querySelector("#tabelaProdutosFalta");
+    if (!Array.isArray(data) || data.length === 0) { tabelaContainer.innerHTML = "<p>Nenhum produto em falta.</p>"; return; }
+    let tabela = `<table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:14px;">
+      <thead style="background:#f3f4f6; text-align:left;"><tr><th>Produto</th><th>Quantidade</th></tr></thead><tbody>`;
+    data.forEach(p => { tabela += `<tr style="background:${p.quantidade_estoque <= 0 ? '#ddd' : '#fff'};">
+      <td>${p.nome}</td><td>${p.quantidade_estoque}</td></tr>`; });
+    tabela += `</tbody></table>`;
+    tabelaContainer.innerHTML = tabela;
+  } catch(e) { console.error(e); document.querySelector("#tabelaProdutosFalta").innerHTML = "<p>Erro ao carregar dados</p>"; }
+}
+
+async function loadEstoqueProdutos() {
+  try {
+    const data = await fetch('/DECKLOGISTIC/api/produtos_parados.php').then(r => r.json());
+    const container = document.querySelector("#chartEstoqueParado");
+    if(!Array.isArray(data)) { container.innerHTML = "<p style='color:red;'>Erro ao carregar dados</p>"; return; }
+    if(data.length === 0) {
+      container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:18px;color:#6b7280;font-weight:500;background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;">Nenhum produto parado nos últimos 30 dias</div>`;
+      return;
+    }
+    const dataPoints = data.map(d => ({ label: d.nome, y: parseInt(d.quantidade_estoque) }));
+    new CanvasJS.Chart(container, { animationEnabled:true, theme:"light2", title:{text:"Estoque Parado"}, axisY:{title:"Quantidade"}, data:[{type:"column", dataPoints}]}).render();
+  } catch(e) { console.error(e); document.querySelector("#chartEstoqueParado").innerHTML = "<p style='color:red;'>Erro ao carregar gráfico</p>"; }
+}
+
+async function loadEntradaSaidaProdutos() {
+  try {
+    const data = await fetch('/DECKLOGISTIC/api/entrada_saida.php').then(r => r.json());
+    const container = document.querySelector("#chartEntradaSaida");
+    if (!Array.isArray(data) || data.length === 0) { 
+      container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:16px;color:#6b7280;font-weight:500;background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;">Nenhuma movimentação registrada</div>`; 
+      return; 
+    }
+    const entrada = data.map(d => ({ label: d.data_movimentacao, y: d.entrada }));
+    const saida   = data.map(d => ({ label: d.data_movimentacao, y: d.saida }));
+    new CanvasJS.Chart(container, { animationEnabled:true, theme:"light2", title:{text:"Entrada x Saída"}, axisY:{title:"Quantidade"}, data:[{type:"line", name:"Entrada", showInLegend:true, dataPoints:entrada},{type:"line", name:"Saída", showInLegend:true, dataPoints:saida}]}).render();
+  } catch(e) { console.error(e); document.querySelector("#chartEntradaSaida").innerHTML = "<p>Erro ao carregar gráfico</p>"; }
+}
+
+// ===================
+// Carregar tudo no DOMContentLoaded
+// ===================
+document.addEventListener("DOMContentLoaded", () => {
+  loadEstoqueTotal();
+  loadProdutosFalta();
+  loadEstoqueProdutos();
+  loadEntradaSaidaProdutos();
+});
+
+// ===================
+// Modal histórico
+// ===================
+const btnHistorico = document.getElementById("btnHistorico");
+const modalHistorico = document.getElementById("modalHistorico");
+const btnFecharModal = document.getElementById("btnFecharModal");
+
+btnHistorico.addEventListener("click", async () => {
+  modalHistorico.style.display = "flex";
+  await loadHistoricoEstoque();  // Carrega o gráfico ao abrir o modal
+});
+
+btnFecharModal.addEventListener("click", () => { modalHistorico.style.display = "none"; });
+</script>
+
 
     <!-- Produtos em Falta -->
     <div class="card">
@@ -135,52 +258,52 @@ const lojaId = <?= $lojaId ?>;
 // ===================
 async function loadEstoqueTotal() {
   try {
-    const data = await fetch(`/DECKLOGISTIC/api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
     const estoqueEl = document.querySelector("#estoque");
-    if(estoqueEl) estoqueEl.textContent = parseFloat(data.total || 0).toFixed(2);
-  } catch(e) { console.error(e); }
+    if (estoqueEl) estoqueEl.textContent = parseFloat(data.total || 0).toFixed(2);
+  } catch (e) { console.error(e); }
 }
 
 async function loadProdutosFalta() {
   try {
     const data = await fetch(`/DECKLOGISTIC/api/produtos_falta.php`).then(r => r.json());
     const tabelaContainer = document.querySelector("#tabelaProdutosFalta");
-    if(!Array.isArray(data) || data.length === 0) { tabelaContainer.innerHTML = "<p>Nenhum produto em falta.</p>"; return; }
+    if (!Array.isArray(data) || data.length === 0) { tabelaContainer.innerHTML = "<p>Nenhum produto em falta.</p>"; return; }
     let tabela = `<table border="1" cellpadding="6" cellspacing="0" style="width:100%; border-collapse:collapse; font-size:14px;">
       <thead style="background:#f3f4f6; text-align:left;"><tr><th>Produto</th><th>Quantidade</th></tr></thead><tbody>`;
     data.forEach(p => { tabela += `<tr style="background:${p.quantidade_estoque <= 0 ? '#ddd' : '#fff'};">
       <td>${p.nome}</td><td>${p.quantidade_estoque}</td></tr>`; });
     tabela += `</tbody></table>`;
     tabelaContainer.innerHTML = tabela;
-  } catch(e) { console.error(e); document.querySelector("#tabelaProdutosFalta").innerHTML = "<p>Erro ao carregar dados</p>"; }
+  } catch (e) { console.error(e); document.querySelector("#tabelaProdutosFalta").innerHTML = "<p>Erro ao carregar dados</p>"; }
 }
 
 async function loadEstoqueProdutos() {
   try {
     const data = await fetch('/DECKLOGISTIC/api/produtos_parados.php').then(r => r.json());
     const container = document.querySelector("#chartEstoqueParado");
-    if(!Array.isArray(data)) { container.innerHTML = "<p style='color:red;'>Erro ao carregar dados</p>"; return; }
-    if(data.length === 0) {
+    if (!Array.isArray(data)) { container.innerHTML = "<p style='color:red;'>Erro ao carregar dados</p>"; return; }
+    if (data.length === 0) {
       container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:18px;color:#6b7280;font-weight:500;background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;">Nenhum produto parado nos últimos 30 dias</div>`;
       return;
     }
     const dataPoints = data.map(d => ({ label: d.nome, y: parseInt(d.quantidade_estoque) }));
-    new CanvasJS.Chart(container, { animationEnabled:true, theme:"light2", title:{text:"Estoque Parado"}, axisY:{title:"Quantidade"}, data:[{type:"column", dataPoints}]}).render();
-  } catch(e) { console.error(e); document.querySelector("#chartEstoqueParado").innerHTML = "<p style='color:red;'>Erro ao carregar gráfico</p>"; }
+    new CanvasJS.Chart(container, { animationEnabled: true, theme: "light2", title: { text: "Estoque Parado" }, axisY: { title: "Quantidade" }, data: [{ type: "column", dataPoints }] }).render();
+  } catch (e) { console.error(e); document.querySelector("#chartEstoqueParado").innerHTML = "<p style='color:red;'>Erro ao carregar gráfico</p>"; }
 }
 
 async function loadEntradaSaidaProdutos() {
   try {
     const data = await fetch('/DECKLOGISTIC/api/entrada_saida.php').then(r => r.json());
     const container = document.querySelector("#chartEntradaSaida");
-    if(!Array.isArray(data) || data.length === 0) { 
-      container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:16px;color:#6b7280;font-weight:500;background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;">Nenhuma movimentação registrada</div>`; 
-      return; 
+    if (!Array.isArray(data) || data.length === 0) {
+      container.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;font-size:16px;color:#6b7280;font-weight:500;background:#f3f4f6;border-radius:8px;padding:20px;text-align:center;">Nenhuma movimentação registrada</div>`;
+      return;
     }
     const entrada = data.map(d => ({ label: d.data_movimentacao, y: d.entrada }));
-    const saida   = data.map(d => ({ label: d.data_movimentacao, y: d.saida }));
-    new CanvasJS.Chart(container, { animationEnabled:true, theme:"light2", title:{text:"Entrada x Saída"}, axisY:{title:"Quantidade"}, data:[{type:"line", name:"Entrada", showInLegend:true, dataPoints:entrada},{type:"line", name:"Saída", showInLegend:true, dataPoints:saida}]}).render();
-  } catch(e) { console.error(e); document.querySelector("#chartEntradaSaida").innerHTML = "<p style='color:red;'>Erro ao carregar gráfico</p>"; }
+    const saida = data.map(d => ({ label: d.data_movimentacao, y: d.saida }));
+    new CanvasJS.Chart(container, { animationEnabled: true, theme: "light2", title: { text: "Entrada x Saída" }, axisY: { title: "Quantidade" }, data: [{ type: "line", name: "Entrada", showInLegend: true, dataPoints: entrada }, { type: "line", name: "Saída", showInLegend: true, dataPoints: saida }] }).render();
+  } catch (e) { console.error(e); document.querySelector("#chartEntradaSaida").innerHTML = "<p style='color:red;'>Erro ao carregar gráfico</p>"; }
 }
 
 // Função para carregar produtos reabastecidos
@@ -188,9 +311,9 @@ async function loadProdutosReabastecidos() {
   try {
     const data = await fetch('/DECKLOGISTIC/api/produtos_reabastecidos.php').then(r => r.json());
     const tabelaContainer = document.querySelector("#tabelaReabastecidos");
-    if(!Array.isArray(data) || data.length === 0) { 
-        tabelaContainer.innerHTML = "<p>Nenhum produto reabastecido recentemente.</p>"; 
-        return; 
+    if (!Array.isArray(data) || data.length === 0) {
+      tabelaContainer.innerHTML = "<p>Nenhum produto reabastecido recentemente.</p>";
+      return;
     }
 
     let tabela = `<table border="1" cellpadding="8" cellspacing="0" style="width:95%; font-size:15px; margin-left:26px; margin-bottom:50px;">
@@ -198,51 +321,20 @@ async function loadProdutosReabastecidos() {
       <tr><th>Lote</th><th>Produto</th><th>Data de Reabastecimento</th></tr></thead><tbody>`;
 
     data.forEach(p => {
-        tabela += `<tr>
-            <td>${p.lote}</td>
-            <td>${p.nome}</td>
-            <td>${p.data_reabastecimento}</td>
-        </tr>`;
+      tabela += `<tr>
+          <td>${p.lote}</td>
+          <td>${p.nome}</td>
+          <td>${p.data_reabastecimento}</td>
+      </tr>`;
     });
 
     tabela += `</tbody></table>`;
     tabelaContainer.innerHTML = tabela;
-  } catch(e) {
+  } catch (e) {
     console.error("Erro ao carregar reabastecidos:", e);
     document.querySelector("#tabelaReabastecidos").innerHTML = "<p>Erro ao carregar dados</p>";
   }
 }
-
-// Filtro da tabela
-const btnFiltrar = document.getElementById("btnFiltrar");
-const filtroInput = document.getElementById("filtroReabastecidos");
-
-btnFiltrar.addEventListener("click", () => {
-  const filtro = filtroInput.value.toLowerCase();
-  const tabela = document.querySelector("#tabelaReabastecidos table");
-  if(!tabela) return;
-
-  const linhas = tabela.querySelectorAll("tbody tr");
-  linhas.forEach(linha => {
-    const texto = linha.cells[1].textContent.toLowerCase(); // coluna Produto
-    linha.style.display = texto.includes(filtro) ? "" : "none";
-  });
-});
-
-// Chamar no carregamento
-document.addEventListener("DOMContentLoaded", () => {
-  loadProdutosReabastecidos();
-});
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadEstoqueTotal();
-  loadProdutosFalta();
-  loadEstoqueProdutos();
-  loadEntradaSaidaProdutos();
-    loadProdutosReabastecidos();
-
-});
 
 // Modal histórico
 const btnHistorico = document.getElementById("btnHistorico");
@@ -252,15 +344,39 @@ const btnFecharModal = document.getElementById("btnFecharModal");
 btnHistorico.addEventListener("click", async () => {
   modalHistorico.style.display = "flex";
   try {
-    const data = await fetch(`/DECKLOGISTIC/api/historico_estoque_6meses.php?loja_id=${lojaId}`).then(r=>r.json());
-    if(!Array.isArray(data) || data.length === 0) { document.querySelector("#chartHistorico").innerHTML = "<p>Nenhum dado disponível</p>"; return; }
-    const dataPoints = data.map(d => ({ label: d.mes, y: parseInt(d.total || 0) }));
-    new CanvasJS.Chart("chartHistorico", { animationEnabled:true, theme:"light2", axisY:{title:"Quantidade total"}, data:[{type:"column", dataPoints}]}).render();
-  } catch(e) { console.error(e); document.querySelector("#chartHistorico").innerHTML = "<p>Erro ao carregar gráfico</p>"; }
+    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+    if (!Array.isArray(data) || data.series.length === 0) { 
+        document.querySelector("#chartHistorico").innerHTML = "<p>Nenhum dado disponível</p>"; 
+        return; 
+    }
+    const dataPoints = data.series.map(d => ({ label: d.mes, y: parseInt(d.total || 0) }));
+    new CanvasJS.Chart("chartHistorico", { 
+      animationEnabled: true, 
+      theme: "light2", 
+      title: { text: "Histórico de Estoque (últimos 6 meses)" }, 
+      axisY: { title: "Quantidade Total de Produtos" }, 
+      data: [{ type: "column", dataPoints }] 
+    }).render();
+  } catch (e) { 
+    console.error(e); 
+    document.querySelector("#chartHistorico").innerHTML = "<p>Erro ao carregar gráfico</p>"; 
+  }
 });
 
-btnFecharModal.addEventListener("click", () => { modalHistorico.style.display = "none"; });
+btnFecharModal.addEventListener("click", () => { 
+  modalHistorico.style.display = "none"; 
+});
 
+// Chamar no carregamento
+document.addEventListener("DOMContentLoaded", () => {
+  loadEstoqueTotal();
+  loadProdutosFalta();
+  loadEstoqueProdutos();
+  loadEntradaSaidaProdutos();
+  loadProdutosReabastecidos();
+});
 </script>
+
+
 </body>
-</html>
+</html>       
