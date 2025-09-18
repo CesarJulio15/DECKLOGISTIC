@@ -46,15 +46,16 @@ $start_date = date('Y-m-01', strtotime('-5 months'));
 
 // Agrega em uma única query (produtos criados a partir do $start_date)
 $sql = "
-    SELECT DATE_FORMAT(criado_em, '%Y-%m') AS mes,
+    SELECT DATE_FORMAT(data_reabastecimento, '%Y-%m') AS mes,
            COALESCE(SUM(quantidade_estoque),0) AS total_mes
     FROM produtos
     WHERE deletado_em IS NULL
-      AND criado_em >= '$start_date'
+      AND data_reabastecimento >= '$start_date'
       $lojaFilter
     GROUP BY mes
     ORDER BY mes ASC
 ";
+
 
 $resSeries = mysqli_query($conn, $sql);
 if (!$resSeries) {
