@@ -1,28 +1,47 @@
 <?php 
 include '../../../conexao.php'; 
-
-// Verifica se o usuário está logado e a sessão contém o 'loja_id'
 session_start();
-if (!isset($_SESSION['loja_id'])) {
-    header("Location: login.php"); // Redireciona caso a sessão de loja não exista
+
+// Verifica se está logado
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login'])) {
+    header("Location: ../auth/login.php");
     exit;
 }
 
-$lojaId = $_SESSION['loja_id']; // Obtém o 'loja_id' da sessão
+$usuarioId = $_SESSION['usuario_id'];
+$tipo_login = $_SESSION['tipo_login']; // 'empresa' ou 'funcionario'
+
+// Descobre a loja_id correta
+if ($tipo_login === 'empresa') {
+    $lojaId = $_SESSION['loja_id']; 
+} else {
+    // Se for funcionário, pega a loja dele
+    $res = $conn->prepare("SELECT loja_id FROM usuarios WHERE id = ?");
+    $res->bind_param("i", $usuarioId);
+    $res->execute();
+    $res = $res->get_result();
+    $lojaId = $res->fetch_assoc()['loja_id'] ?? 0;
+}
+
+// Se não achou loja, bloqueia
+if (!$lojaId) {
+    die("Acesso negado. Loja não encontrada.");
+}
+
+// ---- PAGINAÇÃO ----
 $linhasPorPagina = 14;
 $paginaAtual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
 
-// Total de produtos da loja
+// Total de produtos
 $totalProdutosResult = $conn->prepare("SELECT COUNT(*) as total FROM produtos WHERE loja_id = ?");
 $totalProdutosResult->bind_param("i", $lojaId);
 $totalProdutosResult->execute();
-$totalProdutosResult = $totalProdutosResult->get_result();
-$totalProdutos = $totalProdutosResult->fetch_assoc()['total'];
+$totalProdutos = $totalProdutosResult->get_result()->fetch_assoc()['total'];
 
 $totalPaginas = ceil($totalProdutos / $linhasPorPagina);
 $inicio = ($paginaAtual - 1) * $linhasPorPagina;
 
-// Busca produtos da página atual
+// Busca produtos
 $sql = "SELECT id, nome, preco_unitario, quantidade_estoque, lote 
         FROM produtos 
         WHERE loja_id = ? 
@@ -32,30 +51,15 @@ $stmt->bind_param("iii", $lojaId, $inicio, $linhasPorPagina);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Busca produtos da loja logada
-$sql = "SELECT id, nome, preco_unitario, quantidade_estoque, lote 
-        FROM produtos 
-        WHERE loja_id = ? 
-        LIMIT ?, ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("iii", $lojaId, $inicio, $linhasPorPagina);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if (!$result) {
-    die("Erro na consulta: " . mysqli_error($conn));
-}
-
-// Busca todas as tags
+// ---- TAGS ----
 $tags = [];
-$tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL ORDER BY criado_em DESC");
+$tagResult = $conn->query("SELECT * FROM tags WHERE deletado_em IS NULL AND loja_id = $lojaId ORDER BY criado_em DESC");
 if ($tagResult) {
     while ($row = $tagResult->fetch_assoc()) {
         $tags[] = $row;
     }
 }
 
-// Busca tags já vinculadas a cada produto da loja logada
 $produtoTags = [];
 $tagVincResult = $conn->query("
     SELECT pt.produto_id, pt.tag_id, t.icone, t.cor 
@@ -73,7 +77,6 @@ if ($tagVincResult) {
         ];
     }
 }
-
 ?>
 
 <!DOCTYPE html>

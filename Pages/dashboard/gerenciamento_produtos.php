@@ -3,13 +3,30 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Ajuste: caminho relativo para sua conexão
 include __DIR__ . '/../../conexao.php';
 
-$loja_id = $_SESSION['usuario_id'] ?? 0;
-$usuario_id = $_SESSION['usuario_id'] ?? 0;
-if (!$loja_id || !$usuario_id) {
+// Verifica login
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login'])) {
     die('Faça login para acessar o gerenciamento.');
+}
+
+$usuarioId = $_SESSION['usuario_id'];
+$tipo_login = $_SESSION['tipo_login']; // 'empresa' ou 'funcionario'
+
+// Define a loja_id corretamente
+if ($tipo_login === 'empresa') {
+    $lojaId = $_SESSION['loja_id'] ?? 0;
+} else {
+    $res = $conn->prepare("SELECT loja_id FROM usuarios WHERE id = ?");
+    $res->bind_param("i", $usuarioId);
+    $res->execute();
+    $row = $res->get_result()->fetch_assoc();
+    $lojaId = $row['loja_id'] ?? 0;
+    $res->close();
+}
+
+if (!$lojaId) {
+    die('Loja não encontrada para este usuário.');
 }
 
 $msg = '';
@@ -22,26 +39,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // --- ADICIONAR PRODUTO ---
     if ($acao === 'adicionar_produto') {
-    $nome = trim($_POST['nome'] ?? '');
-    $preco = floatval($_POST['preco'] ?? 0);
-    $estoque = intval($_POST['estoque'] ?? 0);
+        $nome = trim($_POST['nome'] ?? '');
+        $preco = floatval($_POST['preco'] ?? 0);
+        $estoque = intval($_POST['estoque'] ?? 0);
+        $lote = '';
 
-    // Corrigindo a variável de loja_id
-    $stmt = $conn->prepare(
-        "INSERT INTO produtos (loja_id, usuario_id, nome, preco_unitario, quantidade_estoque, quantidade_inicial, criado_em)
-         VALUES (?, ?, ?, ?, ?, ?, NOW())"
-    );
-    
-    // Usando a variável correta para loja_id e usuario_id
-    $stmt->bind_param("iisdii", $loja_id, $usuario_id, $nome, $preco, $estoque, $estoque);
-    
-    if ($stmt->execute()) {
+        $stmt = $conn->prepare("
+            INSERT INTO produtos (nome, preco_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        if (!$stmt) {
+            die("Erro prepare produto: " . $conn->error);
+        }
+
+        $stmt->bind_param("sdisii", $nome, $preco, $estoque, $lote, $lojaId, $usuarioId);
+        if (!$stmt->execute()) {
+            die("Erro execute produto: " . $stmt->error);
+        }
+
+        $idNovoProduto = $stmt->insert_id;
+        $stmt->close();
+
+        // Histórico
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            VALUES (?, ?, ?, 'adicionado', ?, NOW())
+        ");
+        if (!$stmtHist) {
+            die("Erro prepare histórico: " . $conn->error);
+        }
+
+        $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuarioId);
+        if (!$stmtHist->execute()) {
+            die("Erro execute histórico: " . $stmtHist->error);
+        }
+        $stmtHist->close();
+
         $msg = "✅ Produto cadastrado com sucesso!";
-    } else {
-        $msg = "❌ Erro: " . $stmt->error;
     }
-    $stmt->close();
-}
 
     // --- EDITAR PRODUTO ---
     if ($acao === 'editar_produto') {
@@ -51,6 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $estoque = intval($_POST['estoque'] ?? 0);
 
         $stmt = $conn->prepare("UPDATE produtos SET nome=?, preco_unitario=?, quantidade_estoque=? WHERE id=? AND loja_id=?");
+        if (!$stmt) die("Erro prepare editar: " . $conn->error);
+
         $stmt->bind_param("sdiii", $nome, $preco, $estoque, $id, $lojaId);
         if ($stmt->execute()) {
             $msg = "✏️ Produto atualizado!";
@@ -64,16 +101,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($acao === 'apagar_produto') {
         $id = intval($_POST['produto_id'] ?? 0);
 
-        // Remove tags associadas (opcional)
+        // Remove tags associadas
         $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
 
         // Marca como excluído
         $stmt = $conn->prepare(
             "UPDATE produtos SET deletado_em = NOW(), usuario_exclusao_id = ? WHERE id = ? AND loja_id = ?"
         );
+        if (!$stmt) die("Erro prepare apagar: " . $conn->error);
+
         $stmt->bind_param("iii", $usuarioId, $id, $lojaId);
         if ($stmt->execute()) {
             $msg = "🗑️ Produto apagado!";
@@ -90,17 +131,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
 
         $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
+        if (!$stmt) die("Erro prepare comprar: " . $conn->error);
+
         $stmt->bind_param("iii", $qtd, $id, $lojaId);
         if ($stmt->execute()) {
             $tipo = 'entrada';
-            $stmt2 = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) VALUES (?, ?, ?, ?, ?, NOW())");
+            $stmt2 = $conn->prepare("
+                INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) 
+                VALUES (?, ?, ?, ?, ?, NOW())
+            ");
             $stmt2->bind_param("isisi", $id, $tipo, $qtd, $data, $usuarioId);
             $stmt2->execute();
             $stmt2->close();
 
             $msg = "📥 Compra registrada (+$qtd) em $data";
         } else {
-            $msg = "❌ Erro ao registrar compra!";
+            $msg = "❌ Erro ao registrar compra! " . $stmt->error;
         }
         $stmt->close();
     }
@@ -112,17 +158,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
 
         $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id=? AND loja_id=? AND quantidade_estoque >= ?");
+        if (!$stmt) die("Erro prepare vender: " . $conn->error);
+
         $stmt->bind_param("iiii", $qtd, $id, $lojaId, $qtd);
         if ($stmt->execute() && $stmt->affected_rows > 0) {
             $tipo = 'saida';
-            $stmt2 = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) VALUES (?, ?, ?, ?, ?, NOW())");
+            $stmt2 = $conn->prepare("
+                INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) 
+                VALUES (?, ?, ?, ?, ?, NOW())
+            ");
             $stmt2->bind_param("isisi", $id, $tipo, $qtd, $data, $usuarioId);
             $stmt2->execute();
             $stmt2->close();
 
             $msg = "📤 Venda registrada (-$qtd) em $data";
         } else {
-            $msg = "❌ Estoque insuficiente ou erro!";
+            $msg = "❌ Estoque insuficiente ou erro! " . $stmt->error;
         }
         $stmt->close();
     }
@@ -133,19 +184,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    ====================================================== */
 $produtos = [];
 $stmt = $conn->prepare("SELECT id, nome, preco_unitario, quantidade_estoque, quantidade_inicial, lote FROM produtos WHERE loja_id = ? AND deletado_em IS NULL ORDER BY id DESC");
-$stmt->bind_param("i", $lojaId);
-$stmt->execute();
-$result = $stmt->get_result();
-while ($row = $result->fetch_assoc()) {
-    $produtos[] = $row;
-}
-$stmt->close();
-
-// Mensagem temporária (aparece após ação)
-if (!empty($msg)) {
-    // nada, exibe direto na página
+if ($stmt) {
+    $stmt->bind_param("i", $lojaId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $produtos[] = $row;
+    }
+    $stmt->close();
 }
 ?>
+
+
 
 <!doctype html>
 <html lang="pt-br">
