@@ -1,41 +1,41 @@
 <?php
 require 'vendor/autoload.php';
-require '../../../conexao.php'; // Sua conexão já existe aqui
+require '../../../conexao.php';
+
+session_start();
+
+header('Content-Type: application/json');
+
+// Verifica login
+if (!isset($_SESSION['loja_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Você precisa estar logado para importar produtos.']);
+    exit;
+}
+
+$lojaId = $_SESSION['loja_id'];
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
-header('Content-Type: application/json');
-
-// Verificar se o arquivo foi enviado
+// Verifica arquivo
 if (!isset($_FILES['excel_file']) || $_FILES['excel_file']['error'] != UPLOAD_ERR_OK) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Nenhum arquivo enviado ou erro no upload.'
-    ]);
+    echo json_encode(['success' => false, 'message' => 'Nenhum arquivo enviado ou erro no upload.']);
     exit;
 }
 
 $tmp_name = $_FILES['excel_file']['tmp_name'];
-
-// Verificar se é um arquivo Excel
 $allowed_extensions = ['xlsx', 'xls'];
 $file_info = pathinfo($_FILES['excel_file']['name']);
 if (!in_array(strtolower($file_info['extension']), $allowed_extensions)) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Formato de arquivo inválido. Use .xlsx ou .xls.'
-    ]);
+    echo json_encode(['success' => false, 'message' => 'Formato de arquivo inválido. Use .xlsx ou .xls.']);
     exit;
 }
 
 try {
-    // Carrega o arquivo Excel
     $spreadsheet = IOFactory::load($tmp_name);
     $worksheet = $spreadsheet->getActiveSheet();
     $rows = $worksheet->toArray();
     
-    // Remove o cabeçalho (primeira linha)
     $header = array_shift($rows);
     
     $imported = 0;
@@ -43,18 +43,12 @@ try {
     $errors = [];
     
     foreach ($rows as $index => $row) {
-        // Pular linhas vazias
-        if (empty(array_filter($row))) {
-            continue;
-        }
-        
-        // Validação básica dos dados
+        if (empty(array_filter($row))) continue;
         if (empty($row[0])) {
             $errors[] = "Linha " . ($index + 2) . ": Nome do produto é obrigatório";
             continue;
         }
-        
-        // Preparar os dados
+
         $nome = $row[0];
         $descricao = $row[1] ?? '';
         $lote = $row[2] ?? '';
@@ -62,80 +56,46 @@ try {
         $preco_unitario = floatval($row[4] ?? 0);
         $custo_unitario = floatval($row[5] ?? 0);
         $data_reabastecimento = $row[6] ?? null;
-        
-        // Processar data
+
         if ($data_reabastecimento) {
             if (is_numeric($data_reabastecimento)) {
-                // Se for um número serial do Excel, converter para data
                 $data_reabastecimento = Date::excelToDateTimeObject($data_reabastecimento)->format('Y-m-d');
             } else {
-                // Tentar converter para formato de data
                 $timestamp = strtotime($data_reabastecimento);
-                if ($timestamp !== false) {
-                    $data_reabastecimento = date('Y-m-d', $timestamp);
-                } else {
-                    $data_reabastecimento = null;
-                }
+                $data_reabastecimento = $timestamp ? date('Y-m-d', $timestamp) : null;
             }
+        }
+
+        $stmt = $conn->prepare("INSERT INTO produtos 
+            (loja_id, nome, descricao, lote, quantidade_estoque, preco_unitario, custo_unitario, data_reabastecimento) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssidds", $lojaId, $nome, $descricao, $lote, $quantidade_estoque, $preco_unitario, $custo_unitario, $data_reabastecimento);
+
+        if ($stmt->execute()) {
+            $imported++;
+            $importedData[] = [
+                'nome' => $nome,
+                'descricao' => $descricao,
+                'lote' => $lote,
+                'quantidade_estoque' => $quantidade_estoque,
+                'preco_unitario' => $preco_unitario,
+                'custo_unitario' => $custo_unitario,
+                'data_reabastecimento' => $data_reabastecimento
+            ];
         } else {
-            $data_reabastecimento = null;
+            $errors[] = "Linha " . ($index + 2) . ": Erro ao inserir no banco";
         }
-        
-        try {
-            // Inserir no banco de dados
-            $sql = "INSERT INTO produtos (nome, descricao, lote, quantidade_estoque, preco_unitario, custo_unitario, data_reabastecimento) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?)";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param(
-                "sssidds", 
-                $nome, 
-                $descricao, 
-                $lote, 
-                $quantidade_estoque, 
-                $preco_unitario, 
-                $custo_unitario, 
-                $data_reabastecimento
-            );
-            
-            if ($stmt->execute()) {
-                $imported++;
-                $importedData[] = [
-                    'nome' => $nome,
-                    'descricao' => $descricao,
-                    'lote' => $lote,
-                    'quantidade_estoque' => $quantidade_estoque,
-                    'preco_unitario' => $preco_unitario,
-                    'custo_unitario' => $custo_unitario,
-                    'data_reabastecimento' => $data_reabastecimento
-                ];
-            }
-            
-            $stmt->close();
-        } catch (Exception $e) {
-            $errors[] = "Linha " . ($index + 2) . ": " . $e->getMessage();
-        }
+
+        $stmt->close();
     }
-    
-    if ($imported > 0) {
-        echo json_encode([
-            'success' => true,
-            'imported' => $imported,
-            'data' => $importedData,
-            'errors' => $errors
-        ]);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Nenhum dado foi importado. Verifique o formato do arquivo.',
-            'errors' => $errors
-        ]);
-    }
-    
-} catch (Exception $e) {
+
     echo json_encode([
-        'success' => false,
-        'message' => 'Erro ao processar o arquivo: ' . $e->getMessage()
+        'success' => $imported > 0,
+        'imported' => $imported,
+        'data' => $importedData,
+        'errors' => $errors
     ]);
+
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Erro ao processar o arquivo: ' . $e->getMessage()]);
 }
-?>
