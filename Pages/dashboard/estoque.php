@@ -1,6 +1,16 @@
 <?php
 session_start();
-$lojaId = $_SESSION['id'] ?? 0;
+include __DIR__ . '/../../conexao.php';
+
+// Verifica login
+if (!isset($_SESSION['usuario_id'])) {
+    die("Acesso negado. Faça login primeiro.");
+}
+
+// Sempre pega o ID da loja
+$lojaId = $_SESSION['tipo_login'] === 'empresa'
+    ? $_SESSION['usuario_id']  // empresa logada
+    : $_SESSION['loja_id'];    // funcionário logado
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">

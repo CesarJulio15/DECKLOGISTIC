@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" name="alterar_email">Salvar</button>
                 </div>
             </form>
-             <a href="funcionarios/cadastrofuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
+             <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
 
             <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
 

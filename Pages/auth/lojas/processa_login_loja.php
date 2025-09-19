@@ -26,7 +26,8 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
             session_regenerate_id(true);
 
             $_SESSION['usuario_id'] = $loja['id'];
-            $_SESSION['loja_id']    = $loja['id']; 
+            $_SESSION['loja_id']    = $loja['id'];
+            $_SESSION['tipo_login'] = 'empresa';  
             $_SESSION['nome']       = $loja['nome'];
             $_SESSION['email']      = $loja['email'];
             

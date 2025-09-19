@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['loja_id']    = $usuario['loja_id']; // id da loja que ele pertence
             $_SESSION['tipo_login'] = 'funcionario';      // tipo de login
 
-            header("Location: ../../dashboard/financas.php");
+            header("Location: ../../dashboard/estoque.php");
             exit;
         }
     }

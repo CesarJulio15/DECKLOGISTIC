@@ -1,13 +1,9 @@
 <?php
 session_start();
 include __DIR__ . '/../../../conexao.php';
-// Apenas empresas podem cadastrar funcionários
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login']) || $_SESSION['tipo_login'] !== 'empresa') {
     die("Acesso negado. Apenas empresas podem cadastrar funcionários.");
 }
-
-// $loja_id sempre será a loja logada (empresa)
-$loja_id = $_SESSION['usuario_id'];
 
 
 // Se o formulário foi enviado
@@ -103,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
           <button type="submit" class="btn">Cadastrar Funcionário</button>
-          <button type="button" onclick="location.href='../lojas/cadastro.php'" class="btn">Voltar</button>
+          <button type="button" onclick="location.href='../config.php'" class="btn">Voltar</button>
         </form>
       </div>
     </div>
