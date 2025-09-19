@@ -6,7 +6,7 @@
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
-    background: #f5f5f5;
+     background: #1b1b1b; /* fundo escuro */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding-top: 40px;
 }
@@ -25,7 +25,7 @@
 
 .conteudo h1 {
     font-size: 36px;
-    color: #333;
+    color: #e0e0e0; /* texto claro */
     text-align: center;
     margin-top: 80px;
     margin-left: 6px;
@@ -36,17 +36,17 @@
 ====================== */
 .caixa-conta {
     width: 100%;
-    background: #b3b3b3;
+    background: #1b1b1b; /* fundo escuro da caixa */
     border-radius: 12px;
     padding: 35px 50px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); /* sombra mais intensa */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     margin-top: 70px;
 }
 
 .caixa-conta:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+
 }
 
 /* ======================
@@ -61,12 +61,12 @@
 
 .perfil h2 {
     font-size: 24px;
-    color: #000000;
+    color: #e0e0e0; /* texto claro */
 }
 
 .icone-usuario {    
     font-size: 50px;
-    color: #666;
+    color: #ffffff; /* tom neutro para ícone */
 }
 
 /* ======================
@@ -82,7 +82,7 @@
 
 .linha-info strong {
     min-width: 90px;
-    color: #000000;
+    color: #e0e0e0; /* texto claro */
 }
 
 /* Inputs */
@@ -91,15 +91,17 @@
 .linha-info input[type="password"] {
     flex: 1;
     padding: 10px 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #444;
     border-radius: 6px;
     font-size: 14px;
+    background-color: #1e1e1e; /* fundo input escuro */
+    color: #e0e0e0; /* texto claro */
     transition: border 0.3s, box-shadow 0.3s;
 }
 
 .linha-info input:focus {
-    border-color: #000000;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-color: #ff9900; /* borda laranja neon */
+    box-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
     outline: none;
 }
 
@@ -108,7 +110,7 @@
     padding: 8px 15px;
     border-radius: 6px;
     border: none;
-    background: #000000;
+    background: #222; /* botão escuro */
     color: #fff;
     cursor: pointer;
     font-size: 14px;
@@ -116,13 +118,13 @@
 }
 
 .linha-info button:hover {
-    background: #666666;
+    background: #333; /* hover mais claro */
 }
 
 /* ======================
    Botões principais
 ====================== */
-.btn-sair, .btn-excluir, .btn-cadastrar, .btn-alterar-senha {
+.btn-sair, .btn-cadastrar, .btn-alterar-senha {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -140,39 +142,47 @@
 }
 
 .btn-sair {
-    background: #3f3e3e;
+    background: #333; /* cinza escuro */
     color: #fff;
 }
 
 .btn-sair:hover {
-    background: #817e7e;
+    background: #555; /* hover */
 }
 
 .btn-excluir {
-    background: #680101;
+    margin-left: 382px;
+    background: #2c2c2c; /* vermelho escuro */
     color: #fff;
+    padding: 5px 10px;      /* aumenta tamanho */
+    font-size: 16px;         /* texto maior */
+    align-self: flex-end;    /* coloca no canto direito do container flex */
+    margin-top: 25px;        /* espaçamento superior */
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s;
 }
 
 .btn-excluir:hover {
-    background: #800000;
+    background: #6b1010; /* hover vermelho neon */
 }
-
 .btn-cadastrar {
-    background: #000000;
-    color: #fff;
+    background: #1b1b1b; /* escuro */
+    color: #ff9900;       /* laranja neon */
 }
 
 .btn-cadastrar:hover {
-    background: #817e7e;
+    background: #333;
 }
 
 .btn-alterar-senha {
-    background: #55524c;
+    border: 1px solid #ff9900 ;
     color: #fff;
 }
 
 .btn-alterar-senha:hover {
-    background: #817e7e;
+    background: #ff9900;
 }
 
 /* Ícones dentro dos botões */
@@ -187,8 +197,8 @@
    Novo botão de salvar perfil
 ====================== */
 .btn-salvar {
-    background: #28a745;
-    color: #fff;
+    background: #ff9900; /* laranja neon */
+    color: #121212;       /* texto escuro */
     border: none;
     padding: 10px 18px;
     border-radius: 6px;
@@ -198,7 +208,7 @@
 }
 
 .btn-salvar:hover {
-    background: #303030;
+    background: #e68a00; /* hover laranja mais intenso */
 }
 
 /* ======================

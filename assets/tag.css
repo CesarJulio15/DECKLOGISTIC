@@ -154,7 +154,7 @@ input[type="text"]:focus, .search:focus {
 .tags-sidebar h2 {
     font-size: 20px;
     font-weight: bold;
-    color: #ffb300; /* amarelo/laranja vibrante */
+    color: #ffffff; /* amarelo/laranja vibrante */
     margin: 20px 0 15px 10px; /* espaçamento */
     border-bottom: 2px solid rgba(255,179,0,0.4); /* linha sutil */
     padding-bottom: 6px;

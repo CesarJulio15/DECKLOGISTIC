@@ -9,18 +9,12 @@
     padding: 0;
 }
 
-body {
-    font-family: Arial, sans-serif;
-   background: #f5f5f5;
-    color: #e0e0e0;
-}
-
 /* Dashboard */
 .dashboard {
     margin-left: 220px; /* mesma largura da sidebar */
     padding: 20px;
-       background-color: #1b1b1b; /* fundo escuro */
-    color: #e0e0e0; /* texto claro */
+       background: #1b1b1b; /* fundo escuro */
+    color: #000000; /* texto claro */
 }
 
 /* Área principal */
@@ -31,10 +25,13 @@ body {
 }
 
 .conteudo h1 {
+    color: #fff;
     font-size: 28px;
     margin-bottom: 15px;
 }
-
+.conteudo, .dashboard, table {
+    background-color: #1b1b1b !important; /* garante fundo escuro */
+}
 /* Tabela */
 table {
      color: #e0e0e0;
@@ -503,4 +500,13 @@ hr {
         width: 100%;
         border-collapse: collapse;
     }
+}
+html, body {
+    background: #1b1b1b !important; /* fundo preto total */
+    color: #e0e0e0 !important;         /* texto claro */
+}
+
+/* Garante que nenhum container fique branco */
+.container, .conteudo, .dashboard, main {
+    background: transparent !important;
 }
