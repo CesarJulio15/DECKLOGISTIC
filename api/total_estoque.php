@@ -6,7 +6,9 @@ require_once '../conexao.php';
 mysqli_set_charset($conn, 'utf8mb4');
 
 // Pega a loja logada
-$loja_id = $_SESSION['usuario_id'] ?? 0; 
+$loja_id = $_SESSION['tipo_login'] === 'empresa'
+    ? $_SESSION['usuario_id']
+    : $_SESSION['loja_id'] ?? 0; 
 if (!$loja_id) {
     // Nenhuma loja logada, retorna zeros
     header('Content-Type: application/json; charset=utf-8');

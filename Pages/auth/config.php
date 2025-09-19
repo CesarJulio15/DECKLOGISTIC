@@ -3,25 +3,36 @@ session_start();
 include __DIR__ . '/../../conexao.php';
 
 // ===============================
-// Apenas lojas (empresas) podem acessar
+// Define se é loja ou funcionário
 // ===============================
-if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['loja_id'])) {
+$tipo_login = $_SESSION['tipo_login'] ?? ''; // 'empresa' ou 'funcionario'
+
+if (!isset($_SESSION['usuario_id'])) {
     header("Location: /Pages/auth/login.php");
     exit;
 }
 
 // ===============================
-// Busca dados da loja logada
+// Busca dados do usuário logado
 // ===============================
-$stmt = $conn->prepare("SELECT id, nome, email FROM lojas WHERE id = ?");
-$stmt->bind_param("i", $_SESSION['loja_id']);
-$stmt->execute();
-$dados_usuario = $stmt->get_result()->fetch_assoc();
+if ($tipo_login === 'empresa') {
+    // Dados da loja
+    $stmt = $conn->prepare("SELECT id, nome, email FROM lojas WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['loja_id']);
+    $stmt->execute();
+    $dados_usuario = $stmt->get_result()->fetch_assoc();
+} else {
+    // Dados do funcionário
+    $stmt = $conn->prepare("SELECT id, nome, email FROM usuarios WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['usuario_id']);
+    $stmt->execute();
+    $dados_usuario = $stmt->get_result()->fetch_assoc();
+}
 
 // ===============================
-// Processa alterações
+// Processa alterações (somente loja)
 // ===============================
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     // Alterar Nome
     if (isset($_POST['alterar_nome'])) {
         $novo_nome = trim($_POST['nome']);
@@ -63,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Conta - Loja</title>
+    <title>Minha Conta</title>
     <link rel="stylesheet" href="../../assets/config.css">
     <link rel="stylesheet" href="../../assets/sidebar.css">
 </head>
@@ -99,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Conteúdo principal -->
     <div class="conteudo">
-        <h1>Minha Conta - Loja</h1>
+        <h1>Minha Conta</h1>
         <div class="caixa-conta">
             <div class="perfil">
                 <h2><?= htmlspecialchars($dados_usuario['nome'] ?? '') ?></h2>
@@ -108,13 +119,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Formulário Nome -->
             <form method="POST">
                 <div class="linha-info">
-             <span class="icone">
-    <img src="../../img/icon-name.svg" alt="Ícone Nome" 
-         style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
-</span>
+                    <span class="icone">
+                        <img src="../../img/icon-name.svg" alt="Ícone Nome" 
+                             style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
+                    </span>
                     <strong>Nome:</strong>
-                    <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" required>
-                    <button type="submit" name="alterar_nome">Salvar</button>
+                    <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" required
+                    <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
+                    <?php if ($tipo_login === 'empresa'): ?>
+                        <button type="submit" name="alterar_nome">Salvar</button>
+                    <?php endif; ?>
                 </div>
             </form>
 
@@ -125,26 +139,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
                 </span>
                     <strong>Email:</strong>
-                    <input type="email" name="email" value="<?= htmlspecialchars($dados_usuario['email'] ?? '') ?>" required>
-                    <button type="submit" name="alterar_email">Salvar</button>
+                    <input type="email" name="email" value="<?= htmlspecialchars($dados_usuario['email'] ?? '') ?>" required
+                    <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
+                    <?php if ($tipo_login === 'empresa'): ?>
+                        <button type="submit" name="alterar_email">Salvar</button>
+                    <?php endif; ?>
                 </div>
             </form>
-             <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
 
-            <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
+            <?php if ($tipo_login === 'empresa'): ?>
+                <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
+                <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
 
-            <!-- Botão de cadastrar funcionário (somente loja) -->
+                <!-- Excluir conta -->
+            <?php endif; ?>
 
             <!-- Logout -->
             <a href="../auth/logout.php" class="btn-sair">Sair da conta</a>
 
-            <!-- Excluir conta -->
-            <form action="../auth/excluirConta.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
-                <button type="submit" class="btn-excluir">
-                    <span>Excluir Conta</span>
-                    <img src="../../img/icon-lixo.svg" alt="Excluir Conta" style="width:12px; position:relative; top:3px; margin-left:3px;">
-                </button>
-            </form>
+                   <form action="../auth/excluirConta.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
+                    <button type="submit" class="btn-excluir">
+                        <span>Excluir Conta</span>
+                        <img src="../../img/icon-lixo.svg" alt="Excluir Conta" style="width:12px; position:relative; top:3px; margin-left:3px;">
+                    </button>
+                </form>
+
         </div>
     </div>
 </div>

@@ -8,77 +8,91 @@ include __DIR__ . '/../../conexao.php';
 $linhasPorPagina = 13;
 $paginaAtual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
 
-// Query completa de operações
+$whereProdutos = '';
+$whereHistorico = '';
+$whereTags = '';
+
+if ($tipo_login === 'empresa' && $lojaId) {
+    $whereProdutos = "p.loja_id = $lojaId";
+    $whereHistorico = "h.loja_id = $lojaId";
+    $whereTags = "t.loja_id = $lojaId";
+} elseif ($tipo_login === 'funcionario' && $usuarioId) {
+    $whereProdutos = "p.usuario_id = $usuarioId";
+    $whereHistorico = "h.usuario_id = $usuarioId";
+    $whereTags = "t.usuario_id = $usuarioId";
+} else {
+    $whereProdutos = "1=0";
+    $whereHistorico = "1=0";
+    $whereTags = "1=0";
+}
+
 $sql = "
-  SELECT 
-    'Produto Adicionado' AS tipo,
-    p.nome AS item,
-    '' AS icone,
-    '' AS cor,
-    CONCAT('Qtd Inicial: ', COALESCE(p.quantidade_estoque, 0)) AS detalhe,  -- Correção
-    p.criado_em AS data,
-    COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
-FROM produtos p
-LEFT JOIN usuarios u ON u.id = p.usuario_id
+  SELECT 'Produto Adicionado' AS tipo,
+         p.nome AS item,
+         '' AS icone,
+         '' AS cor,
+         CONCAT('Qtd Inicial: ', COALESCE(p.quantidade_estoque, 0)) AS detalhe,
+         p.criado_em AS data,
+         COALESCE(u.nome,'Usuário Desconhecido') AS usuario
+    FROM produtos p
+    LEFT JOIN usuarios u ON u.id = p.usuario_id
+    WHERE $whereProdutos
 
-    UNION ALL
+  UNION ALL
 
-SELECT 
-    'Produto Excluído' AS tipo,
-    h.nome AS item,
-    'fa-trash' AS icone,
-    '#ffffffff' AS cor,  -- cor preta
-    CONCAT('Qtd: ', h.quantidade, ' | Lote: ', h.lote) AS detalhe,
-    h.criado_em AS data,
-    COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
-FROM historico_produtos h
-LEFT JOIN usuarios u ON u.id = h.usuario_id
-WHERE h.acao = 'excluido'
+  SELECT 'Produto Excluído' AS tipo,
+         h.nome AS item,
+         'fa-trash' AS icone,
+         '#ffffffff' AS cor,
+         CONCAT('Qtd: ', h.quantidade, ' | Lote: ', h.lote) AS detalhe,
+         h.criado_em AS data,
+         COALESCE(u.nome,'Usuário Desconhecido') AS usuario
+    FROM historico_produtos h
+    LEFT JOIN usuarios u ON u.id = h.usuario_id
+    WHERE h.acao='excluido' AND $whereHistorico
 
+  UNION ALL
 
-    UNION ALL
-
-    SELECT 
-        'Tag Criada' AS tipo, 
-        t.nome AS item,
-        t.icone AS icone,
-        t.cor AS cor,
-        CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe, 
-        t.criado_em AS data, 
-        COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
+  SELECT 'Tag Criada' AS tipo,
+         t.nome AS item,
+         t.icone AS icone,
+         t.cor AS cor,
+         CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe,
+         t.criado_em AS data,
+         COALESCE(u.nome,'Usuário Desconhecido') AS usuario
     FROM tags t
     LEFT JOIN usuarios u ON u.id = t.usuario_id
+    WHERE $whereTags
 
-    UNION ALL
+  UNION ALL
 
-    SELECT 
-        'Tag Alterada' AS tipo,
-        CONCAT(COALESCE(t.nome_antigo,''),' → ',COALESCE(t.nome,'')) AS item,
-        t.icone AS icone,
-        t.cor AS cor,
-        CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe,
-        t.atualizado_em AS data,
-        COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
+  SELECT 'Tag Alterada' AS tipo,
+         CONCAT(COALESCE(t.nome_antigo,''),' → ',COALESCE(t.nome,'')) AS item,
+         t.icone AS icone,
+         t.cor AS cor,
+         CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe,
+         t.atualizado_em AS data,
+         COALESCE(u.nome,'Usuário Desconhecido') AS usuario
     FROM tags t
     LEFT JOIN usuarios u ON u.id = t.usuario_atualizacao_id
-    WHERE t.atualizado_em IS NOT NULL
+    WHERE t.atualizado_em IS NOT NULL AND $whereTags
 
-    UNION ALL
+  UNION ALL
 
-    SELECT 
-        'Tag Excluída' AS tipo,
-        t.nome AS item,
-        t.icone AS icone,
-        t.cor AS cor,
-        CONCAT('Tag removida em ', DATE_FORMAT(t.deletado_em, '%d/%m/%Y %H:%i')) AS detalhe,
-        t.deletado_em AS data,
-        COALESCE(u.nome, 'Usuário Desconhecido') AS usuario
+  SELECT 'Tag Excluída' AS tipo,
+         t.nome AS item,
+         t.icone AS icone,
+         t.cor AS cor,
+         CONCAT('Tag removida em ', DATE_FORMAT(t.deletado_em, '%d/%m/%Y %H:%i')) AS detalhe,
+         t.deletado_em AS data,
+         COALESCE(u.nome,'Usuário Desconhecido') AS usuario
     FROM tags t
     LEFT JOIN usuarios u ON u.id = t.usuario_exclusao_id
-    WHERE t.deletado_em IS NOT NULL
+    WHERE t.deletado_em IS NOT NULL AND $whereTags
 
-    ORDER BY data DESC
+  ORDER BY data DESC
 ";
+
 
 // Paginação
 $resultTotal = $conn->query($sql);

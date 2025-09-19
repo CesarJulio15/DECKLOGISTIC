@@ -3,7 +3,10 @@ header('Content-Type: application/json; charset=utf-8');
 session_start();
 require_once __DIR__ . '/../conexao.php';
 
-$lojaId = $_SESSION['usuario_id'] ?? 0; // usar a mesma chave de sessão da loja
+// Pega o ID da loja corretamente para empresa ou funcionário
+$lojaId = isset($_SESSION['tipo_login']) && $_SESSION['tipo_login'] === 'empresa'
+    ? ($_SESSION['usuario_id'] ?? 0)
+    : ($_SESSION['loja_id'] ?? 0);
 
 if (!$lojaId) {
     echo json_encode([]);
