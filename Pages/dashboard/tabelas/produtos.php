@@ -162,7 +162,7 @@ if ($tagVincResult) {
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #ffffffff;"></i>
         </button>
-        <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px;"></i>
+        <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px; color:#fff;"></i>
         <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
     </div>
 </div>
@@ -211,15 +211,25 @@ if ($tagVincResult) {
 </tbody>
 </table>
 <?php if ($totalPaginas > 1): ?>
-<div class="paginacao" style="margin-top:10px; display:flex; justify-content:center; gap:5px;">
+<div style="margin-top:10px; display:flex; justify-content:center; gap:5px;">
     <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
-        <a href="?pagina=<?= $i ?>" class="<?= ($i == $paginaAtual) ? 'active' : '' ?>"
+        <a href="?pagina=<?= $i ?>" 
+           class="<?= ($i == $paginaAtual) ? 'active' : '' ?>"
            style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; 
-                  border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#000;">
+                  border:1px solid #555; border-radius:4px; text-decoration:none; color:#fff;">
             <?= $i ?>
         </a>
     <?php endfor; ?>
 </div>
+
+<style>
+a.active {
+    border: 2px solid #ff6600 !important; /* só a borda laranja */
+    color: #fff !important;               /* mantém o texto branco */
+    font-weight: normal;                   /* opcional, sem negrito */
+    background-color: transparent;         /* mantém fundo transparente */
+}
+</style>
 <?php endif; ?>
 
 <script>

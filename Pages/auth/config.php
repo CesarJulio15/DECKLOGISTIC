@@ -108,7 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Formulário Nome -->
             <form method="POST">
                 <div class="linha-info">
-                    <span class="icone"><img src="../../img/icon-name.svg" alt="Ícone Nome"></span>
+             <span class="icone">
+    <img src="../../img/icon-name.svg" alt="Ícone Nome" 
+         style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
+</span>
                     <strong>Nome:</strong>
                     <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" required>
                     <button type="submit" name="alterar_nome">Salvar</button>
@@ -118,17 +121,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Formulário Email -->
             <form method="POST">
                 <div class="linha-info">
-                    <span class="icone"><img src="../../img/icon-email.svg" alt="Ícone Email"></span>
+                    <span class="icone"><img src="../../img/icon-email.svg" alt="Ícone Email"
+                  style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
+                </span>
                     <strong>Email:</strong>
                     <input type="email" name="email" value="<?= htmlspecialchars($dados_usuario['email'] ?? '') ?>" required>
                     <button type="submit" name="alterar_email">Salvar</button>
                 </div>
             </form>
+             <a href="funcionarios/cadastrofuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
 
             <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
 
             <!-- Botão de cadastrar funcionário (somente loja) -->
-            <a href="funcionarios/cadastrofuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
 
             <!-- Logout -->
             <a href="../auth/logout.php" class="btn-sair">Sair da conta</a>
@@ -137,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form action="../auth/excluirConta.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
                 <button type="submit" class="btn-excluir">
                     <span>Excluir Conta</span>
-                    <img src="../../img/icon-lixo.svg" alt="Excluir Conta">
+                    <img src="../../img/icon-lixo.svg" alt="Excluir Conta" style="width:12px; position:relative; top:3px; margin-left:3px;">
                 </button>
             </form>
         </div>

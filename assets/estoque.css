@@ -361,3 +361,36 @@ hr {
   position: relative;
   z-index: 10000;
 }
+/* ===== FORÇA DARK MODE (colar no FINAL do CSS) ===== */
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #000 !important;
+  color: #e0e0e0 !important;
+}
+
+/* overlay permanente atrás de tudo (garante preto mesmo que outra regra tente branco) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: -9999;
+  pointer-events: none;
+}
+
+/* faz o container principal ocupar a altura da viewport para não criar "gap" branco */
+.container, main, .conteudo, .dashboard, .table-wrap {
+  min-height: 100vh !important;
+  background: transparent !important;
+}
+
+/* tabela continua com seu fundo escuro */
+.table-wrap, .table-wrap table, table {
+  background: #1b1b1b !important;
+}
+
+body {
+    background-color: #000 !important; /* força fundo preto */
+    color: #e0e0e0 !important;         /* mantém texto claro */
+}
