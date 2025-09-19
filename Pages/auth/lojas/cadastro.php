@@ -30,30 +30,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login | DeckLogistic</title>
+  <title>Cadastro | DeckLogistic</title>
   <link rel="stylesheet" href="../../../assets/cadastro.css">
   <link rel="icon" href="../img/logoDecklogistic.webp" type="image/x-icon" />
 </head>
 <body>
   <div class="container">
-    <div class="left-side">
-      
-    </div>
+    <div class="left-side"></div>
     <div class="right-side">
       <div class="form-container">
         <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
-        <h1>Bem-Vindo!</h1>
-          <form action="" method="POST">
-            <input type="text" name="nome" placeholder="Nome da Empresa" required>
-              <input type="email" name="email" placeholder="Endereço de e-mail" required>
-              <input type="password" name="senha" placeholder="Insira sua Senha" required>
-              <input type="password" name="senha2" placeholder="Repita sua senha" required>
+        <h1 class="titulo">Bem-Vindo!</h1>
+        
+        <?php if (!empty($erro)): ?>
+          <p style="color:red;"><?= htmlspecialchars($erro) ?></p>
+        <?php endif; ?>
+
+        <form action="" method="POST">
+          <div class="form-group">
+            <label for="nome">Nome da Empresa</label>
+            <input type="text" id="nome" name="nome" placeholder="Digite o nome da empresa" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Endereço de e-mail</label>
+            <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
+          </div>
+
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" placeholder="Insira sua senha" required>
+          </div>
+
+          <div class="form-group">
+            <label for="senha2">Repita a senha</label>
+            <input type="password" id="senha2" name="senha2" placeholder="Repita sua senha" required>
+          </div>
+
           <div class="login-link">
             Já é registrado? <a href="../funcionarios/login.php">Login</a>
           </div>
           <div class="login-link">
             Já é uma loja registrada? <a href="loginLoja.php">Login</a>
           </div>
+
           <button type="submit" class="btn">Continuar</button>
         </form>
       </div>

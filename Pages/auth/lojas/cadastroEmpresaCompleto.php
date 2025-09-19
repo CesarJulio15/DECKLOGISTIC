@@ -125,92 +125,117 @@
 
     <form onsubmit="criptografarCamposSigilosos()" action="finalizarCadastro.php" method="POST">
 
+  <div class="form-group">
+    <label for="razao">Razão</label>
+    <input type="text" id="razao" name="razao" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
 
+    <label for="fantasia">Fantasia</label>
+    <input type="text" id="fantasia" name="fantasia" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
+  </div>
 
+  <div class="form-group">
+    <label for="cep">CEP</label>
+    <input type="text" id="cep" name="cep" required onblur="consultarCEP()">
 
-      <div class="form-group">
-        <input type="text" name="razao" placeholder="Razão" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
-        <input type="text" name="fantasia" placeholder="Fantasia" maxlength="100" required pattern="[A-Za-zÀ-ú\s]+">
-      </div>
+    <label for="endereco">Endereço</label>
+    <input type="text" id="endereco" name="endereco" maxlength="120" required>
 
-      <div class="form-group">
-        <input type="text" name="cep" id="cep" placeholder="CEP" required onblur="consultarCEP()">
-        <input type="text" name="endereco" id="endereco" placeholder="Endereço" maxlength="120" required>
-        <input type="number" name="numero" placeholder="Número" required min="1" max="99999">
-        <input type="text" name="complemento" placeholder="Complemento" maxlength="50">
-      </div>
+    <label for="numero">Número</label>
+    <input type="number" id="numero" name="numero" required min="1" max="99999">
 
-      <div class="form-group">
-        <input type="text" name="bairro" id="bairro" placeholder="Bairro" maxlength="60" required>
-        <select name="uf" id="uf" required>
-          <option value="">UF</option>
-          <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
-          <option>BA</option><option>PE</option><option>PR</option><option>SC</option>
-          <option>GO</option><option>DF</option>
-        </select>
-        <input type="text" name="municipio" id="municipio" placeholder="Município" maxlength="60" required>
-        <select name="pais" required>
-          <option value="">País</option>
-          <option selected>Brasil</option>
-          <option>Argentina</option>
-          <option>Paraguai</option>
-        </select>
-      </div>
+    <label for="complemento">Complemento</label>
+    <input type="text" id="complemento" name="complemento" maxlength="50">
+  </div>
 
-      <div class="form-group">
-        <input type="tel" name="fone" placeholder="Fone" required>
-      </div>
-      <hr><br>
+  <div class="form-group">
+    <label for="bairro">Bairro</label>
+    <input type="text" id="bairro" name="bairro" maxlength="60" required>
 
-      <div class="form-group">
-        <select name="regime_federal" required>
-          <option value="">Regime Federal</option>
-          <option>Lucro Real</option><option>Lucro Presumido</option><option>Simples Nacional</option>
-        </select>
-        <input type="text" name="cnpj" placeholder="CNPJ" id="cnpj" required>
-        <input type="text" name="cnae_f" placeholder="CNAE-F" maxlength="20">
-      </div>
+    <label for="uf">UF</label>
+    <select id="uf" name="uf" required>
+      <option value="">Selecione</option>
+      <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+      <option>BA</option><option>PE</option><option>PR</option><option>SC</option>
+      <option>GO</option><option>DF</option>
+    </select>
 
-      <div class="form-group">
-        <select name="regime_estadual" required>
-          <option value="">Regime Estadual</option>
-          <option>Normal</option><option>Substituição</option><option>Isento</option>
-        </select>
-        <input type="text" name="nir" placeholder="NIRC" id="nir" maxlength="20">
-        <select name="escrituracao_centralizada" required>
-          <option value="">Escrituração Centralizada</option>
-          <option>Sim</option><option>Não</option>
-        </select>
-        <input type="text" name="inscricao_estadual" placeholder="Inscrição Estadual" id="inscricao_estadual">
-      </div>
+    <label for="municipio">Município</label>
+    <input type="text" id="municipio" name="municipio" maxlength="60" required>
 
-      <div class="form-group">
-        <input type="date" name="data_nir" placeholder="Data NIRC">
-        <input type="number" name="area_construida" placeholder="Área construída m²">
-        <input type="text" name="cod_estabelecimento" placeholder="Cod. Estabelecimento">
-      </div>
+    <label for="pais">País</label>
+    <select id="pais" name="pais" required>
+      <option value="">Selecione</option>
+      <option selected>Brasil</option>
+      <option>Argentina</option>
+      <option>Paraguai</option>
+    </select>
+  </div>
 
-      <label style="display: inline-flex; align-items: center;">
-        <input type="checkbox" required style="margin-right: 10px;">
-        Eu li e concordo com os 
-        <a href="../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline;">
-          Termos de Uso
-        </a>
-      </label>
+  <div class="form-group">
+    <label for="fone">Fone</label>
+    <input type="tel" id="fone" name="fone" required>
+  </div>
+  <hr><br>
 
-      <div class="form-group" style="display: flex; gap: 10px; margin-top: 30px;">
-        <button type="button" onclick="location.href='cadastro.php'">Voltar</button>
-        <button type="submit" style="width: 200px;">Prosseguir</button>
-      </div>
+  <div class="form-group">
+    <label for="regime_federal">Regime Federal</label>
+    <select id="regime_federal" name="regime_federal" required>
+      <option value="">Selecione</option>
+      <option>Lucro Real</option><option>Lucro Presumido</option><option>Simples Nacional</option>
+    </select>
 
-      <input type="hidden" name="id" value="<?php echo isset($_GET['id']) ? (int) $_GET['id'] : 0; ?>">
+    <label for="cnpj">CNPJ</label>
+    <input type="text" id="cnpj" name="cnpj" required>
 
-<input type="hidden" name="nome_empresa" value="<?php echo $_SESSION['cadastro']['nome']; ?>">
-<input type="hidden" name="email" value="<?php echo $_SESSION['cadastro']['email']; ?>">
-<input type="hidden" name="senha" value="<?php echo $_SESSION['cadastro']['senha']; ?>">
+    <label for="cnae_f">CNAE-F</label>
+    <input type="text" id="cnae_f" name="cnae_f" maxlength="20">
+  </div>
 
+  <div class="form-group">
+    <label for="regime_estadual">Regime Estadual</label>
+    <select id="regime_estadual" name="regime_estadual" required>
+      <option value="">Selecione</option>
+      <option>Normal</option><option>Substituição</option><option>Isento</option>
+    </select>
 
-    </form>
+    <label for="nir">NIRC</label>
+    <input type="text" id="nir" name="nir" maxlength="20">
+
+    <label for="escrituracao_centralizada">Escrituração Centralizada</label>
+    <select id="escrituracao_centralizada" name="escrituracao_centralizada" required>
+      <option value="">Selecione</option>
+      <option>Sim</option><option>Não</option>
+    </select>
+
+    <label for="inscricao_estadual">Inscrição Estadual</label>
+    <input type="text" id="inscricao_estadual" name="inscricao_estadual">
+  </div>
+
+  <div class="form-group">
+    <label for="data_nir">Data NIRC</label>
+    <input type="date" id="data_nir" name="data_nir">
+
+    <label for="area_construida">Área construída (m²)</label>
+    <input type="number" id="area_construida" name="area_construida">
+
+    <label for="cod_estabelecimento">Cod. Estabelecimento</label>
+    <input type="text" id="cod_estabelecimento" name="cod_estabelecimento">
+  </div>
+
+  <label style="display: inline-flex; align-items: center;">
+    <input type="checkbox" required style="margin-right: 10px;">
+    Eu li e concordo com os 
+    <a href="../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline;">
+      Termos de Uso
+    </a>
+  </label>
+
+  <div class="form-group" style="display: flex; gap: 10px; margin-top: 30px;">
+    <button type="button" onclick="location.href='cadastro.php'">Voltar</button>
+    <button type="submit" style="width: 200px;">Prosseguir</button>
+  </div>
+</form>
+
   </div>
 </body>
 </html>

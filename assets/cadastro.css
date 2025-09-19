@@ -33,6 +33,16 @@ body, html {
 .form-container {
   width: 80%;
   max-width: 400px;
+ text-align: left;
+}
+
+.form-container .titulo {
+  width: 80%;
+  max-width: 400px;
+ text-align: left;
+}
+
+.login-link{
   text-align: center;
 }
 
@@ -121,3 +131,23 @@ input {
   }
 }
 
+label {
+  display: block;
+  text-align: left;
+  margin: 8px 0 4px 15px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #333;
+  justify-content: left;
+}
+
+
+.form-group {
+  margin-bottom: 15px;         /* separa cada campo do outro */
+}
+
+input:focus {
+  border-color: #000;          /* borda preta no foco */
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* leve brilho no foco */
+}
