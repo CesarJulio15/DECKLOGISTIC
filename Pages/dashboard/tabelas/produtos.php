@@ -485,6 +485,64 @@ function resetFiltro() {
 }
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('uploadForm');
+    const importResult = document.getElementById('importResult');
+    const importedData = document.getElementById('importedData');
+    const successMessage = document.getElementById('successMessage');
+
+    if(uploadForm){
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Importando...';
+            submitBtn.disabled = true;
+
+            fetch('importacao.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    successMessage.textContent = `${data.imported} registros importados com sucesso!`;
+                    displayImportedData(data.data);
+                    importResult.classList.remove('d-none');
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(err => alert('Erro na importação: ' + err.message))
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    function displayImportedData(data) {
+        importedData.innerHTML = '';
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.nome}</td>
+                <td>${row.descricao}</td>
+                <td>${row.lote}</td>
+                <td>${row.quantidade_estoque}</td>
+                <td>R$ ${parseFloat(row.preco_unitario).toFixed(2)}</td>
+                <td>R$ ${parseFloat(row.custo_unitario).toFixed(2)}</td>
+                <td>${row.data_reabastecimento}</td>
+            `;
+            importedData.appendChild(tr);
+        });
+    }
+});
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
