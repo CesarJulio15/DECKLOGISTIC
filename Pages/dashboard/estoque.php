@@ -158,7 +158,7 @@ async function loadEstoqueTotal() {
   try {
     const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
     const estoqueEl = document.querySelector("#estoque");
-    if (estoqueEl) estoqueEl.textContent = parseFloat(data.total || 0).toFixed(2);
+    if (estoqueEl) estoqueEl.textContent = parseFloat(data.total || 0).toFixed();
   } catch(e) { console.error(e); }
 }
 
