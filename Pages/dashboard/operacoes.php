@@ -89,9 +89,15 @@ FROM historico_produtos h LEFT JOIN usuarios u ON u.id=h.usuario_id
 WHERE h.acao='adicionado' AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) OR h.usuario_id IS NULL OR h.usuario_id = 0)
 
 UNION ALL
-SELECT 'Produto Excluído' AS tipo, h.nome AS item, 'fa-trash' AS icone, '#fcfcfcff' AS cor, CONCAT('Qtd: ', h.quantidade, ' | Lote: ', h.lote) AS detalhe, h.criado_em AS data, COALESCE(u.nome,'Loja') AS usuario
-FROM historico_produtos h LEFT JOIN usuarios u ON u.id=h.usuario_id
-WHERE h.acao='adicionado' AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) OR h.usuario_id IS NULL OR h.usuario_id = 0)
+SELECT 'Produto Excluído' AS tipo, h.nome AS item, 'fa-trash' AS icone, '#fcfcfcff' AS cor,
+       CONCAT('Qtd: ', h.quantidade, ' | Lote: ', h.lote) AS detalhe, h.criado_em AS data,
+       COALESCE(u.nome,'Loja') AS usuario
+FROM historico_produtos h
+LEFT JOIN usuarios u ON u.id=h.usuario_id
+WHERE h.acao='excluido'
+  AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) 
+       OR h.usuario_id IS NULL OR h.usuario_id = 0)
+
 
 UNION ALL
 SELECT 'Tag Criada' AS tipo, t.nome AS item, t.icone AS icone, t.cor AS cor, CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe, t.criado_em AS data, COALESCE(u.nome,'Loja') AS usuario
