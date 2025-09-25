@@ -84,9 +84,16 @@ $whereHistoricoFinal = $whereHistorico ? " AND $whereHistorico" : "";
 
 // SQL histórico completo
 $sql = "
-SELECT 'Produto Adicionado' AS tipo, h.nome AS item, '' AS icone, '' AS cor, CONCAT('Qtd Inicial: ', h.quantidade) AS detalhe, h.criado_em AS data, COALESCE(u.nome,'Loja') AS usuario
-FROM historico_produtos h LEFT JOIN usuarios u ON u.id=h.usuario_id
-WHERE h.acao='adicionado' AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) OR h.usuario_id IS NULL OR h.usuario_id = 0)
+SELECT 'Produto Adicionado' AS tipo, h.nome AS item, '' AS icone, '' AS cor,
+       CONCAT('Qtd Inicial: ', h.quantidade) AS detalhe, h.criado_em AS data,
+       COALESCE(u.nome, l.nome, 'Loja') AS usuario
+FROM historico_produtos h
+LEFT JOIN usuarios u ON u.id=h.usuario_id
+LEFT JOIN lojas l ON l.id = u.loja_id
+WHERE h.acao='adicionado'
+  AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) 
+       OR h.usuario_id IS NULL OR h.usuario_id = 0)
+
 
 UNION ALL
 SELECT 'Produto Excluído' AS tipo, h.nome AS item, 'fa-trash' AS icone, '#fcfcfcff' AS cor,

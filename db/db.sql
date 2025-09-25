@@ -176,3 +176,7 @@ CREATE TABLE historico_produtos (
     FOREIGN KEY (produto_id) REFERENCES produtos(id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
+
+-- AP DIA 25 DE SETMEOBV 202365
+
+ALTER TABLE tags ADD COLUMN tipo_usuario ENUM('empresa','funcionario') DEFAULT 'funcionario';
