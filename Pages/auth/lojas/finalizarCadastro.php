@@ -9,8 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['cadastro'])) {
     $email = $_SESSION['cadastro']['email'];
     $senha = $_SESSION['cadastro']['senha'];
 
-    // Hash da senha
-    $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+    
+  // Já vem criptografada da primeira etapa
+$senha_hash = $_SESSION['cadastro']['senha'];
+
 
     // Dados do formulário completo
     $razao_social = trim($_POST['razao'] ?? '');

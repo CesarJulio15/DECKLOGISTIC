@@ -11,7 +11,13 @@ $msg = '';
 // Pega contagem de cada tipo
 $contTipos = [];
 if ($lojaId) {
-    $tipos = ['Produto Adicionado'=>'adicionado','Produto Excluído'=>'excluido','Tag Criada'=>'criado','Tag Alterada'=>'alterado','Tag Excluída'=>'excluido_tag'];
+    $tipos = [
+        'Produto Adicionado'=>'adicionado',
+        'Produto Excluído'=>'excluido',
+        'Tag Criada'=>'criado',
+        'Tag Alterada'=>'alterado',
+        'Tag Excluída'=>'excluido_tag'
+    ];
     foreach ($tipos as $label => $acao) {
         switch ($acao) {
             case 'adicionado':
@@ -70,6 +76,7 @@ if ($tipo_login === 'empresa' && isset($_POST['apagar_historico'])) {
 // Paginação e SQL histórico
 $linhasPorPagina = 13;
 $paginaAtual = isset($_GET['pagina']) ? max(1,intval($_GET['pagina'])) : 1;
+
 $whereHistorico = $whereTags = '';
 if ($tipo_login === 'empresa' && $lojaId) {
     $whereHistorico = "h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId)";
@@ -79,39 +86,69 @@ if ($tipo_login === 'empresa' && $lojaId) {
     $lojaFuncionario = $res ? ($res->fetch_assoc()['loja_id'] ?? 0) : 0;
     $whereHistorico = "h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaFuncionario)";
     $whereTags = "t.loja_id = $lojaFuncionario";
-} else { $whereHistorico = $whereTags = "1=0"; }
+} else {
+    $whereHistorico = $whereTags = "1=0";
+}
 $whereHistoricoFinal = $whereHistorico ? " AND $whereHistorico" : "";
 
 // SQL histórico completo
 $sql = "
-SELECT 'Produto Adicionado' AS tipo, h.nome AS item, '' AS icone, '' AS cor, CONCAT('Qtd Inicial: ', h.quantidade) AS detalhe, h.criado_em AS data, COALESCE(u.nome,'Loja') AS usuario
-FROM historico_produtos h LEFT JOIN usuarios u ON u.id=h.usuario_id
-WHERE h.acao='adicionado' AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) OR h.usuario_id IS NULL OR h.usuario_id = 0)
+SELECT 'Produto Adicionado' AS tipo, h.nome AS item, '' AS icone, '' AS cor,
+       CONCAT('Qtd Inicial: ', h.quantidade) AS detalhe, h.criado_em AS data,
+       COALESCE(u.nome, l.nome) AS usuario
+FROM historico_produtos h
+LEFT JOIN usuarios u ON u.id = h.usuario_id
+LEFT JOIN lojas l ON l.id = $lojaId
+WHERE h.acao='adicionado'
+  AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) 
+       OR h.usuario_id IS NULL OR h.usuario_id = 0)
 
 UNION ALL
+
 SELECT 'Produto Excluído' AS tipo, h.nome AS item, 'fa-trash' AS icone, '#fcfcfcff' AS cor,
        CONCAT('Qtd: ', h.quantidade, ' | Lote: ', h.lote) AS detalhe, h.criado_em AS data,
-       COALESCE(u.nome,'Loja') AS usuario
+       COALESCE(u.nome, l.nome) AS usuario
 FROM historico_produtos h
-LEFT JOIN usuarios u ON u.id=h.usuario_id
+LEFT JOIN usuarios u ON u.id = h.usuario_id
+LEFT JOIN lojas l ON l.id = $lojaId
 WHERE h.acao='excluido'
   AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) 
        OR h.usuario_id IS NULL OR h.usuario_id = 0)
 
+UNION ALL
+
+SELECT 'Tag Criada' AS tipo, t.nome AS item, t.icone AS icone, t.cor AS cor, 
+       CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe, t.criado_em AS data,
+       COALESCE(u.nome, l.nome) AS usuario
+FROM tags t
+LEFT JOIN usuarios u ON u.id = t.usuario_id
+LEFT JOIN lojas l ON l.id = t.loja_id
+WHERE t.deletado_em IS NULL AND t.loja_id = $lojaId
 
 UNION ALL
-SELECT 'Tag Criada' AS tipo, t.nome AS item, t.icone AS icone, t.cor AS cor, CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe, t.criado_em AS data, COALESCE(u.nome,'Loja') AS usuario
-FROM tags t LEFT JOIN usuarios u ON u.id=t.usuario_id
-WHERE $whereTags
+
+SELECT 'Tag Alterada' AS tipo, CONCAT(COALESCE(t.nome_antigo,''),' → ',COALESCE(t.nome,'')) AS item, t.icone AS icone, t.cor AS cor, 
+       CONCAT('Cor: ', t.cor,' | Ícone: ', t.icone) AS detalhe, t.atualizado_em AS data,
+       COALESCE(u.nome, l.nome) AS usuario
+FROM tags t
+LEFT JOIN usuarios u ON u.id = t.usuario_atualizacao_id
+LEFT JOIN lojas l ON l.id = t.loja_id
+WHERE t.atualizado_em IS NOT NULL AND t.loja_id = $lojaId
+
 UNION ALL
-SELECT 'Tag Alterada' AS tipo, CONCAT(COALESCE(t.nome_antigo,''),' → ',COALESCE(t.nome,'')) AS item, t.icone AS icone, t.cor AS cor, CONCAT('Cor: ', t.cor,' | Ícone: ', t.icone) AS detalhe, t.atualizado_em AS data, COALESCE(u.nome,'Loja') AS usuario
-FROM tags t LEFT JOIN usuarios u ON u.id=t.usuario_atualizacao_id
-WHERE t.atualizado_em IS NOT NULL AND $whereTags
-UNION ALL
-SELECT 'Tag Excluída' AS tipo, t.nome AS item, t.icone AS icone, t.cor AS cor, CONCAT('Tag removida em ', DATE_FORMAT(t.deletado_em, '%d/%m/%Y %H:%i')) AS detalhe, t.deletado_em AS data, COALESCE(u.nome,'Loja') AS usuario
-FROM tags t LEFT JOIN usuarios u ON u.id=t.usuario_exclusao_id
-WHERE t.deletado_em IS NOT NULL AND $whereTags
-ORDER BY data DESC";
+
+SELECT 'Tag Excluída' AS tipo, t.nome AS item, t.icone AS icone, t.cor AS cor, 
+       CONCAT('Tag removida em ', DATE_FORMAT(t.deletado_em, '%d/%m/%Y %H:%i')) AS detalhe, t.deletado_em AS data,
+       COALESCE(u.nome, l.nome) AS usuario
+FROM tags t
+LEFT JOIN usuarios u ON u.id = t.usuario_exclusao_id
+LEFT JOIN lojas l ON l.id = t.loja_id
+WHERE t.deletado_em IS NOT NULL AND t.loja_id = $lojaId
+
+ORDER BY data DESC
+
+";
+
 
 $resultTotal = $conn->query($sql);
 $totalOperacoes = $resultTotal ? $resultTotal->num_rows : 0;

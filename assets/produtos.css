@@ -86,8 +86,8 @@ button {
   }
 
 .btn-novo {
-    background-color: rgb(0, 0, 0);
-    color: white;
+    background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9));
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,12 +95,46 @@ button {
     height: 42px;   /* altura fixa */
     border-radius: 5px;
     font-size: 12px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    /* box-shadow: rgba(255, 170, 0, 0.4) 0px 4px 12px; */
 }
 
-.btn-ordenar {
-    background-color: black;
-    color: white;
+.btn-novo:hover {
+    transform: translateY(-2px);
+    box-shadow: rgba(255, 170, 0, 0.6) 0px 6px 16px;
 }
+
+
+#ordenar {
+    width: 150px;
+    height: 42px;
+    border-radius: 6px;
+    border: none;
+    background: linear-gradient(135deg, rgba(255, 153, 0.95), rgba(255, 200, 0, 0.95));
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-shadow: rgba(255, 170, 0, 0.25) 0px 4px 10px;
+
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+    padding-right: 30px;
+}
+
+/* opções do dropdown */
+#ordenar option {
+    background-color: #222; /* fundo escuro */
+    color: #fff;            /* texto branco */
+}
+
 /* Input de pesquisa */
 #pesquisa {
     background-color: #222;
@@ -160,16 +194,6 @@ button {
     gap: 10px;
 }
 
-#ordenar {
-    width: 150px;   /* largura fixa */
-    height: 42px;
-    border-radius: 6px;
-    border: 1px solid #555;
-    background-color: #222;
-    color: #fff;
-    cursor: pointer;
-    font-size: 12px;
-}
 
 /* Paginação */
 .paginacao a {

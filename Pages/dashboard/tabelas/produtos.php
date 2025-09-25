@@ -133,7 +133,7 @@ if ($tagVincResult) {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-        <button class="btn-novo" onclick="window.location.href='../gerenciamento_produtos.php'">Novo item +</button>
+        <button class="btn-novo" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
         <button class="btn-novo" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
@@ -341,6 +341,7 @@ document.querySelectorAll('.add-tag-square').forEach(btn => {
 });
 
 // Selecionar uma tag no dropdown
+// Selecionar uma tag no dropdown
 document.querySelectorAll('.tag-option').forEach(opt => {
     opt.addEventListener('click', function() {
         const tagId = this.dataset.tagId;
@@ -354,17 +355,16 @@ document.querySelectorAll('.tag-option').forEach(opt => {
         .then(res => res.text())
         .then(data => {
             if (data.trim() === 'ok') {
-                // Pega o container de tags do produto
                 const container = document.getElementById('tags-produto-' + produtoId);
 
                 // Remove qualquer tag anterior
                 container.innerHTML = '';
 
-                // Adiciona a nova tag
+                // Adiciona a nova tag e garante o data-tag-id
                 const icone = this.querySelector('i').cloneNode(true);
+                icone.dataset.tagId = tagId; // <<< AQUI o segredo
                 container.appendChild(icone);
 
-                // Fecha o dropdown
                 this.closest('.tag-dropdown').style.display = 'none';
             } else {
                 alert('Erro ao vincular tag: ' + data);
@@ -372,6 +372,7 @@ document.querySelectorAll('.tag-option').forEach(opt => {
         });
     });
 });
+
 // Fecha dropdowns ao clicar fora
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.add-tag-square') && !e.target.closest('.tag-dropdown')) {
