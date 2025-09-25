@@ -1,9 +1,8 @@
-
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
 
-// Verifica se o usuário está logado e possui loja
+$tipo_login = $_SESSION['tipo_login'] ?? 'funcionario';
 $loja_id = $_SESSION['loja_id'] ?? null;
 $usuario_id = $_SESSION['usuario_id'] ?? null;
 if (!$loja_id || !$usuario_id) {
@@ -36,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tag_name'], $_POST['i
     $tagName = trim($_POST['tag_name']);
     $icon = trim($_POST['icon']);
     $color = $_POST['color'] ?? '#000000ff';
+
     if ($tagName && $icon) {
         $stmt = $conn->prepare("
             INSERT INTO tags (nome, nome_criado, cor, icone, usuario_id, loja_id, criado_em)
             VALUES (?, ?, ?, ?, ?, ?, NOW())
         ");
-     $stmt->bind_param("ssssii", $tagName, $tagName, $color, $icon, $usuario_id, $loja_id);
-
+        $stmt->bind_param("ssssii", $tagName, $tagName, $color, $icon, $usuario_id, $loja_id);
         $stmt->execute();
         $stmt->close();
         header("Location: tag.php");
@@ -56,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     if ($idToDelete) {
         $stmt = $conn->prepare("
             UPDATE tags
-            SET deletado_em = NOW(), usuario_exclusao_id = ?
+            SET deletado_em = NOW(),
+                usuario_exclusao_id = ?
             WHERE id = ? AND loja_id = ?
         ");
         $stmt->bind_param("iii", $usuario_id, $idToDelete, $loja_id);
@@ -70,10 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 // BUSCAR TAGS DA LOJA LOGADA
 $tags = [];
 $stmt = $conn->prepare("
-    SELECT * 
-    FROM tags 
-    WHERE deletado_em IS NULL AND loja_id = ? 
-    ORDER BY criado_em DESC
+    SELECT t.*, 
+        CASE 
+            WHEN t.usuario_id IS NOT NULL AND t.usuario_id != 0 THEN u.nome
+            ELSE l.nome
+        END AS nome_usuario
+    FROM tags t
+    LEFT JOIN usuarios u ON t.usuario_id = u.id
+    LEFT JOIN lojas l ON t.loja_id = l.id
+    WHERE t.deletado_em IS NULL AND t.loja_id = ?
+    ORDER BY t.criado_em DESC
 ");
 $stmt->bind_param("i", $loja_id);
 $stmt->execute();
@@ -83,6 +89,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
