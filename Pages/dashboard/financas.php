@@ -178,29 +178,34 @@ $lojaId = $_SESSION['loja_id'];
     });
   }
 
-  async function loadLucros() {
-    const periodo = 'mes'; 
-
-    // Consome as APIs
+async function loadLucros() {
+  try {
+    const periodo = 'mes';
     const [bruto, liquido, margem] = await Promise.all([
       fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
       fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
       fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
     ]);
 
-    // Valores totais
-    const lucroBrutoVal = parseFloat(bruto.total || 0).toFixed(2);
-    const lucroLiquidoVal = parseFloat(liquido.total || 0).toFixed(2);
-    const margemVal = parseFloat(margem.total || 0).toFixed(2);
+    if (bruto.error || liquido.error || margem.error) {
+      console.error("Erro API:", bruto.error || liquido.error || margem.error);
+      return;
+    }
+
+    const lucroBrutoVal = parseFloat((bruto.total || bruto.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
+    const lucroLiquidoVal = parseFloat((liquido.total || liquido.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
+    const margemVal = parseFloat((margem.total || margem.percentual || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
 
     document.getElementById('lucroBruto').innerText = `R$ ${lucroBrutoVal}`;
     document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
     document.getElementById('margemLucro').innerText = `${margemVal}%`;
 
-    // Séries históricas
-const brutoSeries = (bruto.series || []).map(item => item.valor || 0);
-const liquidoSeries = (liquido.series || []).map(item => item.valor || 0);
-const margemSeries = (margem.series || []).map(item => item.valor || 0);
+    // Lucro Bruto: usa dados_receita do JSON
+    const brutoSeries = Array.isArray(bruto.dados_receita) ? bruto.dados_receita.map(v => parseFloat(v) || 0) : [];
+    // Lucro Líquido: usa series ou dados do JSON
+    const liquidoSeries = Array.isArray(liquido.series) ? liquido.series.map(item => parseFloat(item.valor || item) || 0) : [];
+    // Margem: usa series ou dados do JSON
+    const margemSeries = Array.isArray(margem.series) ? margem.series.map(item => parseFloat(item.valor || item) || 0) : [];
 
     // Sparkline Lucro Bruto
     new ApexCharts(document.querySelector("#chartBruto"), {
@@ -228,7 +233,11 @@ const margemSeries = (margem.series || []).map(item => item.valor || 0);
       series: [{ data: margemSeries }],
       colors: ['#f59e0b']
     }).render();
+  } catch (err) {
+    console.error("Erro ao carregar lucros:", err);
   }
+}
+
 
   async function loadReceitaDespesa() {
     const data = await fetch(`/DECKLOGISTIC/api/receita_despesas.php?loja_id=${lojaId}`).then(r => r.json());
@@ -276,9 +285,9 @@ async function loadLucros() {
       return;
     }
 
-    const lucroBrutoVal = parseFloat(bruto.total || 0).toFixed(2);
-    const lucroLiquidoVal = parseFloat(liquido.total || 0).toFixed(2);
-    const margemVal = parseFloat(margem.total || 0).toFixed(2);
+    const lucroBrutoVal = parseFloat((bruto.total || bruto.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
+    const lucroLiquidoVal = parseFloat((liquido.total || liquido.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
+    const margemVal = parseFloat((margem.total || margem.percentual || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
 
     document.getElementById('lucroBruto').innerText = `R$ ${lucroBrutoVal}`;
     document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;

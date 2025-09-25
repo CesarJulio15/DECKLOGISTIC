@@ -7,7 +7,8 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #f5f7fa;
+  background: #181818;
+  color: #e0e0e0;
 }
 
 
@@ -15,7 +16,7 @@ body {
 .sidebar {
   width: 220px;
   height: 100vh;
-  background-color: #000;
+  background-color: #181818;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -64,6 +65,9 @@ body {
 
 .nav-list li a {
   gap: unset; /* ou remova */
+  color: #fff;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
 }
 
 .nav-list li a span {
@@ -76,13 +80,13 @@ body {
 }
 
 .nav-list li a:hover {
-  background-color: #222;
+  background: #ff9900;
+  color: #181818;
 }
 
 .nav-list li.active a {
-  background-color: #555;
-  border-radius: 4px;
-  color: #fff;
+  background: #ff9900;
+  color: #181818;
 }
 
 /* Linha divisória */
@@ -103,7 +107,7 @@ hr {
 }
 
 .bottom-links a {
-  color: #ccc;
+  color: #ff9900;
   text-decoration: none;
   font-size: 14px;
   display: flex;
@@ -123,6 +127,8 @@ hr {
 
 .bottom-links a:hover {
   color: #fff;
+  background: #ff9900;
+  border-radius: 6px;
 }
 
 /* Dashboard */
@@ -133,43 +139,119 @@ hr {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   width: calc(100% - 220px);
+  background: transparent;
 }
 
 .card {
   display: flex;
   flex-direction: column;
   padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background: #222;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(255,153,0,0.08);
+  border: 1px solid #222;
   height:400px; /* ou altura que você quiser */
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: box-shadow 0.3s, transform 0.3s;
   overflow: hidden;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 32px rgba(255,153,0,0.18);
+  border-color: #ff9900;
+  transform: translateY(-4px) scale(1.02);
 }
 
 .card h3 {
   font-size: 1rem;
-  color: #374151;
-  margin-bottom: 10px;
+  color: #ff9900;
+  font-weight: 700;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  margin-bottom: 10px;
 }
 
 .value {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  color: #111827;
+  color: #ff9900;
+  margin-bottom: 8px;
 }
 
 /* cores por tipo de card */
 #lucroBruto { color: #10b981; }
 #lucroLiquido { color: #3b82f6; }
 #margemLucro { color: #f59e0b; }
+
+/* Botões modernos: preto + laranja */
+/* Botões modernos: preto + laranja */
+/* Estilo do botão btn-modern */
+/* Botão btn-modern com estilo novo */
+.btn-modern {
+    background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9)); /* Gradiente laranja */
+    color: rgb(255, 255, 255); /* Cor do texto */
+    padding: 10px 16px;
+    font-size: 14px; /* Tamanho da fonte */
+    border-radius: 8px; /* Bordas arredondadas */
+    border: none; /* Remover borda */
+    cursor: pointer; /* Mostrar cursor de clique */
+    margin-top: 12px; /* Margem superior */
+    transition: 0.3s; /* Transição suave */
+    box-shadow: rgba(255, 170, 0, 0.4) 0px 4px 12px; /* Sombra do botão */
+}
+
+/* Efeito de hover para o botão */
+.btn-modern:hover {
+    background: linear-gradient(135deg, rgba(255, 200, 0, 0.9), rgba(255, 153, 0, 0.9)); /* Invertido no hover */
+    box-shadow: rgba(255, 170, 0, 0.6) 0px 6px 18px; /* Sombra mais forte no hover */
+    transform: translateY(-2px) scale(1.04); /* Leve elevação e aumento de escala */
+}
+
+
+
+/* Tabela */
+.card table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* força colunas a se ajustarem */
+  word-wrap: break-word; /* quebra linhas longas */
+  font-size: 0.9rem;
+  background: #181818;
+  color: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Cabeçalho */
+.card table thead th {
+  background-color: #ff9900;
+  color: #fff;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid #ff9900;
+}
+
+/* Corpo da tabela */
+.card table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+}
+
+/* Hover nas linhas */
+.card table tbody tr:hover {
+  background-color: #222;
+  color: #ff9900;
+}
+
+/* Scrollbar laranja */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #181818;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff9900;
+  border-radius: 8px;
+}
 
 /* Responsividade */
 @media (max-width: 768px) {
@@ -251,36 +333,6 @@ hr {
 .table-responsive {
   width: 100%;
   overflow-x: auto; /* scroll horizontal se necessário */
-}
-
-/* Tabela */
-.card table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed; /* força colunas a se ajustarem */
-  word-wrap: break-word; /* quebra linhas longas */
-  font-size: 0.9rem;
-}
-
-/* Cabeçalho */
-.card table thead th {
-  background-color: #f3f4f6;
-  color: #374151;
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 2px solid #e5e7eb;
-}
-
-/* Corpo da tabela */
-.card table tbody td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #e5e7eb;
-  color: #111827;
-}
-
-/* Hover nas linhas */
-.card table tbody tr:hover {
-  background-color: #f9fafb;
 }
 
 /* Ajustes para mobile */
