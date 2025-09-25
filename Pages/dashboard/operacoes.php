@@ -8,7 +8,7 @@ $tipo_login = $_SESSION['tipo_login'] ?? 'funcionario';
 
 $msg = '';
 
-// Pega contagem de cada tipo
+// Contagem de cada tipo
 $contTipos = [];
 if ($lojaId) {
     $tipos = [
@@ -38,7 +38,7 @@ if ($lojaId) {
     }
 }
 
-// Processa exclusão do histórico
+// Exclusão do histórico
 if ($tipo_login === 'empresa' && isset($_POST['apagar_historico'])) {
     $periodo = $_POST['periodo'] ?? 'tudo';
     $tiposSelecionados = $_POST['tipos'] ?? [];
@@ -52,14 +52,12 @@ if ($tipo_login === 'empresa' && isset($_POST['apagar_historico'])) {
         case 'tudo': $condPeriodo=""; break;
     }
 
-    // Excluir produtos
     if(in_array('Produto Adicionado', $tiposSelecionados)) {
         $conn->query("DELETE h FROM historico_produtos h INNER JOIN usuarios u ON h.usuario_id=u.id WHERE u.loja_id=$lojaId AND h.acao='adicionado' $condPeriodo");
     }
     if(in_array('Produto Excluído', $tiposSelecionados)) {
         $conn->query("DELETE h FROM historico_produtos h INNER JOIN usuarios u ON h.usuario_id=u.id WHERE u.loja_id=$lojaId AND h.acao='excluido' $condPeriodo");
     }
-    // Excluir tags
     if(in_array('Tag Criada', $tiposSelecionados)) {
         $conn->query("DELETE FROM tags WHERE loja_id=$lojaId AND criado_em IS NOT NULL AND deletado_em IS NULL $condPeriodo");
     }
@@ -73,33 +71,21 @@ if ($tipo_login === 'empresa' && isset($_POST['apagar_historico'])) {
     $msg="✅ Histórico atualizado com sucesso!";
 }
 
-// Paginação e SQL histórico
+// Paginação
 $linhasPorPagina = 13;
 $paginaAtual = isset($_GET['pagina']) ? max(1,intval($_GET['pagina'])) : 1;
 
-$whereHistorico = $whereTags = '';
-if ($tipo_login === 'empresa' && $lojaId) {
-    $whereHistorico = "h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId)";
-    $whereTags = "t.loja_id = $lojaId";
-} elseif ($tipo_login === 'funcionario' && $usuarioId) {
-    $res = $conn->query("SELECT loja_id FROM usuarios WHERE id = $usuarioId LIMIT 1");
-    $lojaFuncionario = $res ? ($res->fetch_assoc()['loja_id'] ?? 0) : 0;
-    $whereHistorico = "h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaFuncionario)";
-    $whereTags = "t.loja_id = $lojaFuncionario";
-} else {
-    $whereHistorico = $whereTags = "1=0";
-}
-$whereHistoricoFinal = $whereHistorico ? " AND $whereHistorico" : "";
-
-// SQL histórico completo (agora inclui todas operações relevantes)
+// SQL histórico completo
 $sql = "
 SELECT h.acao AS tipo, h.nome AS item, 
        CASE WHEN h.acao='excluido' THEN 'fa-trash' ELSE '' END AS icone,
        CASE WHEN h.acao='excluido' THEN '#fcfcfcff' ELSE '' END AS cor,
-       CONCAT('Qtd: ', h.quantidade, IFNULL(CONCAT(' | Lote: ', h.lote),'')) AS detalhe, h.criado_em AS data,
-       u.nome AS usuario
+       CONCAT('Qtd: ', h.quantidade, IFNULL(CONCAT(' | Lote: ', h.lote),'')) AS detalhe, 
+       h.criado_em AS data,
+       COALESCE(u.nome, l.nome) AS usuario
 FROM historico_produtos h
 LEFT JOIN usuarios u ON u.id = h.usuario_id
+LEFT JOIN lojas l ON l.id = u.loja_id
 WHERE (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) OR h.usuario_id IS NULL OR h.usuario_id = 0)
 
 UNION ALL
@@ -111,10 +97,10 @@ SELECT
     '' AS cor,
     CONCAT('Qtd: ', m.quantidade) AS detalhe,
     m.data_movimentacao AS data,
-    u.nome AS usuario
+    COALESCE(u.nome, 'Sistema') AS usuario
 FROM movimentacoes_estoque m
 INNER JOIN produtos p ON m.produto_id = p.id
-LEFT JOIN usuarios u ON m.usuario_id = u.id
+LEFT JOIN usuarios u ON u.id = m.usuario_id
 WHERE p.loja_id = $lojaId
 
 UNION ALL
@@ -150,7 +136,6 @@ WHERE t.deletado_em IS NOT NULL AND t.loja_id = $lojaId
 ORDER BY data DESC
 ";
 
-
 $resultTotal = $conn->query($sql);
 $totalOperacoes = $resultTotal ? $resultTotal->num_rows : 0;
 $totalPaginas = ceil($totalOperacoes / $linhasPorPagina);
@@ -158,6 +143,7 @@ $inicio = ($paginaAtual - 1) * $linhasPorPagina;
 $sqlComLimit = $sql . " LIMIT $inicio, $linhasPorPagina";
 $result = $conn->query($sqlComLimit);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
