@@ -91,29 +91,31 @@ if ($tipo_login === 'empresa' && $lojaId) {
 }
 $whereHistoricoFinal = $whereHistorico ? " AND $whereHistorico" : "";
 
-// SQL histórico completo
+// SQL histórico completo (agora inclui todas operações relevantes)
 $sql = "
-SELECT 'Produto Adicionado' AS tipo, h.nome AS item, '' AS icone, '' AS cor,
-       CONCAT('Qtd Inicial: ', h.quantidade) AS detalhe, h.criado_em AS data,
-       COALESCE(u.nome, l.nome) AS usuario
+SELECT h.acao AS tipo, h.nome AS item, 
+       CASE WHEN h.acao='excluido' THEN 'fa-trash' ELSE '' END AS icone,
+       CASE WHEN h.acao='excluido' THEN '#fcfcfcff' ELSE '' END AS cor,
+       CONCAT('Qtd: ', h.quantidade, IFNULL(CONCAT(' | Lote: ', h.lote),'')) AS detalhe, h.criado_em AS data,
+       u.nome AS usuario
 FROM historico_produtos h
 LEFT JOIN usuarios u ON u.id = h.usuario_id
-LEFT JOIN lojas l ON l.id = $lojaId
-WHERE h.acao='adicionado'
-  AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) 
-       OR h.usuario_id IS NULL OR h.usuario_id = 0)
+WHERE (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) OR h.usuario_id IS NULL OR h.usuario_id = 0)
 
 UNION ALL
 
-SELECT 'Produto Excluído' AS tipo, h.nome AS item, 'fa-trash' AS icone, '#fcfcfcff' AS cor,
-       CONCAT('Qtd: ', h.quantidade, ' | Lote: ', h.lote) AS detalhe, h.criado_em AS data,
-       COALESCE(u.nome, l.nome) AS usuario
-FROM historico_produtos h
-LEFT JOIN usuarios u ON u.id = h.usuario_id
-LEFT JOIN lojas l ON l.id = $lojaId
-WHERE h.acao='excluido'
-  AND (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) 
-       OR h.usuario_id IS NULL OR h.usuario_id = 0)
+SELECT 
+    CASE WHEN m.tipo='entrada' THEN 'Compra (Entrada)' ELSE 'Venda (Saída)' END AS tipo,
+    p.nome AS item,
+    '' AS icone,
+    '' AS cor,
+    CONCAT('Qtd: ', m.quantidade) AS detalhe,
+    m.data_movimentacao AS data,
+    u.nome AS usuario
+FROM movimentacoes_estoque m
+INNER JOIN produtos p ON m.produto_id = p.id
+LEFT JOIN usuarios u ON m.usuario_id = u.id
+WHERE p.loja_id = $lojaId
 
 UNION ALL
 
@@ -146,7 +148,6 @@ LEFT JOIN lojas l ON l.id = t.loja_id
 WHERE t.deletado_em IS NOT NULL AND t.loja_id = $lojaId
 
 ORDER BY data DESC
-
 ";
 
 
@@ -292,4 +293,5 @@ window.addEventListener('click', e => { if(e.target===modalFundo) modalFundo.sty
 </script>
 </main>
 </body>
+</html>
 </html>

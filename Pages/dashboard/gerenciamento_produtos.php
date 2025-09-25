@@ -90,6 +90,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->bind_param("sdiii", $nome, $preco, $estoque, $id, $lojaId);
         if ($stmt->execute()) {
+            // Registra histórico de edição
+            $stmtHist = $conn->prepare("
+                INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+                VALUES (?, ?, ?, 'editado', ?, NOW())
+            ");
+            if ($stmtHist) {
+                $stmtHist->bind_param("isii", $id, $nome, $estoque, $usuarioId);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
             $msg = "✏️ Produto atualizado!";
         } else {
             $msg = "❌ Erro: " . $stmt->error;
@@ -117,6 +127,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->bind_param("iii", $usuarioId, $id, $lojaId);
         if ($stmt->execute()) {
+            // Registra histórico de exclusão
+            $stmtHist = $conn->prepare("
+                INSERT INTO historico_produtos (produto_id, nome, quantidade, lote, acao, usuario_id, criado_em)
+                SELECT id, nome, quantidade_estoque, lote, 'excluido', ?, NOW()
+                FROM produtos WHERE id=? AND loja_id=?
+            ");
+            if ($stmtHist) {
+                $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
             $msg = "🗑️ Produto apagado!";
         } else {
             $msg = "❌ Erro: " . $stmt->error;
@@ -144,6 +165,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt2->execute();
             $stmt2->close();
 
+            // Registra histórico de compra
+            $stmtHist = $conn->prepare("
+                INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+                SELECT id, nome, quantidade_estoque, 'comprado', ?, NOW()
+                FROM produtos WHERE id=? AND loja_id=?
+            ");
+            if ($stmtHist) {
+                $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
+
             $msg = "📥 Compra registrada (+$qtd) em $data";
         } else {
             $msg = "❌ Erro ao registrar compra! " . $stmt->error;
@@ -151,31 +184,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 
-    // --- VENDER (SAÍDA) ---
-    if ($acao === 'vender_produto') {
-        $id = intval($_POST['produto_id'] ?? 0);
-        $qtd = intval($_POST['quantidade'] ?? 0);
-        $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
+    // --- REGISTRAR VENDA DE PRODUTO ---
+    if (($acao ?? '') === 'vender_produto') {
+        $produto_id = intval($_POST['produto_id'] ?? 0);
+        $quantidade = intval($_POST['quantidade'] ?? 0);
+        $data_movimentacao = $_POST['data_movimentacao'] ?? date('Y-m-d');
 
-        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id=? AND loja_id=? AND quantidade_estoque >= ?");
-        if (!$stmt) die("Erro prepare vender: " . $conn->error);
-
-        $stmt->bind_param("iiii", $qtd, $id, $lojaId, $qtd);
-        if ($stmt->execute() && $stmt->affected_rows > 0) {
-            $tipo = 'saida';
-            $stmt2 = $conn->prepare("
-                INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) 
-                VALUES (?, ?, ?, ?, ?, NOW())
-            ");
-            $stmt2->bind_param("isisi", $id, $tipo, $qtd, $data, $usuarioId);
-            $stmt2->execute();
-            $stmt2->close();
-
-            $msg = "📤 Venda registrada (-$qtd) em $data";
-        } else {
-            $msg = "❌ Estoque insuficiente ou erro! " . $stmt->error;
+        if ($produto_id <= 0 || $quantidade <= 0) {
+            die("❌ Dados inválidos para venda.");
         }
-        $stmt->close();
+
+        // 1. Verifica estoque suficiente
+        $stmtEstoque = $conn->prepare("SELECT quantidade_estoque, preco_unitario, custo_unitario FROM produtos WHERE id=? AND loja_id=? AND deletado_em IS NULL");
+        if (!$stmtEstoque) die("Erro prepare estoque: " . $conn->error);
+        $stmtEstoque->bind_param("ii", $produto_id, $lojaId);
+        $stmtEstoque->execute();
+        $result = $stmtEstoque->get_result();
+        $prod = $result->fetch_assoc();
+        $stmtEstoque->close();
+
+        if (!$prod || $prod['quantidade_estoque'] < $quantidade) {
+            die("❌ Estoque insuficiente para venda.");
+        }
+
+        // 2. Decrementa estoque
+        $stmtUpdate = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id=? AND loja_id=? AND quantidade_estoque >= ?");
+        if (!$stmtUpdate) die("Erro prepare update estoque: " . $conn->error);
+        $stmtUpdate->bind_param("iiii", $quantidade, $produto_id, $lojaId, $quantidade);
+        if (!$stmtUpdate->execute() || $stmtUpdate->affected_rows === 0) {
+            $stmtUpdate->close();
+            die("❌ Falha ao decrementar estoque ou estoque insuficiente.");
+        }
+        $stmtUpdate->close();
+
+        // 3. Registra movimentação de estoque
+        $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) VALUES (?, 'saida', ?, ?, ?, NOW())");
+        if (!$stmtMov) die("Erro prepare movimentação: " . $conn->error);
+        $stmtMov->bind_param("iisi", $produto_id, $quantidade, $data_movimentacao, $usuarioId);
+        if (!$stmtMov->execute()) {
+            $stmtMov->close();
+            die("❌ Falha ao registrar movimentação: " . $stmtMov->error);
+        }
+        $stmtMov->close();
+
+        // Registra histórico de venda
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            SELECT id, nome, quantidade_estoque, 'vendido', ?, NOW()
+            FROM produtos WHERE id=? AND loja_id=?
+        ");
+        if ($stmtHist) {
+            $stmtHist->bind_param("iii", $usuarioId, $produto_id, $lojaId);
+            $stmtHist->execute();
+            $stmtHist->close();
+        }
+
+        // 4. Registra venda
+        $valor_total = $prod['preco_unitario'] * $quantidade;
+        $custo_total = $prod['custo_unitario'] * $quantidade;
+        $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total, usuario_id) VALUES (?, ?, ?, ?, ?)");
+        if (!$stmtVenda) die("Erro prepare venda: " . $conn->error);
+        $stmtVenda->bind_param("isddi", $lojaId, $data_movimentacao, $valor_total, $custo_total, $usuarioId);
+        if (!$stmtVenda->execute()) {
+            $stmtVenda->close();
+            die("❌ Falha ao registrar venda: " . $stmtVenda->error);
+        }
+        $venda_id = $stmtVenda->insert_id;
+        $stmtVenda->close();
+
+        // 5. Registra item da venda
+        $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, ?)");
+        if (!$stmtItem) die("Erro prepare item venda: " . $conn->error);
+        $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $prod['preco_unitario'], $prod['custo_unitario'], $data_movimentacao);
+        if (!$stmtItem->execute()) {
+            $stmtItem->close();
+            die("❌ Falha ao registrar item da venda: " . $stmtItem->error);
+        }
+        $stmtItem->close();
+
+        $msg = "📤 Venda registrada com sucesso! (-$quantidade unidade(s))";
     }
 }
 

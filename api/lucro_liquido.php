@@ -1,16 +1,13 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-
-// Ajuste este caminho se necessário
 require_once __DIR__ . '/../conexao.php';
 
 $lojaId = $_SESSION['loja_id'] ?? 0;
-if ($lojaId == 0) {
+if ($lojaId <= 0) {
     echo json_encode(["error" => "Loja não autenticada"]);
     exit;
 }
-
 // --------- período ----------
 $periodo = $_GET['periodo'] ?? 'mes'; // 'mes' | '30d' | 'ano'
 $agruparPor = 'dia';
