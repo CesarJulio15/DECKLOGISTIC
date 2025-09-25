@@ -12,14 +12,16 @@
       display: flex;
       min-height: 100vh;
     }
-    .left-side {
-      flex: 1;
-      background: url('../img/mesacadastro.webp') no-repeat center center;
-      background-size: cover;
-    }
+   .left-side {
+  flex: 1;
+  max-width: 620px;
+  background: url('../img/mesacadastro.webp') no-repeat center center;
+  background-size: cover;
+}
+
     .container {
       flex: 1;
-      max-width: 800px;
+      max-width: 1300px;
       padding: 100px 30px 30px 30px;
       background-color: #fff;
     }

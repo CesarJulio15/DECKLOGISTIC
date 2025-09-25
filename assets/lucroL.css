@@ -1,7 +1,8 @@
 body {
     margin: 0;
-    background: #999999;
+    background: #121212; /* fundo escuro */
     font-family: Arial, sans-serif;
+    color: #e0e0e0; /* texto claro */
 }
 
 .pagina {
@@ -20,14 +21,14 @@ body {
 }
 
 .grafico-container {
-    width: 90%;          /* ocupa 90% da largura disponível */
-    max-width: 1200px;   /* limite máximo para telas grandes */
-    height: 70vh;        /* ocupa 70% da altura da tela */
-    max-height: 800px;   /* limite máximo */
-    background: #fff;
+    width: 90%;          
+    max-width: 1200px;   
+    height: 70vh;        
+    max-height: 800px;   
+    background: #1e1e1e; /* fundo do card escuro */
     border-radius: 8px;
     padding: 15px;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
 }
@@ -48,14 +49,14 @@ canvas {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 15px;
-    flex-wrap: wrap; /* quebra para linha de baixo se faltar espaço */
+    flex-wrap: wrap;
 }
 
 .indicador {
     display: flex;
     align-items: center;
     font-size: 18px;
-    color: green;
+    color: #4caf50; /* verde para destaque */
 }
 
 .indicador span {
@@ -67,14 +68,15 @@ canvas {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 15px;
+    color: #f3f3f3; /* título claro */
 }
 
 .btn-voltar {
     position: fixed;
     bottom: 15px;
     right: 15px;
-    background-color: #000000;
-    color: white;
+    background-color: #333; /* botão escuro */
+    color: #fff;
     border: none;
     padding: 10px 16px;
     border-radius: 6px;
@@ -86,7 +88,7 @@ canvas {
 }
 
 .btn-voltar:hover {
-    background-color: #333;
+    background-color: #555;
 }
 
 /* Responsividade para tablets */
@@ -104,7 +106,7 @@ canvas {
 /* Responsividade para celular */
 @media (max-width: 768px) {
     .conteudo {
-        margin-left: 0; /* sidebar pode ser recolhida em mobile */
+        margin-left: 0;
         padding: 10px;
     }
     .grafico-container {
