@@ -34,7 +34,7 @@ $msg = '';
 /* ======================================================
    TRATAMENTO DE AÇÕES (ADD / EDIT / DELETE / COMPRAR / VENDER)
    ====================================================== */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
     $acao = $_POST['acao'] ?? '';
 
     // --- ADICIONAR PRODUTO ---
@@ -61,22 +61,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         // Histórico
-        $stmtHist = $conn->prepare("
-            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
-            VALUES (?, ?, ?, 'adicionado', ?, NOW())
-        ");
-        if (!$stmtHist) {
-            die("Erro prepare histórico: " . $conn->error);
-        }
-
-        $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuarioId);
-        if (!$stmtHist->execute()) {
-            die("Erro execute histórico: " . $stmtHist->error);
-        }
-        $stmtHist->close();
-
-        $msg = "✅ Produto cadastrado com sucesso!";
+ if ($tipo_login === 'empresa') {
+    // Se for empresa → usuario_id = NULL
+    $stmtHist = $conn->prepare("
+        INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+        VALUES (?, ?, ?, 'adicionado', NULL, NOW())
+    ");
+    if (!$stmtHist) {
+        die("Erro prepare histórico: " . $conn->error);
     }
+
+    $stmtHist->bind_param("isi", $idNovoProduto, $nome, $estoque);
+} else {
+    // Se for funcionário → usuario_id = $usuarioId
+    $stmtHist = $conn->prepare("
+        INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+        VALUES (?, ?, ?, 'adicionado', ?, NOW())
+    ");
+    if (!$stmtHist) {
+        die("Erro prepare histórico: " . $conn->error);
+    }
+
+    $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuarioId);
+}
+
+if (!$stmtHist->execute()) {
+    die("Erro execute histórico: " . $stmtHist->error);
+}
+$stmtHist->close();
+
+$msg = "✅ Produto cadastrado com sucesso!";
 
     // --- EDITAR PRODUTO ---
     if ($acao === 'editar_produto') {

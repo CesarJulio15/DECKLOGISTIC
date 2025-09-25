@@ -349,6 +349,7 @@ document.querySelectorAll('.add-tag-square').forEach(btn => {
 });
 
 // Selecionar uma tag no dropdown
+// Selecionar uma tag no dropdown
 document.querySelectorAll('.tag-option').forEach(opt => {
     opt.addEventListener('click', function() {
         const tagId = this.dataset.tagId;
@@ -362,17 +363,16 @@ document.querySelectorAll('.tag-option').forEach(opt => {
         .then(res => res.text())
         .then(data => {
             if (data.trim() === 'ok') {
-                // Pega o container de tags do produto
                 const container = document.getElementById('tags-produto-' + produtoId);
 
                 // Remove qualquer tag anterior
                 container.innerHTML = '';
 
-                // Adiciona a nova tag
+                // Adiciona a nova tag e garante o data-tag-id
                 const icone = this.querySelector('i').cloneNode(true);
+                icone.dataset.tagId = tagId; // <<< AQUI o segredo
                 container.appendChild(icone);
 
-                // Fecha o dropdown
                 this.closest('.tag-dropdown').style.display = 'none';
             } else {
                 alert('Erro ao vincular tag: ' + data);
@@ -380,6 +380,7 @@ document.querySelectorAll('.tag-option').forEach(opt => {
         });
     });
 });
+
 // Fecha dropdowns ao clicar fora
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.add-tag-square') && !e.target.closest('.tag-dropdown')) {
