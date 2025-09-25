@@ -75,38 +75,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Conta</title>
-    <link rel="stylesheet" href="../../assets/config.css">
     <link rel="stylesheet" href="../../assets/sidebar.css">
+    <link rel="stylesheet" href="../../assets/config.css">
+    
 </head>
 <body>
 <div class="pagina">
 
     <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo-area">
-            <img src="../../img/logoDecklogistic.webp" alt="Logo DeckLogistic">
-        </div>
-
-        <nav class="nav-section">
-            <div class="nav-menus">
-                <ul class="nav-list top-section">
-                    <li><a href="../dashboard/financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-                    <li><a href="../dashboard/estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
-                </ul>
-                <hr>
-                <ul class="nav-list middle-section">
-                    <li><a href="/DECKLOGISTIC/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-                    <li><a href="/DECKLOGISTIC/Pages/dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
-                    <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-                    <li><a href="../dashboard/tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
-                </ul>
-            </div>
-            <div class="bottom-links">
-                <li class="active"><a href="/DECKLOGISTIC/pages/auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a></li>
-                <a href="dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
-            </div>
-        </nav>
+ <div class="sidebar">
+    <link rel="stylesheet" href="../../assets/sidebar.css">
+    <div class="logo-area">
+      <img src="../../img/logoDecklogistic.webp" alt="Logo">
     </div>
+    <nav class="nav-section">
+      <div class="nav-menus">
+       <ul class="nav-list top-section">
+    <li><a href="../dashboard/financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+    <li><a href="../dashboard/estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+</ul>
+        <hr>
+        <ul class="nav-list middle-section">
+          <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+          <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+          <li><a href="../dashboard/tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
+        </ul>
+      </div>
+      <div class="bottom-links">
+     <li class="active"><a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a></li>
+       <a href="../../Pages/auth/dicas.php" ><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+      </div>
+    </nav>
+  </div>
 
     <!-- Conteúdo principal -->
     <div class="conteudo">
