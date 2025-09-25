@@ -141,7 +141,7 @@ if ($tagVincResult) {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-        <button class="btn-novo" onclick="window.location.href='../gerenciamento_produtos.php'">Novo item +</button>
+        <button class="btn-novo" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
         <button class="btn-novo" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>

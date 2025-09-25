@@ -83,6 +83,7 @@ CREATE TABLE tags (
     atualizado_em DATETIME NULL,
     usuario_id INT,
     usuario_atualizacao_id INT NULL,
+    deletado_em DATETIME DEFAULT NULL,
     FOREIGN KEY (loja_id) REFERENCES lojas(id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
     FOREIGN KEY (usuario_atualizacao_id) REFERENCES usuarios(id)
