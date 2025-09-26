@@ -157,8 +157,7 @@ if ($tagVincResult) {
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #ffffffff;"></i>
         </button>
-        <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px; color:#fff;"></i>
-        <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
+        
     </div>
 </div>
 
@@ -228,42 +227,8 @@ a.active {
 <?php endif; ?>
 
 <script>
-// Seleção múltipla
-const btnMultiDelete = document.getElementById('btn-multi-delete');
-const confirmDeleteBtn = document.getElementById('confirm-delete');
-let multiDeleteActive = false;
 
-btnMultiDelete.addEventListener('click', function() {
-    multiDeleteActive = !multiDeleteActive;
 
-    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = multiDeleteActive ? 'table-cell' : 'none');
-    document.getElementById('multi-checkbox-header').style.display = multiDeleteActive ? 'table-cell' : 'none';
-    confirmDeleteBtn.style.display = multiDeleteActive ? 'inline-block' : 'none';
-});
-
-// Confirmar exclusão
-document.getElementById('confirm-delete').addEventListener('click', function() {
-    const checkboxes = document.querySelectorAll('.chk-delete:checked');
-    if (checkboxes.length === 0) return alert("Selecione pelo menos um produto.");
-    if (!confirm("Deseja realmente excluir os produtos selecionados?")) return;
-    let ids = Array.from(checkboxes).map(chk => chk.dataset.id);
-
-    fetch('excluir_produto.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `produto_ids=${ids.join(',')}`
-    })
-    .then(res => res.text())
-    .then(data => {
-        if(data.trim() === 'ok'){
-            checkboxes.forEach(chk => chk.closest('tr').remove());
-            document.getElementById('confirm-delete').style.display = 'none';
-            document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'none');
-        } else {
-            alert('Erro ao excluir produtos!');
-        }
-    });
-});
 
 // Pesquisa
 document.getElementById('pesquisa').addEventListener('input', function() {
