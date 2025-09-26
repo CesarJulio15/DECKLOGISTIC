@@ -108,42 +108,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // --- APAGAR PRODUTO ---
-    if ($acao === 'apagar_produto') {
-        $id = intval($_POST['produto_id'] ?? 0);
+      if ($acao === 'apagar_produto') {
+          $id = intval($_POST['produto_id'] ?? 0);
 
-        // Remove tags associadas
-        $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
-        if ($stmt) {
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $stmt->close();
-        }
+          // Remove tags associadas
+          $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
+          if ($stmt) {
+              $stmt->bind_param("i", $id);
+              $stmt->execute();
+              $stmt->close();
+          }
 
-        // Marca como excluído
-        $stmt = $conn->prepare(
-            "UPDATE produtos SET deletado_em = NOW(), usuario_exclusao_id = ? WHERE id = ? AND loja_id = ?"
-        );
-        if (!$stmt) die("Erro prepare apagar: " . $conn->error);
+          // Marca como excluído
+          $stmt = $conn->prepare(
+              "UPDATE produtos SET deletado_em = NOW(), usuario_exclusao_id = ? WHERE id = ? AND loja_id = ?"
+          );
+          if (!$stmt) die("Erro prepare apagar: " . $conn->error);
 
-        $stmt->bind_param("iii", $usuarioId, $id, $lojaId);
-        if ($stmt->execute()) {
-            // Registra histórico de exclusão
-            $stmtHist = $conn->prepare("
-                INSERT INTO historico_produtos (produto_id, nome, quantidade, lote, acao, usuario_id, criado_em)
-                SELECT id, nome, quantidade_estoque, lote, 'excluido', ?, NOW()
-                FROM produtos WHERE id=? AND loja_id=?
-            ");
-            if ($stmtHist) {
-                $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
-                $stmtHist->execute();
-                $stmtHist->close();
-            }
-            $msg = "🗑️ Produto apagado!";
-        } else {
-            $msg = "❌ Erro: " . $stmt->error;
-        }
-        $stmt->close();
-    }
+          $stmt->bind_param("iii", $usuarioId, $id, $lojaId);
+          if ($stmt->execute()) {
+              // Registra histórico de exclusão
+              $stmtHist = $conn->prepare("
+                  INSERT INTO historico_produtos (produto_id, nome, quantidade, lote, acao, usuario_id, criado_em)
+                  SELECT id, nome, quantidade_estoque, lote, 'excluido', ?, NOW()
+                  FROM produtos WHERE id=? AND loja_id=?
+              ");
+              if ($stmtHist) {
+                  $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
+                  $stmtHist->execute();
+                  $stmtHist->close();
+              }
+              $msg = "🗑️ Produto apagado!";
+          } else {
+              $msg = "❌ Erro: " . $stmt->error;
+          }
+          $stmt->close();
+      }
 
     // --- COMPRAR (ENTRADA) ---
     if ($acao === 'comprar_produto') {
