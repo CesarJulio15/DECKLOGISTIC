@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Dicas - DeckLogistic</title>
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <link rel="stylesheet" href="../../assets/sidebar.css">
   <link rel="stylesheet" href="../../assets/dicas.css">
 

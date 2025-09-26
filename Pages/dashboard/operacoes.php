@@ -152,6 +152,7 @@ $result = $conn->query($sqlComLimit);
 <title>Operações Recentes</title>
 <link rel="stylesheet" href="../../assets/sidebar.css">
 <link rel="stylesheet" href="../../assets/operacoes.css">
+<link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 .paginacao a { display:inline-block; width:30px; height:30px; text-align:center; line-height:30px; border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#000; }

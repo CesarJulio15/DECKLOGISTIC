@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Conta</title>
+    <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
     <link rel="stylesheet" href="../../assets/sidebar.css">
     <link rel="stylesheet" href="../../assets/config.css">
     

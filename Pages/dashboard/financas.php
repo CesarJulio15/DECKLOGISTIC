@@ -15,6 +15,7 @@ $lojaId = $_SESSION['loja_id'];
   <meta charset="UTF-8">
   <title>Finanças - Decklogistic</title>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <link rel="stylesheet" href="../../assets/financas.css">
 </head>
 <body>
