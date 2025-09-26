@@ -77,16 +77,31 @@ $paginaAtual = isset($_GET['pagina']) ? max(1,intval($_GET['pagina'])) : 1;
 
 // SQL histórico completo
 $sql = "
-SELECT h.acao AS tipo, h.nome AS item, 
-       CASE WHEN h.acao='excluido' THEN 'fa-trash' ELSE '' END AS icone,
-       CASE WHEN h.acao='excluido' THEN '#fcfcfcff' ELSE '' END AS cor,
-       CONCAT('Qtd: ', h.quantidade, IFNULL(CONCAT(' | Lote: ', h.lote),'')) AS detalhe, 
-       h.criado_em AS data,
-       COALESCE(u.nome, l.nome) AS usuario
+SELECT 
+    CASE 
+        WHEN h.acao = 'adicionado' THEN 'Produto Adicionado'
+        WHEN h.acao = 'excluido'   THEN 'Produto Excluído'
+        ELSE h.acao
+    END AS tipo,
+    h.nome AS item, 
+    CASE 
+        WHEN h.acao='excluido'   THEN 'fa-trash'
+        WHEN h.acao='adicionado' THEN 'fa-plus'
+        ELSE ''
+    END AS icone,
+    CASE 
+        WHEN h.acao='excluido'   THEN '#fcfcfcff'
+        WHEN h.acao='adicionado' THEN '#d1ffd6'
+        ELSE ''
+    END AS cor,
+    CONCAT('Qtd: ', h.quantidade, IFNULL(CONCAT(' | Lote: ', h.lote),'')) AS detalhe, 
+    h.criado_em AS data,
+    COALESCE(u.nome, l.nome, 'Sistema') AS usuario
 FROM historico_produtos h
+LEFT JOIN produtos p ON p.id = h.produto_id
 LEFT JOIN usuarios u ON u.id = h.usuario_id
-LEFT JOIN lojas l ON l.id = u.loja_id
-WHERE (h.usuario_id IN (SELECT id FROM usuarios WHERE loja_id = $lojaId) OR h.usuario_id IS NULL OR h.usuario_id = 0)
+LEFT JOIN lojas l ON l.id = u.loja_id OR l.id = p.loja_id
+WHERE p.loja_id = $lojaId OR h.usuario_id IS NOT NULL
 
 UNION ALL
 
