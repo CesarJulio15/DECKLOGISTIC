@@ -34,7 +34,7 @@ $msg = '';
 /* ======================================================
    TRATAMENTO DE AÇÕES (ADD / EDIT / DELETE / COMPRAR / VENDER)
    ====================================================== */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
     $acao = $_POST['acao'] ?? '';
 
     // --- ADICIONAR PRODUTO ---
@@ -147,43 +147,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // --- COMPRAR (ENTRADA) ---
-    if ($acao === 'comprar_produto') {
-        $id = intval($_POST['produto_id'] ?? 0);
-        $qtd = intval($_POST['quantidade'] ?? 0);
-        $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
+   if ($acao === 'comprar_produto') {
+    $id = intval($_POST['produto_id'] ?? 0);
+    $qtd = intval($_POST['quantidade'] ?? 0);
+    $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
 
-        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
-        if (!$stmt) die("Erro prepare comprar: " . $conn->error);
+    // 1. Atualiza estoque
+    $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
+    if (!$stmt) die("Erro prepare comprar: " . $conn->error);
+    $stmt->bind_param("iii", $qtd, $id, $lojaId);
+    $stmt->execute();
+    $stmt->close();
 
-        $stmt->bind_param("iii", $qtd, $id, $lojaId);
-        if ($stmt->execute()) {
-            $tipo = 'entrada';
-            $stmt2 = $conn->prepare("
-                INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) 
-                VALUES (?, ?, ?, ?, ?, NOW())
-            ");
-            $stmt2->bind_param("isisi", $id, $tipo, $qtd, $data, $usuarioId);
-            $stmt2->execute();
-            $stmt2->close();
+    // 2. Registra movimentação de estoque
+    $tipo = 'entrada';
+    $stmt2 = $conn->prepare("
+        INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) 
+        VALUES (?, ?, ?, ?, ?, NOW())
+    ");
+    $stmt2->bind_param("isisi", $id, $tipo, $qtd, $data, $usuarioId);
+    $stmt2->execute();
+    $stmt2->close();
 
-            // Registra histórico de compra
-            $stmtHist = $conn->prepare("
-                INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
-                SELECT id, nome, quantidade_estoque, 'comprado', ?, NOW()
-                FROM produtos WHERE id=? AND loja_id=?
-            ");
-            if ($stmtHist) {
-                $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
-                $stmtHist->execute();
-                $stmtHist->close();
-            }
+    // 3. Registra histórico de compra
+    $stmtHist = $conn->prepare("
+        INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+        SELECT id, nome, quantidade_estoque, 'comprado', ?, NOW()
+        FROM produtos WHERE id=? AND loja_id=?
+    ");
+    $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
+    $stmtHist->execute();
+    $stmtHist->close();
 
-            $msg = "📥 Compra registrada (+$qtd) em $data";
-        } else {
-            $msg = "❌ Erro ao registrar compra! " . $stmt->error;
-        }
-        $stmt->close();
-    }
+    // 4. Registrar despesa financeira
+    $resProduto = $conn->prepare("SELECT nome, custo_unitario FROM produtos WHERE id=? AND loja_id=?");
+    $resProduto->bind_param("ii", $id, $lojaId);
+    $resProduto->execute();
+    $produto = $resProduto->get_result()->fetch_assoc();
+    $resProduto->close();
+
+    $custo_total = $produto['custo_unitario'] * $qtd;
+    $nome = $produto['nome'];
+
+   $stmtDesp = $conn->prepare("
+    INSERT INTO transacoes_financeiras (loja_id, tipo, valor, descricao, data_transacao)
+    VALUES (?, 'saida', ?, ?, ?)
+");
+    $descricao = "Compra do produto $nome (x$qtd)";
+    $stmtDesp->bind_param("idss", $lojaId, $custo_total, $descricao, $data);
+    $stmtDesp->execute();
+    $stmtDesp->close();
+
+    $msg = "📥 Compra registrada (+$qtd) em $data";
+}
+
+    
 
     // --- REGISTRAR VENDA DE PRODUTO ---
     if (($acao ?? '') === 'vender_produto') {
@@ -265,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $msg = "📤 Venda registrada com sucesso! (-$quantidade unidade(s))";
     }
-}
+
 
 /* ======================================================
    BUSCA PRODUTOS (LISTAGEM)
