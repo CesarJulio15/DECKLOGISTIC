@@ -146,7 +146,7 @@ if ($entradas > 0) {
             </ul>
         </div>
         <div class="bottom-links">
-            <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+            <a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
             <a href="../../Pages/auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
         </div>
     </nav>

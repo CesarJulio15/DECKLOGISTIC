@@ -1,11 +1,33 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f8f9fa;
-    color: #111;
+    background: #121212; /* fundo dark */
+    color: #e0e0e0;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* evita barra horizontal no mobile */
+    overflow-x: hidden;
 }
+
+.botao-historico {
+  background: linear-gradient(135deg, rgba(255,153,0,0.9), rgba(255,200,0,0.9));
+  color: #fff;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 12px;
+  width: 100%; /* Mantém alinhado e não deixa quebrar */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255,170,0,0.4);
+  display: block; /* garante que fiquem empilhados */
+}
+
+.botao-historico:hover {
+  background: linear-gradient(135deg, rgba(255,153,0,1), rgba(255,200,0,1));
+  box-shadow: 0 6px 20px rgba(255,170,0,0.6);
+  color: #fff; /* letras continuam brancas */
+}
+
 
 /* Dashboard principal */
 .dashboard {
@@ -17,8 +39,8 @@ body {
 /* Título */
 .dashboard h1 {
     margin-bottom: 30px;
-    color: #333;
-    font-size: clamp(1.5rem, 2vw, 2rem); /* tamanho adaptável */
+    color: #ff9900; /* laranja destaque */
+    font-size: clamp(1.5rem, 2vw, 2rem);
 }
 
 /* Container de cards */
@@ -31,17 +53,18 @@ body {
 
 /* Cards individuais */
 .card {
-    background: #fff;
+    background: #1e1e1e;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
     text-align: center;
+    color: #fff;
 }
 
 .card h2 {
     font-size: 1rem;
     margin-bottom: 10px;
-    color: #555;
+    color: #ffcc80; /* tom laranja suave */
 }
 
 .card p {
@@ -64,23 +87,26 @@ body {
 
 .filtros-container label {
     font-size: 0.9rem;
+    color: #e0e0e0;
 }
 
 .filtros-container select {
     padding: 8px 12px;
     font-size: 0.95rem;
     border-radius: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid #ff9900;
+    background: #1e1e1e;
+    color: #fff;
     flex: 1;
     max-width: 200px;
 }
 
 /* Gráfico */
 #grafico {
-    background: #fff;
+    background: #1e1e1e;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
@@ -112,7 +138,7 @@ body {
         top: 0;
         height: 100%;
         width: 250px;
-        background: #fff;
+        background: #1b1b1b;
         transition: left 0.3s ease;
         z-index: 1000;
     }
@@ -127,8 +153,8 @@ body {
         position: fixed;
         top: 15px;
         left: 15px;
-        background: #333;
-        color: #fff;
+        background: #ff9900;
+        color: #121212;
         border: none;
         padding: 10px 15px;
         border-radius: 5px;
@@ -137,7 +163,7 @@ body {
     }
 
     .cards-container {
-        grid-template-columns: 1fr; /* sempre em coluna */
+        grid-template-columns: 1fr;
     }
 
     .filtros-container {
@@ -153,11 +179,12 @@ body {
         padding: 15px;
     }
 }
+
 .toggle-btn {
     margin-top: 20px;
     padding: 10px 15px;
-    background: #111;
-    color: #fff;
+    background: #ff9900;
+    color: #121212;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -165,14 +192,15 @@ body {
 }
 
 .toggle-btn:hover {
-    background: #333;
+    background: #e68a00;
+    color: #fff;
 }
 
 /* Container da tabela */
 #tabela-container {
     margin-top: 20px;
-    background-color: #ddd; /* fundo preto escuro */
-    color: #000000;
+    background-color: #1e1e1e;
+    color: #fff;
     overflow-x: auto;
 }
 
@@ -185,8 +213,8 @@ body {
 
 /* Cabeçalho */
 #tabela-container th {
-    background-color: #f5f5f5; /* cinza escuro */
-    color: #000000;
+    background-color: #ff9900;
+    color: #121212;
     padding: 12px;
     text-align: center;
 }
@@ -195,19 +223,17 @@ body {
 #tabela-container td {
     padding: 12px;
     text-align: center;
-    border-bottom: 1px solid #ddd; /* linha cinza */
+    border-bottom: 1px solid #333;
 }
 
 /* Linhas alternadas */
 #tabela-container tr:nth-child(even) {
-    background-color: #ffffff; /* cinza médio */
+    background-color: #2a2a2a;
 }
 
 #tabela-container tr:nth-child(odd) {
-    background-color: #cecece; /* cinza escuro */
+    background-color: #1b1b1b;
 }
-
-
 
 /* Responsividade */
 @media (max-width: 768px) {
