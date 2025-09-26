@@ -131,17 +131,19 @@ hr {
   border-radius: 6px;
 }
 
+
 /* Dashboard */
 .dashboard {
   margin-left: 220px;
   padding: 30px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  width: calc(100% - 220px);
+  display: grid;  /* Usando Grid para alinhar os cards lado a lado */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));  /* Cards de 280px no mínimo, preenchendo o espaço */
+  gap: 20px;  /* Espaçamento entre os cards */
+  width: calc(100% - 220px);  /* Ajuste da largura considerando a sidebar */
   background: transparent;
 }
 
+/* Card */
 .card {
   display: flex;
   flex-direction: column;
@@ -150,10 +152,40 @@ hr {
   border-radius: 14px;
   box-shadow: 0 2px 12px rgba(255,153,0,0.08);
   border: 1px solid #222;
-  height:400px; /* ou altura que você quiser */
+  height: 300px;  /* Altura fixada para todos os cards */
   transition: box-shadow 0.3s, transform 0.3s;
   overflow: hidden;
+  width: 100%;  /* A largura do card se ajusta ao seu container */
 }
+
+/* Responsividade para telas menores */
+@media (max-width: 1024px) {
+  .dashboard {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));  /* Cards com no mínimo 320px em telas médias */
+  }
+
+  .card {
+    width: 100%;  /* Cards ocupam 100% da largura do grid */
+    max-width: 400px;  /* Limite máximo para evitar que fiquem excessivamente grandes */
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    grid-template-columns: 1fr;  /* Cards ocupando 100% da largura em telas menores */
+    padding: 10px;
+  }
+
+  .card {
+    width: 100%;  /* Faz o card ocupar toda a largura */
+    margin-bottom: 20px;  /* Espaço entre os cards quando empilhados */
+  }
+}
+
+
+
+
+
 
 .card:hover {
   box-shadow: 0 8px 32px rgba(255,153,0,0.18);
