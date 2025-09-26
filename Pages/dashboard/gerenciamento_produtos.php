@@ -41,18 +41,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($acao === 'adicionar_produto') {
         $nome = trim($_POST['nome'] ?? '');
         $preco = floatval($_POST['preco'] ?? 0);
+        $custo = floatval($_POST['custo'] ?? 0);
         $estoque = intval($_POST['estoque'] ?? 0);
         $lote = '';
 
         $stmt = $conn->prepare("
-            INSERT INTO produtos (nome, preco_unitario, quantidade_estoque, lote, loja_id, usuario_id)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         if (!$stmt) {
             die("Erro prepare produto: " . $conn->error);
         }
 
-        $stmt->bind_param("sdisii", $nome, $preco, $estoque, $lote, $lojaId, $usuarioId);
+        $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuarioId);
         if (!$stmt->execute()) {
             die("Erro execute produto: " . $stmt->error);
         }
@@ -637,6 +638,7 @@ if ($stmt) {
         <div class="form-row">
           <input type="text" name="nome" placeholder="Nome do produto" required>
           <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required>
+          <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required>
           <input type="number" name="estoque" placeholder="Estoque inicial" required>
         </div>
         <div class="actions">

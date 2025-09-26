@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $_SESSION['erro_login'] = "E-mail ou senha inválidos.";
-    header("Location: login_funcionario.php");
+    header("Location: login.php");
     exit;
 }
 ?>

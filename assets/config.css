@@ -210,6 +210,11 @@
 .btn-salvar:hover {
     background: #e68a00; /* hover laranja mais intenso */
 }
+.bottom-links a.active {
+  font-weight: bold;
+  color: #ff9900; /* ou a cor do seu tema */
+}
+
 
 /* ======================
    Responsividade

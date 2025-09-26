@@ -1,10 +1,17 @@
 <?php
 session_start();
-// Verifique a chave correta da sessão
+
+// Verifica se usuário não é loja
 if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
-    echo json_encode(["error" => "Loja não autenticada"]);
-    exit; 
-    
+    echo "<script>
+        alert('Faça login como loja para acessar.');
+        if(document.referrer) {
+            window.location.href = document.referrer; // volta para a página anterior
+        } else {
+            window.history.back(); // se não houver referrer, volta no histórico
+        }
+    </script>";
+    exit;
 }
 
 $lojaId = $_SESSION['loja_id'];
@@ -15,6 +22,7 @@ $lojaId = $_SESSION['loja_id'];
   <meta charset="UTF-8">
   <title>Finanças - Decklogistic</title>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <link rel="stylesheet" href="../../assets/financas.css">
 </head>
 <body>

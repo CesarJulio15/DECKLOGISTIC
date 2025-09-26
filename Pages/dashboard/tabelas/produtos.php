@@ -157,8 +157,7 @@ if ($tagVincResult) {
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #ffffffff;"></i>
         </button>
-        <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px; color:#fff;"></i>
-        <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
+
     </div>
 </div>
 
@@ -175,9 +174,9 @@ if ($tagVincResult) {
 <tbody id="tabela-produtos">
 <?php while ($produto = mysqli_fetch_assoc($result)): ?>
 <tr>
-    <td class="multi-checkbox" style="display:none;">
+    <!-- <td class="multi-checkbox" style="display:none;">
         <input type="checkbox" class="chk-delete" data-id="<?= $produto['id'] ?>">
-    </td>
+    </td> -->
     <td style="display:flex; align-items:center; gap:10px; position:relative;">
         <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
             <?php if (isset($produtoTags[$produto['id']])): ?>

@@ -18,6 +18,7 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
   <meta charset="UTF-8">
   <title>Estoque - Decklogistic</title>
   <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <link rel="stylesheet" href="../../assets/sidebar.css">
   <link rel="stylesheet" href="../../assets/estoque.css?v=2">
   
@@ -40,7 +41,7 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
         <hr>
         <ul class="nav-list middle-section">
           <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
           <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
           <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
         </ul>

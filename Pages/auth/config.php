@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Conta</title>
+    <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
     <link rel="stylesheet" href="../../assets/sidebar.css">
     <link rel="stylesheet" href="../../assets/config.css">
     
@@ -103,9 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
         </ul>
       </div>
       <div class="bottom-links">
-     <li class="active"><a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a></li>
-       <a href="../../Pages/auth/dicas.php" ><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
-      </div>
+  <a class="active" href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+  <a href="../../Pages/auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+</div>
     </nav>
   </div>
 
@@ -150,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
 
             <?php if ($tipo_login === 'empresa'): ?>
                 <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
-                <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
+                <a href="../../Pages/auth/2FA.php" class="btn-alterar-senha">Alterar Senha</a>
 
                 <!-- Excluir conta -->
             <?php endif; ?>
