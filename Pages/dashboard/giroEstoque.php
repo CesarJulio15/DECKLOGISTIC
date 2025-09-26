@@ -134,7 +134,7 @@ if ($entradas > 0) {
     <nav class="nav-section">
         <div class="nav-menus">
             <ul class="nav-list top-section">
-                <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+                <li><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
                 <li class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
             </ul>
             <hr>
