@@ -88,252 +88,12 @@ if ($tagVincResult) {
 <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/produtos.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- Remover Bootstrap -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 .add-tag-square { width:24px; height:24px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; border-radius:6px; margin-left:5px; }
 .tag-dropdown { display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:4px; z-index:10; }
 .tag-option { padding:2px 5px; cursor:pointer; }
-
-/* NOVO: Estilo moderno para tabela */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    /* background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9)); */
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-thead tr {
-    background: rgba(0,0,0,0.12);
-}
-th, td {
-    padding: 12px 16px;
-    text-align: left;
-    font-size: 15px;
-    color: #222;
-}
-th {
-    font-weight: bold;
-    border-bottom: 2px solid #ff9900;
-}
-tbody tr {
-    transition: background 0.2s;
-}
-tbody tr:hover {
-    background: rgba(255, 200, 0, 0.18);
-}
-td {
-    border-bottom: 1px solid #ffe0a3;
-}
-a.active {
-    border: 2px solid #ff6600 !important;
-    color: #fff !important;
-    font-weight: normal;
-    background-color: transparent;
-}
-.tags-area .tag-item {
-    background: #fff3e0;
-    border-radius: 6px;
-    padding: 4px 10px;
-    margin-right: 2px;
-    font-size: 14px;
-    border: 1px solid #ffd580;
-    transition: box-shadow 0.2s;
-}
-.tags-area .tag-item:hover {
-    box-shadow: 0 2px 8px rgba(255,153,0,0.15);
-}
-.btn-reset-filtro {
-    background: #ff9900;
-    border: none;
-    border-radius: 6px;
-    padding: 4px 10px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px;
-    margin-left: 8px;
-    transition: background 0.2s;
-}
-.btn-reset-filtro:hover {
-    background: #ff6600;
-}
-.btn-novo {
-    background: #ff9900;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 15px;
-    margin-right: 8px;
-    transition: background 0.2s;
-}
-.btn-novo:hover {
-    background: #ff6600;
-}
-select#ordenar {
-    border-radius: 6px;
-    border: 1px solid #ffd580;
-    padding: 8px 12px;
-    font-size: 15px;
-    background: #fffbe6;
-    color: #222;
-    margin-left: 8px;
-}
-.pesquisa-produtos input {
-    background: #fffbe6;
-    border: 1px solid #ffd580;
-    color: #222;
-}
-.pagination {
-    margin-top:10px; display:flex; justify-content:center; gap:5px;
-}
-.pagination a {
-    width:30px; height:30px; display:flex; align-items:center; justify-content:center; 
-    border:1px solid #555; border-radius:4px; text-decoration:none; color:#fff;
-    background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9));
-    font-weight: bold;
-    transition: border 0.2s;
-}
-.pagination a.active {
-    border: 2px solid #ff6600 !important;
-    color: #fff !important;
-    background: linear-gradient(135deg, rgba(255, 153, 0, 1), rgba(255, 200, 0, 1));
-}
-.pagination a:hover {
-    border: 2px solid #ff6600;
-}
-
-/* MODAL customizado */
-.modal-custom {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.35);
-    z-index: 9999;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-.modal-custom.active {
-    display: flex;
-}
-.modal-dialog-custom {
-    background: #fff;
-    border-radius: 16px;
-    max-width: 900px;
-    width: 98%;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    padding: 0;
-    overflow: hidden;
-}
-.modal-content-custom {
-    padding: 0;
-}
-.modal-body-custom {
-    padding: 0;
-}
-.card {
-    background: #fffbe6;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(255,153,0,0.08);
-    border: 1px solid #ffd580;
-    margin-bottom: 18px;
-}
-.card-header {
-    background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9));
-    border-bottom: 1px solid #ffd580;
-    border-radius: 12px 12px 0 0;
-    padding: 18px 24px;
-    text-align: center;
-}
-.card-body {
-    padding: 24px;
-}
-.table-responsive {
-    overflow-x: auto;
-}
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 8px;
-}
-.table th, .table td {
-    padding: 10px 14px;
-    border-bottom: 1px solid #ffd580;
-    font-size: 14px;
-}
-.table th {
-    background: #fff3e0;
-    font-weight: bold;
-}
-.table-striped tbody tr:nth-child(odd) {
-    background: #fffbe6;
-}
-.alert-success {
-    background: #dfffd6;
-    color: #2e7d32;
-    border-radius: 6px;
-    padding: 10px 16px;
-    margin-top: 8px;
-}
-.btn-success {
-    background: #2ecc40;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.btn-success:hover {
-    background: #27ae60;
-}
-.bg-light {
-    background: #fffbe6;
-}
-.border {
-    border: 1px solid #ffd580;
-}
-.rounded {
-    border-radius: 8px;
-}
-.mt-3 { margin-top: 18px; }
-.p-3 { padding: 18px; }
-.py-4 { padding-top: 24px; padding-bottom: 24px; }
-.me-2 { margin-right: 8px; }
-.mb-0 { margin-bottom: 0; }
-.mb-3 { margin-bottom: 18px; }
-.mt-4 { margin-top: 24px; }
-.step-number {
-    display: inline-block;
-    background: #ff9900;
-    color: #fff;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    text-align: center;
-    font-weight: bold;
-    margin-right: 8px;
-}
-.instructions p {
-    margin: 0 0 6px 0;
-    font-size: 13px;
-    color: #555;
-}
-.form-control {
-    border-radius: 6px;
-    border: 1px solid #ffd580;
-    padding: 8px 12px;
-    font-size: 15px;
-    background: #fffbe6;
-    color: #222;
-}
 </style>
 </head>
 <body>
@@ -397,7 +157,8 @@ select#ordenar {
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #ffffffff;"></i>
         </button>
-
+        <i id="btn-multi-delete" class="fa-solid fa-trash" style="cursor:pointer; font-size:18px; color:#fff;"></i>
+        <button id="confirm-delete" style="display:none;">Confirmar Remoção</button>
     </div>
 </div>
 
@@ -414,9 +175,9 @@ select#ordenar {
 <tbody id="tabela-produtos">
 <?php while ($produto = mysqli_fetch_assoc($result)): ?>
 <tr>
-    <!-- <td class="multi-checkbox" style="display:none;">
+    <td class="multi-checkbox" style="display:none;">
         <input type="checkbox" class="chk-delete" data-id="<?= $produto['id'] ?>">
-    </td> -->
+    </td>
     <td style="display:flex; align-items:center; gap:10px; position:relative;">
         <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
             <?php if (isset($produtoTags[$produto['id']])): ?>
@@ -445,14 +206,25 @@ select#ordenar {
 </tbody>
 </table>
 <?php if ($totalPaginas > 1): ?>
-<div class="pagination">
+<div style="margin-top:10px; display:flex; justify-content:center; gap:5px;">
     <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
         <a href="?pagina=<?= $i ?>" 
-           class="<?= ($i == $paginaAtual) ? 'active' : '' ?>">
+           class="<?= ($i == $paginaAtual) ? 'active' : '' ?>"
+           style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; 
+                  border:1px solid #555; border-radius:4px; text-decoration:none; color:#fff;">
             <?= $i ?>
         </a>
     <?php endfor; ?>
 </div>
+
+<style>
+a.active {
+    border: 2px solid #ff6600 !important; /* só a borda laranja */
+    color: #fff !important;               /* mantém o texto branco */
+    font-weight: normal;                   /* opcional, sem negrito */
+    background-color: transparent;         /* mantém fundo transparente */
+}
+</style>
 <?php endif; ?>
 
 <script>
@@ -482,7 +254,7 @@ document.getElementById('confirm-delete').addEventListener('click', function() {
         body: `produto_ids=${ids.join(',')}`
     })
     .then(res => res.text())
-    .then data => {
+    .then(data => {
         if(data.trim() === 'ok'){
             checkboxes.forEach(chk => chk.closest('tr').remove());
             document.getElementById('confirm-delete').style.display = 'none';
@@ -614,10 +386,10 @@ document.addEventListener('click', function(e) {
 </main>
 
 <!-- Modal Importação -->
-<div class="modal-custom" id="importModalCustom">
-  <div class="modal-dialog-custom">
-    <div class="modal-content-custom">
-      <div class="modal-body-custom">
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-body p-0">
         <!-- Aqui entra o conteúdo do importador -->
         <div class="container-fluid py-4">
             <div class="row justify-content-center">
@@ -637,3 +409,147 @@ document.addEventListener('click', function(e) {
                                     <p><i class="fas fa-info-circle me-2"></i>O arquivo deve seguir a estrutura da tabela de produtos</p>
                                 </div>
                                 <form id="uploadForm" enctype="multipart/form-data">
+                                    <input class="form-control mb-3" type="file" id="formFile" name="excel_file" accept=".xlsx, .xls" required>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload me-2"></i>Fazer Upload e Importar
+                                    </button>
+                                </form>
+                            </div>
+
+                            <hr>
+
+                            <!-- Resultado -->
+                            <div id="importResult" class="d-none">
+                                <h4><span class="step-number">2</span>Resultado da Importação</h4>
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <span id="successMessage">Dados importados com sucesso!</span>
+                                </div>
+
+                                <h5 class="mt-4">Dados Importados:</h5>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-striped table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Nome</th>
+                                                <th>Descrição</th>
+                                                <th>Lote</th>
+                                                <th>Estoque</th>
+                                                <th>Preço</th>
+                                                <th>Custo</th>
+                                                <th>Data Reabastecimento</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="importedData"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Template download -->
+                    <div class="template-download mt-3 p-3 bg-light border rounded">
+                        <h5><i class="fas fa-download me-2"></i>Template de Planilha</h5>
+                        <p>Baixe nosso template para garantir que sua planilha tenha o formato correto para importação</p>
+                        <a href="../../../assets/templates/ProdutoTemplate.xlsx" class="btn btn-success" download>
+                            <i class="fas fa-download me-2"></i>Baixar Template
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Filtro por tag
+document.querySelectorAll('.tag-item').forEach(tag => {
+    tag.addEventListener('click', function() {
+        const tagId = this.dataset.tagId;
+
+        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+            const icones = tr.querySelectorAll('.tags-vinculadas i');
+            let possuiTag = false;
+
+            icones.forEach(icon => {
+                if (icon.dataset.tagId === tagId) {
+                    possuiTag = true;
+                }
+            });
+
+            tr.style.display = possuiTag ? '' : 'none';
+        });
+    });
+});
+
+// Resetar filtro
+function resetFiltro() {
+    document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+        tr.style.display = '';
+    });
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('uploadForm');
+    const importResult = document.getElementById('importResult');
+    const importedData = document.getElementById('importedData');
+    const successMessage = document.getElementById('successMessage');
+
+    if(uploadForm){
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Importando...';
+            submitBtn.disabled = true;
+
+            fetch('importacao.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    successMessage.textContent = `${data.imported} registros importados com sucesso!`;
+                    displayImportedData(data.data);
+                    importResult.classList.remove('d-none');
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(err => alert('Erro na importação: ' + err.message))
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+
+    function displayImportedData(data) {
+        importedData.innerHTML = '';
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${row.nome}</td>
+                <td>${row.descricao}</td>
+                <td>${row.lote}</td>
+                <td>${row.quantidade_estoque}</td>
+                <td>R$ ${parseFloat(row.preco_unitario).toFixed(2)}</td>
+                <td>R$ ${parseFloat(row.custo_unitario).toFixed(2)}</td>
+                <td>${row.data_reabastecimento}</td>
+            `;
+            importedData.appendChild(tr);
+        });
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
