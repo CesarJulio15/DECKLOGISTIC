@@ -6,9 +6,9 @@ if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa
     echo "<script>
         alert('Faça login como loja para acessar.');
         if(document.referrer) {
-            window.location.href = document.referrer; // volta para a página anterior
+            window.location.href = document.referrer;
         } else {
-            window.history.back(); // se não houver referrer, volta no histórico
+            window.history.back();
         }
     </script>";
     exit;
@@ -24,21 +24,21 @@ $lojaId = $_SESSION['loja_id'];
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <link rel="stylesheet" href="../../assets/financas.css">
+  <link rel="stylesheet" href="../../assets/sidebar.css">
 </head>
 <body>
 
 <div class="content">
   <div class="sidebar">
-    <link rel="stylesheet" href="../../assets/sidebar.css">
     <div class="logo-area">
       <img src="../../img/logoDecklogistic.webp" alt="Logo">
     </div>
     <nav class="nav-section">
       <div class="nav-menus">
        <ul class="nav-list top-section">
-    <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-    <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
-</ul>
+          <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+          <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+        </ul>
         <hr>
         <ul class="nav-list middle-section">
           <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
@@ -53,6 +53,7 @@ $lojaId = $_SESSION['loja_id'];
       </div>
     </nav>
   </div>
+
 <style>
 .btn-modern {
     display: inline-block;
@@ -66,9 +67,8 @@ $lojaId = $_SESSION['loja_id'];
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    margin-top: auto; /* empurra o botão para o bottom do card */
+    margin-top: auto;
 }
-
 .btn-modern:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -186,66 +186,60 @@ $lojaId = $_SESSION['loja_id'];
     });
   }
 
-async function loadLucros() {
-  try {
-    const periodo = 'mes';
-    const [bruto, liquido, margem] = await Promise.all([
-      fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
-      fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
-      fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
-    ]);
+  async function loadLucros() {
+    try {
+      const periodo = 'mes';
+      const [bruto, liquido, margem] = await Promise.all([
+        fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+        fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+        fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
+      ]);
 
-    if (bruto.error || liquido.error || margem.error) {
-      console.error("Erro API:", bruto.error || liquido.error || margem.error);
-      return;
+      if (bruto.error || liquido.error || margem.error) {
+        console.error("Erro API:", bruto.error || liquido.error || margem.error);
+        return;
+      }
+
+      const lucroBrutoVal = parseFloat((bruto.total || bruto.lucro || 0).toString().replace(',', '.')).toFixed(2);
+      const lucroLiquidoVal = parseFloat((liquido.total || liquido.lucro || 0).toString().replace(',', '.')).toFixed(2);
+      const margemVal = parseFloat((margem.total || margem.percentual || 0)).toFixed(1);
+
+      document.getElementById('lucroBruto').innerText = `R$ ${lucroBrutoVal}`;
+      document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
+      document.getElementById('margemLucro').innerText = `${margemVal}%`;
+
+      const brutoSeries = Array.isArray(bruto.dados_receita) ? bruto.dados_receita.map(v => parseFloat(v) || 0) : [];
+      const liquidoSeries = Array.isArray(liquido.series) ? liquido.series.map(item => parseFloat(item.valor || item) || 0) : [];
+      const margemSeries = Array.isArray(margem.series) ? margem.series.map(item => parseFloat(item.valor || item) || 0) : [];
+
+      new ApexCharts(document.querySelector("#chartBruto"), {
+        chart: { type: 'area', height: 60, sparkline: { enabled: true } },
+        stroke: { curve: 'smooth' },
+        fill: { opacity: 0.3 },
+        series: [{ data: brutoSeries }],
+        colors: ['#10b981']
+      }).render();
+
+      new ApexCharts(document.querySelector("#chartLiquido"), {
+        chart: { type: 'area', height: 60, sparkline: { enabled: true } },
+        stroke: { curve: 'smooth' },
+        fill: { opacity: 0.3 },
+        series: [{ data: liquidoSeries }],
+        colors: ['#3b82f6']
+      }).render();
+
+      new ApexCharts(document.querySelector("#chartMargem"), {
+        chart: { type: 'area', height: 60, sparkline: { enabled: true } },
+        stroke: { curve: 'smooth' },
+        fill: { opacity: 0.3 },
+        series: [{ data: margemSeries }],
+        colors: ['#f59e0b']
+      }).render();
+
+    } catch (err) {
+      console.error("Erro ao carregar lucros:", err);
     }
-
-    const lucroBrutoVal = parseFloat((bruto.total || bruto.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
-    const lucroLiquidoVal = parseFloat((liquido.total || liquido.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
-    const margemVal = parseFloat((margem.total || margem.percentual || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
-
-    document.getElementById('lucroBruto').innerText = `R$ ${lucroBrutoVal}`;
-    document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
-    document.getElementById('margemLucro').innerText = `${margemVal}%`;
-
-    // Lucro Bruto: usa dados_receita do JSON
-    const brutoSeries = Array.isArray(bruto.dados_receita) ? bruto.dados_receita.map(v => parseFloat(v) || 0) : [];
-    // Lucro Líquido: usa series ou dados do JSON
-    const liquidoSeries = Array.isArray(liquido.series) ? liquido.series.map(item => parseFloat(item.valor || item) || 0) : [];
-    // Margem: usa series ou dados do JSON
-    const margemSeries = Array.isArray(margem.series) ? margem.series.map(item => parseFloat(item.valor || item) || 0) : [];
-
-    // Sparkline Lucro Bruto
-    new ApexCharts(document.querySelector("#chartBruto"), {
-      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-      stroke: { curve: 'smooth' },
-      fill: { opacity: 0.3 },
-      series: [{ data: brutoSeries }],
-      colors: ['#10b981']
-    }).render();
-
-    // Sparkline Lucro Líquido
-    new ApexCharts(document.querySelector("#chartLiquido"), {
-      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-      stroke: { curve: 'smooth' },
-      fill: { opacity: 0.3 },
-      series: [{ data: liquidoSeries }],
-      colors: ['#3b82f6']
-    }).render();
-
-    // Sparkline Margem de Lucro
-    new ApexCharts(document.querySelector("#chartMargem"), {
-      chart: { type: 'area', height: 60, sparkline: { enabled: true } },
-      stroke: { curve: 'smooth' },
-      fill: { opacity: 0.3 },
-      series: [{ data: margemSeries }],
-      colors: ['#f59e0b']
-    }).render();
-  } catch (err) {
-    console.error("Erro ao carregar lucros:", err);
   }
-}
-
 
   async function loadReceitaDespesa() {
     const data = await fetch(`/DECKLOGISTIC/api/receita_despesas.php?loja_id=${lojaId}`).then(r => r.json());
@@ -268,48 +262,17 @@ async function loadLucros() {
       colors: ['#10b981', '#ef4444']
     }).render();
   }
-// Redireciona ao clicar no botão
-document.getElementById('btnLucroLiquido').addEventListener('click', () => {
-    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
-});
-document.getElementById('btnLucroBruto').addEventListener('click', () => {
-    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroB.php';
-});
-document.getElementById('btnLucroMargem').addEventListener('click', () => {
-    window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/margem.php';
-});
 
-async function loadLucros() {
-  try {
-    const periodo = 'mes';
-    const [bruto, liquido, margem] = await Promise.all([
-      fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
-      fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
-      fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
-    ]);
-
-    if (bruto.error || liquido.error || margem.error) {
-      console.error("Erro API:", bruto.error || liquido.error || margem.error);
-      return;
-    }
-
-    const lucroBrutoVal = parseFloat((bruto.total || bruto.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
-    const lucroLiquidoVal = parseFloat((liquido.total || liquido.lucro || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
-    const margemVal = parseFloat((margem.total || margem.percentual || 0).toString().replace('.', '').replace(',', '.')).toFixed(2);
-
-    document.getElementById('lucroBruto').innerText = `R$ ${lucroBrutoVal}`;
-    document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
-    document.getElementById('margemLucro').innerText = `${margemVal}%`;
-
-    const brutoSeries = (bruto.series || []).map(item => item.valor || 0);
-    const liquidoSeries = (liquido.series || []).map(item => item.valor || 0);
-    const margemSeries = (margem.series || []).map(item => item.valor || 0);
-
-    // Render ApexCharts...
-  } catch(err) {
-    console.error("Erro ao carregar lucros:", err);
-  }
-}
+  // Botões de redirecionamento
+  document.getElementById('btnLucroLiquido').addEventListener('click', () => {
+      window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
+  });
+  document.getElementById('btnLucroBruto').addEventListener('click', () => {
+      window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroB.php';
+  });
+  document.getElementById('btnLucroMargem').addEventListener('click', () => {
+      window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/margem.php';
+  });
 
   // Chamada inicial das funções
   loadLucros();
