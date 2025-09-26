@@ -102,15 +102,17 @@ $lojaId = $_SESSION['loja_id'];
     <div id="produtosMaisVendidos">
         <?php include '../../api/produtosMaisVendidos.php'; ?> <!-- Inclui o cálculo dos produtos mais vendidos -->
     </div>
+  </div>
+
+  <div class="card">
+  <h3>Anomalias de Vendas</h3>
+  <div id="anomaliasVendas">
+    <p>Carregando...</p>
+  </div>
+  <button class="btn-modern" onclick="executarIA()">Executar IA</button>
 </div>
 
-    
-   
-
- 
-
-   
-  </div>
+</div>
 
 </div>
 
@@ -152,6 +154,56 @@ async function loadProdutosMaisVendidos() {
     console.error("Erro ao carregar produtos mais vendidos:", err);
   }
 }
+
+// Anomalias de Vendas
+async function loadAnomalias() {
+  try {
+    const data = await fetch(`/DECKLOGISTIC/api/anomalias.php?loja_id=${lojaId}`).then(r => r.json());
+
+    const div = document.getElementById("anomaliasVendas");
+    div.innerHTML = '';
+
+    if (data.length === 0) {
+      div.innerHTML = '<p>Nenhuma anomalia detectada</p>';
+      return;
+    }
+
+    const table = document.createElement('table');
+    table.setAttribute('border', '1');
+    table.setAttribute('cellpadding', '10');
+    table.setAttribute('cellspacing', '0');
+
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = '<th>Data</th><th>Detalhe</th><th>Score</th>';
+    table.appendChild(headerRow);
+
+    data.forEach(a => {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${a.data_ocorrencia}</td>
+                       <td>${a.detalhe}</td>
+                       <td>${a.score.toFixed(2)}</td>`;
+      table.appendChild(row);
+    });
+
+    div.appendChild(table);
+  } catch (err) {
+    console.error("Erro ao carregar anomalias:", err);
+  }
+}
+
+async function executarIA() {
+  try {
+    const res = await fetch(`/DECKLOGISTIC/api/run_anomalias.php`);
+    const data = await res.json();
+    alert("IA executada!\n\nSaída:\n" + data.output);
+    loadAnomalias(); // recarrega tabela
+  } catch (e) {
+    alert("Erro ao executar IA: " + e);
+  }
+}
+
+// Chama a função ao carregar a página
+loadAnomalias();
 
 // Chama a função ao carregar a página
 loadProdutosMaisVendidos();
