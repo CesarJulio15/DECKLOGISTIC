@@ -41,18 +41,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($acao === 'adicionar_produto') {
         $nome = trim($_POST['nome'] ?? '');
         $preco = floatval($_POST['preco'] ?? 0);
+        $custo = floatval($_POST['custo'] ?? 0);
         $estoque = intval($_POST['estoque'] ?? 0);
         $lote = '';
 
         $stmt = $conn->prepare("
-            INSERT INTO produtos (nome, preco_unitario, quantidade_estoque, lote, loja_id, usuario_id)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         if (!$stmt) {
             die("Erro prepare produto: " . $conn->error);
         }
 
-        $stmt->bind_param("sdisii", $nome, $preco, $estoque, $lote, $lojaId, $usuarioId);
+        $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuarioId);
         if (!$stmt->execute()) {
             die("Erro execute produto: " . $stmt->error);
         }
@@ -108,42 +109,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // --- APAGAR PRODUTO ---
-      if ($acao === 'apagar_produto') {
-          $id = intval($_POST['produto_id'] ?? 0);
+    if ($acao === 'apagar_produto') {
+        $id = intval($_POST['produto_id'] ?? 0);
 
-          // Remove tags associadas
-          $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
-          if ($stmt) {
-              $stmt->bind_param("i", $id);
-              $stmt->execute();
-              $stmt->close();
-          }
+        // Remove tags associadas
+        $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
 
-          // Marca como excluído
-          $stmt = $conn->prepare(
-              "UPDATE produtos SET deletado_em = NOW(), usuario_exclusao_id = ? WHERE id = ? AND loja_id = ?"
-          );
-          if (!$stmt) die("Erro prepare apagar: " . $conn->error);
+        // Marca como excluído
+        $stmt = $conn->prepare(
+            "UPDATE produtos SET deletado_em = NOW(), usuario_exclusao_id = ? WHERE id = ? AND loja_id = ?"
+        );
+        if (!$stmt) die("Erro prepare apagar: " . $conn->error);
 
-          $stmt->bind_param("iii", $usuarioId, $id, $lojaId);
-          if ($stmt->execute()) {
-              // Registra histórico de exclusão
-              $stmtHist = $conn->prepare("
-                  INSERT INTO historico_produtos (produto_id, nome, quantidade, lote, acao, usuario_id, criado_em)
-                  SELECT id, nome, quantidade_estoque, lote, 'excluido', ?, NOW()
-                  FROM produtos WHERE id=? AND loja_id=?
-              ");
-              if ($stmtHist) {
-                  $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
-                  $stmtHist->execute();
-                  $stmtHist->close();
-              }
-              $msg = "🗑️ Produto apagado!";
-          } else {
-              $msg = "❌ Erro: " . $stmt->error;
-          }
-          $stmt->close();
-      }
+        $stmt->bind_param("iii", $usuarioId, $id, $lojaId);
+        if ($stmt->execute()) {
+            // Registra histórico de exclusão
+            $stmtHist = $conn->prepare("
+                INSERT INTO historico_produtos (produto_id, nome, quantidade, lote, acao, usuario_id, criado_em)
+                SELECT id, nome, quantidade_estoque, lote, 'excluido', ?, NOW()
+                FROM produtos WHERE id=? AND loja_id=?
+            ");
+            if ($stmtHist) {
+                $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
+            $msg = "🗑️ Produto apagado!";
+        } else {
+            $msg = "❌ Erro: " . $stmt->error;
+        }
+        $stmt->close();
+    }
 
     // --- COMPRAR (ENTRADA) ---
     if ($acao === 'comprar_produto') {
@@ -637,6 +638,7 @@ if ($stmt) {
         <div class="form-row">
           <input type="text" name="nome" placeholder="Nome do produto" required>
           <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required>
+          <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required>
           <input type="number" name="estoque" placeholder="Estoque inicial" required>
         </div>
         <div class="actions">

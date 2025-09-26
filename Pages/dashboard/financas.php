@@ -1,10 +1,17 @@
 <?php
 session_start();
-// Verifique a chave correta da sessão
+
+// Verifica se usuário não é loja
 if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
-    echo json_encode(["error" => "Loja não autenticada"]);
-    exit; 
-    
+    echo "<script>
+        alert('Faça login como loja para acessar.');
+        if(document.referrer) {
+            window.location.href = document.referrer; // volta para a página anterior
+        } else {
+            window.history.back(); // se não houver referrer, volta no histórico
+        }
+    </script>";
+    exit;
 }
 
 $lojaId = $_SESSION['loja_id'];
