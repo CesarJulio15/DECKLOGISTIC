@@ -6,13 +6,12 @@ include $_SERVER['DOCUMENT_ROOT'] . '/DECKLOGISTIC/conexao.php';
 $data_inicio = '2025-01-01';
 $data_fim = '2025-12-31';
 
-// Consulta para pegar os produtos mais vendidos
+// Consulta para pegar os produtos mais vendidos da tabela itens_venda
 $sql = "SELECT p.nome AS produto, 
-               SUM(me.quantidade) AS total_vendido
-        FROM movimentacoes_estoque me
-        JOIN produtos p ON p.id = me.produto_id
-        WHERE me.tipo = 'saida' 
-        AND me.data_movimentacao BETWEEN ? AND ? 
+               SUM(iv.quantidade) AS total_vendido
+        FROM itens_venda iv
+        JOIN produtos p ON p.id = iv.produto_id
+        WHERE iv.data_venda BETWEEN ? AND ?
         GROUP BY p.id
         ORDER BY total_vendido DESC";  // Ordena os produtos do mais vendido para o menos vendido
 
