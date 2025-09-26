@@ -1,0 +1,172 @@
+/* ====================== */
+/* 2FA Dark Theme         */
+/* ====================== */
+
+/* Reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background: #1b1b1b !important;
+    color: #e0e0e0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Form principal 2FA */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;  /* adiciona espaçamento entre input e botão */
+    margin-top: 14px;
+}
+
+/* Container principal */
+.conteudo {
+    background: rgba(27, 27, 27, 0.95);
+    padding: 30px 25px;
+    border-radius: 12px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.conteudo h1 {
+    color: #fff;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.conteudo p {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    color: #cfcfcf;
+    line-height: 1.35;
+}
+
+.email-mascarado {
+    display: inline-block;
+    background: rgba(255,153,0,0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #ffb84d;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin-left: 6px;
+}
+
+#contador {
+    display: inline-block;
+    min-width: 68px;
+    text-align: center;
+    font-weight: 700;
+    color: #fff5e0;
+    background: rgba(255,153,0,0.15);
+    border: 1px solid rgba(255,153,0,0.25);
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: 6px;
+}
+
+.erro-msg {
+    background: rgba(200,0,0,0.12);
+    border: 1px solid rgba(255,0,0,0.22);
+    color: #ff9b9b;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+/* Inputs */
+input[type="text"] {
+    padding: 12px;
+    font-size: 1.1rem;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    background: rgba(40,40,40,0.9);
+    color: #fff;
+    text-align: center;
+    letter-spacing: 3px;
+    transition: border 0.18s ease, box-shadow 0.18s ease;
+}
+
+input[type="text"]::placeholder { 
+    color: #ffcc80; 
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #ff9900;
+    box-shadow: 0 0 12px rgba(255,153,0,0.3);
+}
+
+/* Botões */
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    text-decoration: none;
+}
+
+.btn.principal {
+    background: linear-gradient(135deg, rgba(255,153,0,0.95), rgba(255,200,0,0.95));
+    color: #0b0b0b;
+    box-shadow: 0 6px 20px rgba(255,153,0,0.15);
+}
+
+.btn.principal:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(255,153,0,0.25);
+}
+
+.btn.secundario {
+    background: transparent;
+    color: #e6e6e6;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.btn.secundario:hover {
+    background: rgba(255,255,255,0.02);
+    transform: translateY(-2px);
+}
+
+.btn[disabled],
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Animação fade-in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+    .conteudo { padding: 20px; max-width: 92%; }
+    input[type="text"] { letter-spacing: 2px; font-size: 1rem; padding: 10px; }
+    .email-mascarado { font-size: 0.95rem; padding: 3px 6px; }
+    #contador { min-width: 56px; font-size: 0.95rem; }
+}

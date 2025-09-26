@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
 
             <?php if ($tipo_login === 'empresa'): ?>
                 <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
-                <a href="/Pages/auth/verificacao2fatores.php" class="btn-alterar-senha">Alterar Senha</a>
+                <a href="../../Pages/auth/2FA.php" class="btn-alterar-senha">Alterar Senha</a>
 
                 <!-- Excluir conta -->
             <?php endif; ?>

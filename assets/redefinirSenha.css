@@ -1,104 +1,144 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #bfbfbf;
-  display: flex;
+/* ====================== */
+/* Reset e base           */
+/* ====================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* Container geral */
-.content {
-  flex: 1;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Alinha no topo */
+html, body {
+    height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background: #1b1b1b;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Card de redefinição */
-.reset-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 30px 40px;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  margin-top: 200px; /* Joga para baixo */
+/* ====================== */
+/* Container principal    */
+/* ====================== */
+.conteudo {
+    background: rgba(25,25,25,0.95);
+    padding: 30px 25px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    animation: fadeIn 0.4s ease-in-out;
 }
 
-.reset-card h2 {
-  margin-bottom: 10px;
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
+.conteudo h1 {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+    color: #fff;
 }
 
-.reset-card p {
-  margin-bottom: 25px;
-  font-size: 14px;
-  color: #666;
+.conteudo p {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    color: #cfcfcf;
 }
 
-.form-group {
-  margin-bottom: 20px;
+/* ====================== */
+/* Inputs                 */
+/* ====================== */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 14px;
 }
 
-.form-group label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #444;
+input[type="password"] {
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(40,40,40,0.9);
+    color: #fff;
+    text-align: center;
+    transition: border 0.18s, box-shadow 0.18s;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.2s;
+input[type="password"]::placeholder {
+    color: #9e9e9e;
 }
 
-.form-group input:focus {
-  border-color: #0F0F0F;
+input[type="password"]:focus {
+    outline: none;
+    border-color: #ff9900;
+    box-shadow: 0 0 10px rgba(255,153,0,0.2);
 }
 
-.btn-submit {
-  width: 100%;
-  padding: 12px;
-  background-color: #0F0F0F;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+/* ====================== */
+/* Botões                 */
+/* ====================== */
+.btn {
+    padding: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(255,153,0,0.95), rgba(255,200,0,0.95));
+    color: #0b0b0b;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.btn-submit:hover {
-  background-color: #0F0F0F;
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255,170,0,0.3);
 }
 
-/* Link de voltar */
-.back-link {
-  display: inline-block;
-  margin-top: 15px;
-  font-size: 14px;
-  color: #0F0F0F;
-  text-decoration: none;
+/* ====================== */
+/* Mensagens              */
+/* ====================== */
+.erro-msg {
+    background: rgba(200,0,0,0.12);
+    border: 1px solid rgba(255,0,0,0.22);
+    color: #ff9b9b;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
 }
 
-.back-link:hover {
-  text-decoration: underline;
+.sucesso-msg {
+    background: rgba(40,180,90,0.08);
+    border: 1px solid rgba(40,180,90,0.14);
+    color: #b7f0c6;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
 }
 
-/* Responsivo */
-@media (max-width: 768px) {
-  .content {
-    padding: 20px;
-  }
+/* ====================== */
+/* Fade-in                */
+/* ====================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
 
-  .reset-card {
-    padding: 20px;
-  }
+/* ====================== */
+/* Responsividade          */
+/* ====================== */
+@media (max-width: 480px) {
+    .conteudo {
+        padding: 20px;
+        max-width: 92%;
+    }
+
+    input[type="password"] {
+        font-size: 0.95rem;
+        padding: 10px;
+    }
+
+    .btn {
+        font-size: 0.95rem;
+        padding: 10px;
+    }
 }
