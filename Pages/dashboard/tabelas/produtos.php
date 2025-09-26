@@ -157,7 +157,7 @@ if ($tagVincResult) {
         <button class="btn-reset-filtro" onclick="resetFiltro()">
             <i class="fa-solid fa-xmark" style="color: #ffffffff;"></i>
         </button>
-
+        
     </div>
 </div>
 
@@ -174,9 +174,9 @@ if ($tagVincResult) {
 <tbody id="tabela-produtos">
 <?php while ($produto = mysqli_fetch_assoc($result)): ?>
 <tr>
-    <!-- <td class="multi-checkbox" style="display:none;">
+    <td class="multi-checkbox" style="display:none;">
         <input type="checkbox" class="chk-delete" data-id="<?= $produto['id'] ?>">
-    </td> -->
+    </td>
     <td style="display:flex; align-items:center; gap:10px; position:relative;">
         <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
             <?php if (isset($produtoTags[$produto['id']])): ?>
@@ -227,42 +227,8 @@ a.active {
 <?php endif; ?>
 
 <script>
-// Seleção múltipla
-const btnMultiDelete = document.getElementById('btn-multi-delete');
-const confirmDeleteBtn = document.getElementById('confirm-delete');
-let multiDeleteActive = false;
 
-btnMultiDelete.addEventListener('click', function() {
-    multiDeleteActive = !multiDeleteActive;
 
-    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = multiDeleteActive ? 'table-cell' : 'none');
-    document.getElementById('multi-checkbox-header').style.display = multiDeleteActive ? 'table-cell' : 'none';
-    confirmDeleteBtn.style.display = multiDeleteActive ? 'inline-block' : 'none';
-});
-
-// Confirmar exclusão
-document.getElementById('confirm-delete').addEventListener('click', function() {
-    const checkboxes = document.querySelectorAll('.chk-delete:checked');
-    if (checkboxes.length === 0) return alert("Selecione pelo menos um produto.");
-    if (!confirm("Deseja realmente excluir os produtos selecionados?")) return;
-    let ids = Array.from(checkboxes).map(chk => chk.dataset.id);
-
-    fetch('excluir_produto.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `produto_ids=${ids.join(',')}`
-    })
-    .then(res => res.text())
-    .then(data => {
-        if(data.trim() === 'ok'){
-            checkboxes.forEach(chk => chk.closest('tr').remove());
-            document.getElementById('confirm-delete').style.display = 'none';
-            document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'none');
-        } else {
-            alert('Erro ao excluir produtos!');
-        }
-    });
-});
 
 // Pesquisa
 document.getElementById('pesquisa').addEventListener('input', function() {

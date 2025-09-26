@@ -78,6 +78,26 @@ onmouseover="this.style.background='linear-gradient(135deg, rgba(255,153,0,1), r
 onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), rgba(255,200,0,0.9))'; this.style.boxShadow='0 4px 12px rgba(255,170,0,0.4)';">
   Ver histórico 6 meses
 </button>
+
+
+  <!-- Botão Giro de Estoque -->
+  <button id="btnGiro" onclick="window.location.href='giroEstoque.php'" style="
+      background: linear-gradient(135deg, rgba(0,153,255,0.9), rgba(0,200,255,0.9));
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,170,255,0.4);
+  "
+  onmouseover="this.style.background='linear-gradient(135deg, rgba(0,153,255,1), rgba(0,200,255,1))'; this.style.boxShadow='0 6px 20px rgba(0,170,255,0.6)';"
+  onmouseout="this.style.background='linear-gradient(135deg, rgba(0,153,255,0.9), rgba(0,200,255,0.9))'; this.style.boxShadow='0 4px 12px rgba(0,170,255,0.4)';">
+    Ver Giro de Estoque
+  </button>
+
     </div>
 
 <!-- Popup modal -->
@@ -260,6 +280,7 @@ btnFecharModal.addEventListener("click", () => { modalHistorico.style.display = 
 <!-- Produtos Reabastecidos Recentemente -->
 <div class="card reabastecidos">
   <h3>Produtos Reabastecidos Recentemente</h3>
+
 
   <!-- Filtro -->
   <div style="margin-bottom:10px;">
