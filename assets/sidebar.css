@@ -90,6 +90,7 @@ body {
     background-color: #222;  /* fundo mais claro */
     border-left: 4px solid #fff; /* barra lateral clara */
     padding-left: 16px; /* ajusta para não encostar no texto */
+    color: #ff9900;
 }
 
 /* Linha divisória */

@@ -104,9 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
         </ul>
       </div>
       <div class="bottom-links">
-     <li class="active"><a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a></li>
-       <a href="../../Pages/auth/dicas.php" ><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
-      </div>
+  <a class="active" href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+  <a href="../../Pages/auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+</div>
     </nav>
   </div>
 
