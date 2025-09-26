@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .msg {
       margin: 10px 0;
       font-weight: bold;
-      color: red;
+      color: #58c14c  ;
     }
   </style>
 </head>
