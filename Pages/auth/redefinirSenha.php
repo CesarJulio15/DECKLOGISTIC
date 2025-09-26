@@ -1,63 +1,71 @@
+<?php
+session_start();
+include __DIR__ . '/../../conexao.php';
+
+// Se o usuário não estiver autorizado pelo 2FA, volta para login
+if (!isset($_SESSION['autorizado_alterar_senha']) || !$_SESSION['autorizado_alterar_senha']) {
+    header("Location: /Pages/auth/login.php");
+    exit;
+}
+
+$erro = '';
+$sucesso = '';
+
+// Processa o formulário
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $senha = trim($_POST['senha'] ?? '');
+    $senha_confirm = trim($_POST['senha_confirm'] ?? '');
+
+    if (!$senha || !$senha_confirm) {
+        $erro = "Preencha todos os campos.";
+    } elseif ($senha !== $senha_confirm) {
+        $erro = "As senhas não coincidem.";
+    } elseif (strlen($senha) < 6) {
+        $erro = "A senha deve ter no mínimo 6 caracteres.";
+    } else {
+        // Atualiza senha no banco (exemplo para tabela 'usuarios')
+        $usuario_id = $_SESSION['usuario_id'];
+        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare("UPDATE usuarios SET senha_hash = ? WHERE id = ?");
+        $stmt->bind_param("si", $senha_hash, $usuario_id);
+
+        if ($stmt->execute()) {
+            $sucesso = "Senha alterada com sucesso!";
+            unset($_SESSION['autorizado_alterar_senha']);
+        } else {
+            $erro = "Erro ao atualizar a senha. Tente novamente.";
+        }
+    }
+}
+?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redefinir Senha</title>
-   <link rel="stylesheet" href="../../assets/redefinirSenha.css">
+    <title>Redefinir Senha | DeckLogistic</title>
+    <link rel="stylesheet" href="../../assets/redefinirSenha.css">
 </head>
 <body>
+<div class="conteudo">
+    <h1>Redefinir Senha</h1>
+    <p>Digite sua nova senha abaixo:</p>
 
-  <div class="sidebar">
-<link rel="stylesheet" href="../../assets/sidebar.css">
+    <?php if($erro): ?>
+        <div class="erro-msg"><?= htmlspecialchars($erro) ?></div>
+    <?php endif; ?>
+    <?php if($sucesso): ?>
+        <div class="sucesso-msg"><?= htmlspecialchars($sucesso) ?></div>
+    <?php endif; ?>
 
-  <div class="logo-area">
-    <img src="../../img/logoDecklogistic.webp" alt="Logo">
-  </div>
-
-  <nav class="nav-section">
-    <div class="nav-menus">
-      <ul class="nav-list top-section">
-        <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-        <li class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
-      </ul>
-
-      <hr>
-
-      <ul class="nav-list middle-section">
-    <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-        <li><a href="/Pages/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
-        <li><a href="/Pages/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-        <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
-      </ul>
-    </div>
-
-    <div class="bottom-links">
-      <a href="/Pages/conta.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
-      <a href="/Pages/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
-    </div>
-  </nav>
+    <?php if(!$sucesso): ?>
+    <form method="POST">
+        <input type="password" name="senha" placeholder="Nova senha" required>
+        <input type="password" name="senha_confirm" placeholder="Confirme a nova senha" required>
+        <button type="submit" class="btn">Alterar Senha</button>
+    </form>
+    <?php endif; ?>
 </div>
-
-  <div class="content">
-    <div class="reset-card">
-      <h1>Redefinição de senha</h1>
-      <p>Insira sua nova senha abaixo para redefinir o acesso à sua conta.</p>
-      <form action="/processa_redefinicao.php" method="POST">
-        <div class="form-group">
-          <label for="novaSenha">Nova Senha</label>
-          <input type="password" id="novaSenha" name="novaSenha" required>
-        </div>
-        <div class="form-group">
-          <label for="confirmaSenha">Confirmar Nova Senha</label>
-          <input type="password" id="confirmaSenha" name="confirmaSenha" required>
-        </div>
-        <button type="submit" class="btn-submit">Redefinir</button>
-      </form>
-    </div>
-  </div>
-
-
-
 </body>
 </html>
