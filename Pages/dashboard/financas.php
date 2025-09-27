@@ -31,7 +31,7 @@ $lojaId = $_SESSION['loja_id'];
 <div class="content">
   <div class="sidebar">
     <div class="logo-area">
-      <img src="../../img/logoDecklogistic.webp" alt="Logo">
+      <img src="../../img/logo2.svg" alt="Logo">
     </div>
     <nav class="nav-section">
       <div class="nav-menus">

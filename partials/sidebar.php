@@ -11,7 +11,7 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="logo-area">
-      <img src="../img/logoDecklogistic.webp" alt="Logo">
+      <img src="../img/Logo2.png" alt="Logo">
     </div>
 
     <nav class="nav-section">

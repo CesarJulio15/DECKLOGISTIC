@@ -30,7 +30,7 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
 <div class="sidebar">
     <link rel="stylesheet" href="../../assets/sidebar.css">
     <div class="logo-area">
-      <img src="../../img/logoDecklogistic.webp" alt="Logo">
+      <img src="../../img/logo2.svg" alt="Logo">
     </div>
     <nav class="nav-section">
       <div class="nav-menus">
@@ -79,25 +79,32 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
   Ver histórico 6 meses
 </button>
 
+<style>
+  .btn-modern {
+  display: inline-block;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(90deg, #1a1b1bff, #000000ff); /* fundo preto gradiente */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+}
 
+.btn-modern:hover {
+     background: linear-gradient(135deg, rgba(255, 200, 0, 0.9), rgba(255, 153, 0, 0.9)); /* Invertido no hover */
+    box-shadow: rgba(255, 170, 0, 0.6) 0px 6px 18px; /* Sombra mais forte no hover */
+    transform: translateY(-2px) scale(1.04); /* Leve elevação e aumento de escala */
+}
+
+</style>
   <!-- Botão Giro de Estoque -->
-  <button id="btnGiro" onclick="window.location.href='giroEstoque.php'" style="
-      background: linear-gradient(135deg, rgba(0,153,255,0.9), rgba(0,200,255,0.9));
-      color: #fff;
-      padding: 10px 16px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      margin-top: 12px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,170,255,0.4);
-  "
-  onmouseover="this.style.background='linear-gradient(135deg, rgba(0,153,255,1), rgba(0,200,255,1))'; this.style.boxShadow='0 6px 20px rgba(0,170,255,0.6)';"
-  onmouseout="this.style.background='linear-gradient(135deg, rgba(0,153,255,0.9), rgba(0,200,255,0.9))'; this.style.boxShadow='0 4px 12px rgba(0,170,255,0.4)';">
-    Ver Giro de Estoque
-  </button>
-
+<button id="btnGiro" class="btn-modern" onclick="window.location.href='giroEstoque.php'">
+  Ver Giro de Estoque
+</button>
     </div>
 
 <!-- Popup modal -->

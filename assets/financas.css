@@ -79,14 +79,16 @@ body {
   height: 18px;
 }
 
-.nav-list li a:hover {
-  background: #ff9900;
-  color: #181818;
+.nav-list li a {
+  color: #fff; /* garante que seja branco sempre */
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
 }
 
+.nav-list li a:hover,
 .nav-list li.active a {
   background: #ff9900;
-  color: #181818;
+  color: #fff; /* força o branco */
 }
 
 /* Linha divisória */
@@ -127,7 +129,6 @@ hr {
 
 .bottom-links a:hover {
   color: #fff;
-  background: #ff9900;
   border-radius: 6px;
 }
 
@@ -148,7 +149,7 @@ hr {
   padding: 20px;
   background: #222;
   border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(255,153,0,0.08);
+
   border: 1px solid #222;
   height:400px; /* ou altura que você quiser */
   transition: box-shadow 0.3s, transform 0.3s;
@@ -196,7 +197,7 @@ hr {
     cursor: pointer; /* Mostrar cursor de clique */
     margin-top: 12px; /* Margem superior */
     transition: 0.3s; /* Transição suave */
-    box-shadow: rgba(255, 170, 0, 0.4) 0px 4px 12px; /* Sombra do botão */
+
 }
 
 /* Efeito de hover para o botão */
@@ -249,7 +250,7 @@ hr {
   background: #181818;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ff9900;
+  background: #ffffff;
   border-radius: 8px;
 }
 

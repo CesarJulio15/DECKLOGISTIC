@@ -26,16 +26,21 @@ body {
 }
 
 /* Logo */
+/* Logo */
 .logo-area {
-    padding: 0;
-    text-align: center;
+    position: relative; /* cria referência para a logo */
+    height: 120px;      /* altura reservada para a logo */
+    overflow: visible;
 }
 
 .logo-area img {
-    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* centraliza */
+    width: 400px;  /* ou o tamanho que quiser */
     height: auto;
-    object-fit: cover;
-    display: block;
+    max-width: none; /* remove a limitação */
 }
 
 /* Navegação */

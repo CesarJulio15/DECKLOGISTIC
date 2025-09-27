@@ -159,14 +159,16 @@ hr {
   background: rgba(30,30,30,0.85); /* card escuro translúcido */
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.4); /* sombra mais sutil */
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.2s;
   overflow: hidden;
   min-height: 250px;
+  border: 2px solid transparent; /* borda transparente base para evitar "pular" */
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 32px rgba(255,153,0,0.18);
+  border-color: #ff9900;
+  transform: translateY(-4px) scale(1.02);
 }
 
 .card h3 {

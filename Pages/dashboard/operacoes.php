@@ -189,7 +189,7 @@ $result = $conn->query($sqlComLimit);
     <div class="sidebar">
         <link rel="stylesheet" href="../../assets/sidebar.css">
         <div class="logo-area">
-        <img src="../../img/logoDecklogistic.webp" alt="Logo">
+        <img src="../../img/logo2.svg" alt="Logo">
         </div>
         <nav class="nav-section">
         <div class="nav-menus">
