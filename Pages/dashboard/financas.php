@@ -25,24 +25,27 @@ $lojaId = $_SESSION['loja_id'];
   <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <link rel="stylesheet" href="../../assets/financas.css">
   <link rel="stylesheet" href="../../assets/sidebar.css">
+  
 </head>
 <body>
 
 <div class="content">
-  <div class="sidebar">
+  <!-- Sidebar -->
+<div class="sidebar">
+    <link rel="stylesheet" href="../../assets/sidebar.css">
     <div class="logo-area">
       <img src="../../img/logo2.svg" alt="Logo">
     </div>
     <nav class="nav-section">
       <div class="nav-menus">
        <ul class="nav-list top-section">
-          <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-          <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
-        </ul>
+    <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+    <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+</ul>
         <hr>
         <ul class="nav-list middle-section">
           <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
           <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
           <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
         </ul>
@@ -53,6 +56,7 @@ $lojaId = $_SESSION['loja_id'];
       </div>
     </nav>
   </div>
+
 
 <style>
 .btn-modern {
