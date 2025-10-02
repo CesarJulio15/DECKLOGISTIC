@@ -135,7 +135,7 @@ if ($tagVincResult) {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-        <button class="btn-novo" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
+    <button class="btn-novo" id="acoes-itens-btn" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
         <button class="btn-novo" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
         <select id="ordenar">
             <option value="">Ordenar...</option>
@@ -515,8 +515,63 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<?php if (!isset($_COOKIE['visitou_produtos'])): ?>
+  <div id="welcome-overlay">
+    <div class="welcome-card">
+      <h2>Seja bem-vindo!</h2>
+      <p>Essa é a página principal do seu sistema de estoque, aqui você pode gerenciar os seus produtos.</p>
+      <button id="close-welcome">Entendi</button>
+    </div>
+  </div>
+  <style>
+    #welcome-overlay {
+      position: fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(1px);
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      z-index:9999;
+      padding:20px;
+      padding-top:500px;
+    }
+    .welcome-card {
+      background:#fff;
+      color:#333;
+      padding:20px 30px;
+      border-radius:12px;
+      max-width:300px;
+      box-shadow:0 0 15px rgba(0,0,0,0.4);
+      animation: fadeIn 0.3s ease;
+    }
+    .welcome-card h2 { margin-bottom:10px; font-size:20px; }
+    .welcome-card button {
+      margin-top:15px;
+      padding:8px 16px;
+      border:none;
+      border-radius:6px;
+      background:#ff6600;
+      color:#fff;
+      cursor:pointer;
+    }
+    @keyframes fadeIn {
+      from {opacity:0; transform:translateY(20px);}
+      to {opacity:1; transform:translateY(0);}
+    }
+  </style>
+  <script>
+    document.getElementById('close-welcome').addEventListener('click', function(){
+      document.getElementById('welcome-overlay').style.display = 'none';
+      // Marca que já viu (salva cookie pelo PHP)
+      fetch('../marcar_visitou.php');
+    });
+  </script>
+<?php endif; ?>
+
+
 
 </body>
 </html>
