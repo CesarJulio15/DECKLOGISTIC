@@ -78,7 +78,6 @@ onmouseover="this.style.background='linear-gradient(135deg, rgba(255,153,0,1), r
 onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), rgba(255,200,0,0.9))'; this.style.boxShadow='0 4px 12px rgba(255,170,0,0.4)';">
   Ver histórico 6 meses
 </button>
-
 <style>
   .btn-modern {
   display: inline-block;
@@ -289,6 +288,7 @@ btnFecharModal.addEventListener("click", () => { modalHistorico.style.display = 
   <h3>Produtos Reabastecidos Recentemente</h3>
 
 
+
   <!-- Filtro -->
   <div style="margin-bottom:10px;">
   <input type="text" id="filtroReabastecidos" placeholder="Pesquisar por produto..." 
@@ -311,6 +311,8 @@ btnFecharModal.addEventListener("click", () => { modalHistorico.style.display = 
 
   </div>
 </div>
+
+
 
 <script>
 const lojaId = <?= $lojaId ?>;
@@ -492,6 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadProdutosReabastecidos();
 });
 </script>
+
 
 
 </body>

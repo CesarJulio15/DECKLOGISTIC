@@ -33,6 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Cadastro | DeckLogistic</title>
   <link rel="stylesheet" href="../../../assets/cadastro.css">
   <link rel="icon" href="../img/logoDecklogistic.webp" type="image/x-icon" />
+
+<link rel="manifest" href="/decklogistic/manifest.json">
+<meta name="theme-color" content="#0d6efd">
+
+
 </head>
 <body>
   <div class="container">
@@ -79,5 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/decklogistic/sw.js');
+}
+
+</script>
+
+
 </body>
 </html>

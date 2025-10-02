@@ -1,0 +1,26 @@
+{
+  "id": "index.php",
+  "name": "DECKLOGISTIC",
+  "short_name": "DECKLOGISTIC",
+  "start_url": "index.php",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "img/logo2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "img/logoTeste.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logoTeste.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
