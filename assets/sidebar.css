@@ -15,7 +15,7 @@ body {
     width: 220px;
     height: 100vh;
     background-color: #000;
-    color: #fff;
+    color: #000000;
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -26,22 +26,22 @@ body {
 }
 
 /* Logo */
-/* Logo */
 .logo-area {
-    position: relative; /* cria referência para a logo */
-    height: 120px;      /* altura reservada para a logo */
-    overflow: visible;
+    height: 180px;           /* aumenta a área da logo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;        /* garante que não ultrapasse */
 }
 
 .logo-area img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* centraliza */
-    width: 400px;  /* ou o tamanho que quiser */
-    height: auto;
-    max-width: none; /* remove a limitação */
+
+    object-fit: contain;     /* mantém proporção */
+    width: 400px;
+    height: 400px;
 }
+
+
 
 /* Navegação */
 .nav-section {
