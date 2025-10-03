@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../../../conexao.php';
+include '../../../header.php';
 
 $usuario_id = $_SESSION['usuario_id'] ?? null;
 $loja_id = $_SESSION['loja_id'] ?? null;

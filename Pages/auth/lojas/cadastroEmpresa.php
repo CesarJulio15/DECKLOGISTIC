@@ -1,5 +1,7 @@
 <?php
 require_once '../../../conexao.php'; // aqui o $conn deve ser mysqli_connect(...)
+include __DIR__ . '/../../../header.php';
+
 
 $nome  = mysqli_real_escape_string($conn, $_POST['nome']);
 $email = mysqli_real_escape_string($conn, $_POST['email']);

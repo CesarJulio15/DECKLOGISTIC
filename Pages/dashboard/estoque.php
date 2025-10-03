@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
+include __DIR__ . '/../../header.php';
 
 // Verifica login
 if (!isset($_SESSION['usuario_id'])) {
@@ -99,6 +100,102 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
 }
 
 </style>
+<style>
+/* Overlay e blur para dicas */
+#overlay-blur-estoque {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+}
+/* Overlay 1: canto inferior direito */
+#overlay-estoque-1 {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  right: 32px;
+  bottom: 32px;
+  width: auto;
+  height: auto;
+  justify-content: flex-end;
+  align-items: flex-end;
+  background: none;
+}
+/* Overlay 2: próximo ao botão, mas mais abaixo */
+#overlay-estoque-2 {
+  margin-top: 50px;
+  display: none;
+  position: absolute;
+  z-index: 10001;
+  background: none;
+  width: auto;
+  height: auto;
+  left: 0;
+  top: 0;
+}
+.welcome-card-estoque {
+  background: #000;
+  color: #fff;
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  max-width: 340px;
+  text-align: left;
+}
+.welcome-card-estoque h2 {
+  font-size: 22px;
+  margin-bottom: 18px;
+}
+.welcome-card-estoque p {
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+.welcome-card-estoque button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #ff6600;
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+}
+/* Botão de ajuda fixo */
+#help-btn-estoque {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Botões destacados acima do blur no overlay 2 */
+.fora-do-blur-estoque {
+  position: relative !important;
+  z-index: 10003 !important;
+}
+.fora-do-blur-estoque:hover {
+  box-shadow: none !important;
+  transform: none !important;
+  background: inherit !important;
+  color: inherit !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+</style>
   <!-- Botão Giro de Estoque -->
 <button id="btnGiro" class="btn-modern" onclick="window.location.href='giroEstoque.php'">
   Ver Giro de Estoque
@@ -130,7 +227,67 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
   </div>
 </div>
 
+<!-- Blur e overlays de dicas -->
+<div id="overlay-blur-estoque"></div>
+<div id="overlay-estoque-1">
+  <div class="welcome-card-estoque">
+    <h2>ESTOQUE</h2>
+    <p>Nessa página você tem acesso aos dados e estatísticas do seu estoque de produtos.</p>
+    <button id="btnProximoEstoque">Próximo</button>
+  </div>
+</div>
+<div id="overlay-estoque-2">
+  <div class="welcome-card-estoque">
+    <h2>GRÁFICOS</h2>
+    <p>Aqui você tem acesso a dados exclusivos do seu estoque.</p>
+    <button id="btnFecharEstoque">Entendi</button>
+  </div>
+</div>
+<button id="help-btn-estoque">?</button>
+
 <script>
+// --- Dicas/Overlay Estoque ---
+const helpBtnEstoque = document.getElementById('help-btn-estoque');
+const overlayBlurEstoque = document.getElementById('overlay-blur-estoque');
+const overlayEstoque1 = document.getElementById('overlay-estoque-1');
+const overlayEstoque2 = document.getElementById('overlay-estoque-2');
+const btnProximoEstoque = document.getElementById('btnProximoEstoque');
+const btnFecharEstoque = document.getElementById('btnFecharEstoque');
+// btnHistorico e btnGiro já existem no escopo global
+
+function showBlurEstoque() {
+  overlayBlurEstoque.style.display = 'block';
+}
+function hideBlurEstoque() {
+  overlayBlurEstoque.style.display = 'none';
+}
+
+helpBtnEstoque.addEventListener('click', () => {
+  showBlurEstoque();
+  overlayEstoque1.style.display = 'flex';
+});
+
+
+btnProximoEstoque.addEventListener('click', () => {
+  overlayEstoque1.style.display = 'none';
+  // Posiciona overlay2 mais abaixo do botão "Ver histórico 6 meses"
+  const rect = btnHistorico.getBoundingClientRect();
+  overlayEstoque2.style.display = 'flex';
+  overlayEstoque2.style.position = 'absolute';
+  // 32px abaixo do botão, alinhado à esquerda do botão
+  overlayEstoque2.style.top = `${rect.bottom + window.scrollY + 32}px`;
+  overlayEstoque2.style.left = `${rect.left + window.scrollX}px`;
+  // Destaca botões acima do blur
+  btnHistorico.classList.add('fora-do-blur-estoque');
+  btnGiro.classList.add('fora-do-blur-estoque');
+});
+
+btnFecharEstoque.addEventListener('click', () => {
+  overlayEstoque2.style.display = 'none';
+  hideBlurEstoque();
+  btnHistorico.classList.remove('fora-do-blur-estoque');
+  btnGiro.classList.remove('fora-do-blur-estoque');
+});
   
 const lojaId = <?= $lojaId ?>;
 
@@ -252,9 +409,9 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===================
 // Modal histórico
 // ===================
-const btnHistorico = document.getElementById("btnHistorico");
-const modalHistorico = document.getElementById("modalHistorico");
-const btnFecharModal = document.getElementById("btnFecharModal");
+var btnHistorico = document.getElementById("btnHistorico");
+var modalHistorico = document.getElementById("modalHistorico");
+var btnFecharModal = document.getElementById("btnFecharModal");
 
 btnHistorico.addEventListener("click", async () => {
   modalHistorico.style.display = "flex";

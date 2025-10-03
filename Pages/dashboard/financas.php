@@ -1,5 +1,6 @@
 <?php
 session_start();
+include __DIR__ . '/../../header.php';
 
 // Verifica se usuário não é loja
 if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
@@ -76,6 +77,13 @@ $lojaId = $_SESSION['loja_id'];
 .btn-modern:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+</style>
+<style>
+/* Classe para botões ficarem acima do blur */
+.fora-do-blur {
+  position: relative;
+  z-index: 10002 !important;
 }
 </style>
 
@@ -284,6 +292,266 @@ $lojaId = $_SESSION['loja_id'];
   loadTopDespesas();
   loadCustoMedioProdutos();
 </script>
+<!-- Overlays de Boas-vindas -->
+<!-- Overlay 1: cobre toda a tela -->
+<!-- Blur atrás do overlay -->
+<div id="overlay-blur" class="full-screen-blur" style="display:none;"></div>
 
+<!-- Overlay 1: canto inferior direito -->
+<div id="overlay-financas" style="display:none;">
+  <div class="welcome-card">
+       <h2>Finanças</h2>
+    <p>Essa é a área de finanças da sua empresa, aqui você vai gerir e analisará detalhadamente o desempenho econômico da sua empresa.</p>
+    <button id="closeOverlay1">Entendi</button>
+  </div>
+</div>
+
+<!-- Overlay 2: próximo ao botão "Ver detalhes" -->
+<div id="overlay-graficos" class="welcome-overlay" style="display:none;">
+  <div class="welcome-card">
+     <h2>Ver detalhes</h2>
+    <p>Aqui você pode analisar os gráficos referentes a lucro bruto, lucro líquido e margem de lucro.</p>
+    <button id="closeOverlay2">Entendi</button>
+  </div>
+</div>
+
+<style>
+  .fora-do-blur:hover {
+  box-shadow: none !important;
+  transform: none !important;
+  background: inherit !important;
+  color: inherit !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+  /* Blur que cobre toda a tela */
+#overlay-blur {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999; /* abaixo dos overlays */
+}
+
+/* Overlay de finanças */
+#overlay-financas {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 10000;
+    padding: 30px;
+    padding-top: 700px;
+    background: transparent; /* não precisa do ::before */
+}
+
+/* Overlay gráfico */
+#overlay-graficos {
+    display: none;
+    position: absolute; /* posicionado via JS */
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Overlay de finanças */
+#welcome-overlay .welcome-card h2 {
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+
+/* Card do overlay */
+#overlay-financas .welcome-card {
+    background: #000;            /* fundo preto do card */
+    padding: 20px 30px;
+    border-radius: 10px;
+    max-width: 300px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    text-align: left;
+    
+    color: #fff;
+}
+
+/* Texto do card */
+#overlay-financas .welcome-card p {
+  margin-top:10px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Botão */
+#overlay-financas .welcome-card button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #ff6600;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Fundo borrado atrás do card */
+#overlay-financas::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: -1;  /* fica atrás do card */
+}
+
+/* Overlay de gráficos */
+/* Card do overlay gráfico */
+#overlay-graficos .welcome-card h2 {
+    margin-bottom: 20px; /* espaço abaixo do título */
+    font-size: 24px;
+}
+#welcome-overlay .welcome-card h2 {
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+#welcome-overlay .welcome-card p {
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+/* Overlay gráfico */
+
+
+
+#overlay-graficos .welcome-card {
+    background: #000;
+    padding: 20px 30px;
+    border-radius: 10px;
+    max-width: 300px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    text-align: left;
+    color: #fff;
+}
+
+/* Botão do overlay gráfico */
+#overlay-graficos .welcome-card button {
+  margin-top: 15px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #ff6600;
+    color: #fff;
+    cursor: pointer;
+}
+
+
+
+/* Fundo borrado opcional (pode ser usado apenas se quiser blur no fundo do overlay2) */
+#overlay-graficos::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.0); /* transparente, pois blur já é controlado pelo overlay1 */
+    z-index: -1;
+}
+
+</style>
+<button id="help-btn" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+">?</button>
+
+<script>
+const helpBtn = document.getElementById('help-btn');
+const overlay1 = document.getElementById('overlay-financas');
+const overlay2 = document.getElementById('overlay-graficos');
+const blur = document.getElementById('overlay-blur');
+const btnClose1 = document.getElementById('closeOverlay1');
+const btnClose2 = document.getElementById('closeOverlay2');
+
+helpBtn.addEventListener('click', () => {
+  overlay1.style.display = 'flex';
+  blur.style.display = 'block';
+});
+
+btnClose1.addEventListener('click', () => {
+  overlay1.style.display = 'none';
+  
+  // Ativa blur
+  blur.style.display = 'block';
+
+  // Pega posição do botão
+  const btn = document.getElementById('btnLucroBruto');
+  const rect = btn.getBoundingClientRect();
+
+  // Posiciona overlay2 perto do botão
+  overlay2.style.position = 'absolute';
+  overlay2.style.top = `${rect.bottom + window.scrollY + 10}px`;
+  overlay2.style.left = `${rect.left + window.scrollX}px`;
+  overlay2.style.display = 'flex';
+});
+
+
+helpBtn.addEventListener('click', () => {
+  overlay1.style.display = 'flex';
+  blur.style.display = 'block';
+});
+
+btnClose1.addEventListener('click', () => {
+  overlay1.style.display = 'none';
+  
+  // Mantém blur ativo
+  blur.style.display = 'block';
+
+  // Posiciona overlay2 próximo do botão
+  const btn = document.getElementById('btnLucroBruto'); // você pode trocar pro outro botão se quiser
+  const rect = btn.getBoundingClientRect();
+  
+  overlay2.style.position = 'absolute';
+  overlay2.style.top = `${rect.bottom + window.scrollY + 10}px`;
+  overlay2.style.left = `${rect.left + window.scrollX}px`;
+  overlay2.style.display = 'flex';
+  overlay2.style.zIndex = '10001';
+
+  // Adiciona classe para os 3 botões ficarem acima do blur
+  document.getElementById('btnLucroBruto').classList.add('fora-do-blur');
+  document.getElementById('btnLucroLiquido').classList.add('fora-do-blur');
+  document.getElementById('btnLucroMargem').classList.add('fora-do-blur');
+});
+
+btnClose2.addEventListener('click', () => {
+  overlay2.style.display = 'none';
+  blur.style.display = 'none'; // aqui remove o blur
+
+  // Remove classe dos botões
+  document.getElementById('btnLucroBruto').classList.remove('fora-do-blur');
+  document.getElementById('btnLucroLiquido').classList.remove('fora-do-blur');
+  document.getElementById('btnLucroMargem').classList.remove('fora-do-blur');
+});
+
+</script>
 </body>
 </html>

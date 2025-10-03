@@ -1,5 +1,6 @@
 <?php 
 include '../../../conexao.php'; 
+include '../../../header.php';
 session_start();
 
 // Verifica se está logado
@@ -124,6 +125,82 @@ if ($tagVincResult) {
       </div>
     </nav>
   </div>
+  
+<!-- Primeiro overlay -->
+<div id="welcome-overlay">
+    <div class="welcome-card">
+        <h2>Seja bem-vindo!</h2>
+        <p>Essa é a página de produtos. Aqui você pode gerenciar seus itens e tags.</p>
+        <button id="close-welcome">Entendi</button>
+    </div>
+</div>
+
+<style>
+/* Primeiro overlay ocupa toda a tela */
+#welcome-overlay {
+     display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 1000;
+    padding: 30px;
+    padding-top: 700px; /* ajusta altura se quiser */
+}
+
+/* Card do overlay */
+#welcome-overlay .welcome-card {
+    background: #000;
+    padding: 20px 30px;
+    border-radius: 10px;
+    max-width: 300px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    text-align: left;
+    color: #fff;
+}
+
+#welcome-overlay .welcome-card h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+#welcome-overlay .welcome-card p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Botão */
+#welcome-overlay .welcome-card button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #ff6600;
+    color: #fff;
+    cursor: pointer;
+}
+</style>
+
+<script>
+document.getElementById('close-welcome').addEventListener('click', function() {
+    document.getElementById('welcome-overlay').style.display = 'none';
+
+    const overlay = document.getElementById('acoes-overlay');
+    const card = overlay.querySelector('.welcome-card');
+    const btn = document.getElementById('acoes-itens-btn');
+    const rect = btn.getBoundingClientRect();
+
+    card.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+    card.style.left = (rect.left + window.scrollX) + 'px';
+
+    overlay.style.display = 'block';
+    btn.style.position = 'relative';
+    btn.style.zIndex = 2000;
+});
+</script>
 
 <main class="dashboard">
 <div class="content">
@@ -135,8 +212,203 @@ if ($tagVincResult) {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-    <button class="btn-novo" id="acoes-itens-btn" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
-        <button class="btn-novo" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
+   <button class="btn-novo" id="acoes-itens-btn" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
+
+<!-- Segundo overlay -->
+<div id="acoes-overlay" style="display:none;">
+    <div class="blur-bg"></div>
+    <div class="welcome-card">
+        <h2>Ações Itens</h2>
+        <p>Você pode gerenciar os produtos clicando nos botões abaixo.</p>
+        <button id="close-acoes">Fechar</button>
+    </div>
+</div>
+
+<style>
+/* Overlay */
+#acoes-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+/* Blur cobrindo a tela */
+#acoes-overlay .blur-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.3);
+    z-index: 1;
+}
+
+/* Card acima do blur */
+#acoes-overlay .welcome-card {
+    position: absolute;
+    z-index: 2;
+    background: #000;
+    padding: 20px 30px;
+    border-radius: 10px;
+    max-width: 300px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    color: #fff;
+}
+
+/* Botão dentro do card */
+#acoes-overlay .welcome-card button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #ff6600;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Botão Ações Itens normal (não afeta primeiro overlay) */
+#acoes-itens-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9));
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    position: static; /* normal */
+    z-index: auto;
+}
+</style>
+
+<script>
+document.getElementById('close-acoes').addEventListener('click', function() {
+    document.getElementById('acoes-overlay').style.display = 'none';
+
+    // Restaura o botão Ações Itens
+    const btnAcoes = document.getElementById('acoes-itens-btn');
+    btnAcoes.style.position = 'static';
+    btnAcoes.style.zIndex = 'auto';
+
+    // Abre o terceiro overlay automaticamente
+    const overlayImport = document.getElementById('import-overlay');
+    const cardImport = overlayImport.querySelector('.welcome-card');
+    const btnImport = document.getElementById('import-btn');
+    const rectImport = btnImport.getBoundingClientRect();
+
+    cardImport.style.top = (rectImport.bottom + window.scrollY + 10) + 'px';
+    cardImport.style.left = (rectImport.left + window.scrollX) + 'px';
+
+    overlayImport.style.display = 'block';
+    btnImport.style.position = 'relative';
+    btnImport.style.zIndex = 2000;
+});
+
+</script>
+
+
+    
+    <!-- Botão Importar -->
+<button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
+
+<!-- Terceiro overlay -->
+<div id="import-overlay" style="display:none;">
+    <div class="blur-bg"></div> <!-- blur de fundo -->
+    <div class="welcome-card">
+        <h2>Importar Produtos</h2>
+        <p>Aqui você pode importar seus produtos diretamente de um arquivo do Excel.</p>
+        <button id="close-import">Fechar</button>
+    </div>
+</div>
+
+<style>
+/* Overlay terceiro */
+#import-overlay {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:1000;
+    display:flex;
+    justify-content:flex-start;
+    align-items:flex-start;
+}
+
+/* Blur cobrindo toda a tela */
+#import-overlay .blur-bg {
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.3);
+    z-index:1;
+}
+
+/* Card acima do blur */
+#import-overlay .welcome-card {
+    position: absolute;
+    z-index:2;
+    background:#000;
+    padding:20px 30px;
+    border-radius:10px;
+    max-width:300px;
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
+    color:#fff;
+}
+
+/* Botões dentro do card */
+#import-overlay .welcome-card button {
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    background:#ff6600;
+    color:#fff;
+    cursor:pointer;
+}
+
+/* Botão Importar fora do blur */
+#import-btn {
+    position: static; /* será alterado quando o overlay abrir */
+    z-index: auto;
+    padding: 8px 16px;
+    border-radius:6px;
+       background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9));
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+</style>
+
+<script>
+document.getElementById('import-btn').addEventListener('click', function() {
+    const overlay = document.getElementById('import-overlay');
+    const card = overlay.querySelector('.welcome-card');
+    const btn = document.getElementById('import-btn');
+    const rect = btn.getBoundingClientRect();
+
+    // Posiciona o card abaixo do botão
+    card.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+    card.style.left = (rect.left + window.scrollX) + 'px';
+
+    overlay.style.display = 'block';
+
+    // Botão fora do blur
+    btn.style.position = 'relative';
+    btn.style.zIndex = 2000;
+});
+
+document.getElementById('close-import').addEventListener('click', function() {
+    const overlay = document.getElementById('import-overlay');
+    overlay.style.display = 'none';
+
+    // Restaura botão
+    const btn = document.getElementById('import-btn');
+    btn.style.position = 'static';
+    btn.style.zIndex = 'auto';
+});
+</script>
+
         <select id="ordenar">
             <option value="">Ordenar...</option>
             <option value="nome-asc">Nome (A-Z)</option>
@@ -516,62 +788,39 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<?php if (!isset($_COOKIE['visitou_produtos'])): ?>
-  <div id="welcome-overlay">
-    <div class="welcome-card">
-      <h2>Seja bem-vindo!</h2>
-      <p>Essa é a página principal do seu sistema de estoque, aqui você pode gerenciar os seus produtos.</p>
-      <button id="close-welcome">Entendi</button>
-    </div>
-  </div>
-  <style>
-    #welcome-overlay {
-      position: fixed;
-      top:0; left:0;
-      width:100%; height:100%;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(1px);
-      display:flex;
-      justify-content:flex-end;
-      align-items:center;
-      z-index:9999;
-      padding:20px;
-      padding-top:500px;
-    }
-    .welcome-card {
-      background:#fff;
-      color:#333;
-      padding:20px 30px;
-      border-radius:12px;
-      max-width:300px;
-      box-shadow:0 0 15px rgba(0,0,0,0.4);
-      animation: fadeIn 0.3s ease;
-    }
-    .welcome-card h2 { margin-bottom:10px; font-size:20px; }
-    .welcome-card button {
-      margin-top:15px;
-      padding:8px 16px;
-      border:none;
-      border-radius:6px;
-      background:#ff6600;
-      color:#fff;
-      cursor:pointer;
-    }
-    @keyframes fadeIn {
-      from {opacity:0; transform:translateY(20px);}
-      to {opacity:1; transform:translateY(0);}
-    }
-  </style>
-  <script>
-    document.getElementById('close-welcome').addEventListener('click', function(){
-      document.getElementById('welcome-overlay').style.display = 'none';
-      // Marca que já viu (salva cookie pelo PHP)
-      fetch('../marcar_visitou.php');
-    });
-  </script>
-<?php endif; ?>
 
 
+<button id="help-btn" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+">?</button>
 
+
+<script>
+const helpBtn = document.getElementById('help-btn');
+helpBtn.addEventListener('click', function() {
+    // Exibe os overlays na ordem
+    const welcome = document.getElementById('welcome-overlay');
+    welcome.style.display = 'flex';
+    
+    // Forçar os botões e cards na posição inicial
+    document.getElementById('acoes-overlay').style.display = 'none';
+    document.getElementById('import-overlay').style.display = 'none';
+});
+</script>
 </body>
 </html>

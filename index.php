@@ -21,7 +21,7 @@ session_start();
   <script>
     // Redirecionamento conforme sessão
     <?php if (isset($_SESSION['usuario_id'])): ?>
-        window.location.href = 'Pages/dashboard/estoque.php';
+        window.location.href = 'Pages/dashboard/tabelas/produtos.php';
     <?php else: ?>
         window.location.href = 'Pages/auth/lojas/cadastro.php';
     <?php endif; ?>

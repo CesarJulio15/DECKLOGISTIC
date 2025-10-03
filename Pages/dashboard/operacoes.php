@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
+include __DIR__ . '/../../header.php';
 
 $lojaId = $_SESSION['loja_id'] ?? 0;
 $usuarioId = $_SESSION['usuario_id'] ?? 0;
@@ -101,7 +102,8 @@ FROM historico_produtos h
 LEFT JOIN produtos p ON p.id = h.produto_id
 LEFT JOIN usuarios u ON u.id = h.usuario_id
 LEFT JOIN lojas l ON l.id = u.loja_id OR l.id = p.loja_id
-WHERE p.loja_id = $lojaId OR h.usuario_id IS NOT NULL
+WHERE (p.loja_id = $lojaId OR u.loja_id = $lojaId)
+
 
 UNION ALL
 

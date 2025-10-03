@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 require '../../../conexao.php';
+include '../../../header.php';
 
 session_start();
 

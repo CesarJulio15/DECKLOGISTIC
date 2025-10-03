@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../../../conexao.php'; // caminho do arquivo de conexão
+include __DIR__ . '/../../../header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = trim($_POST['empresa'] ?? '');

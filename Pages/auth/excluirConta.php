@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
+include __DIR__ . '/../../header.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: /Pages/auth/login.php");
