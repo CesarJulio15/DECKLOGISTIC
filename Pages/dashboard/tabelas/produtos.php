@@ -503,6 +503,34 @@ a.active {
 <script>
 
 
+    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = multiDeleteActive ? 'table-cell' : 'none');
+    document.getElementById('multi-checkbox-header').style.display = multiDeleteActive ? 'table-cell' : 'none';
+    confirmDeleteBtn.style.display = multiDeleteActive ? 'inline-block' : 'none';
+});
+
+// Confirmar exclusão
+document.getElementById('confirm-delete').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.chk-delete:checked');
+    if (checkboxes.length === 0) return alert("Selecione pelo menos um produto.");
+    if (!confirm("Deseja realmente excluir os produtos selecionados?")) return;
+    let ids = Array.from(checkboxes).map(chk => chk.dataset.id);
+
+    fetch('excluir_produto.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `produto_ids=${ids.join(',')}`
+    })
+    .then(res => res.text())
+    .then(data => {
+        if(data.trim() === 'ok'){
+            checkboxes.forEach(chk => chk.closest('tr').remove());
+            document.getElementById('confirm-delete').style.display = 'none';
+            document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'none');
+        } else {
+            alert('Erro ao excluir produtos!');
+        }
+    });
+});
 
 // Pesquisa
 document.getElementById('pesquisa').addEventListener('input', function() {
@@ -787,40 +815,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<button id="help-btn" style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #ff6600;
-    color: #fff;
-    border: none;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 3000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-">?</button>
-
-
-<script>
-const helpBtn = document.getElementById('help-btn');
-helpBtn.addEventListener('click', function() {
-    // Exibe os overlays na ordem
-    const welcome = document.getElementById('welcome-overlay');
-    welcome.style.display = 'flex';
-    
-    // Forçar os botões e cards na posição inicial
-    document.getElementById('acoes-overlay').style.display = 'none';
-    document.getElementById('import-overlay').style.display = 'none';
-});
-</script>
 </body>
 </html>
