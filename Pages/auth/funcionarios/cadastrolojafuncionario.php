@@ -13,20 +13,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST['senha'] ?? '';
     $senha2 = $_POST['senha2'] ?? '';
 
-  if ($nome && $email && $senha && $senha2) {
+if ($nome && $email && $senha && $senha2) {
     if ($senha !== $senha2) {
         $msg = "As senhas não coincidem.";
     } else {
-        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-        $loja_id = $_SESSION['usuario_id']; // ✅ aqui pegamos o ID do login correto
+        // 🔎 Verifica se já existe um usuário com esse e-mail
+        $check = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+        $check->bind_param("s", $email);
+        $check->execute();
+        $check->store_result();
 
-        $stmt = $conn->prepare("INSERT INTO usuarios (loja_id, nome, email, senha_hash) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $loja_id, $nome, $email, $senha_hash);
-
-        if ($stmt->execute()) {
-            $msg = "Funcionário cadastrado com sucesso!";
+        if ($check->num_rows > 0) {
+            $msg = "Este e-mail já está em uso.";
         } else {
-            $msg = "Erro ao cadastrar: " . $stmt->error;
+            // Se não existir, cadastra normalmente
+            $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+            $loja_id = $_SESSION['usuario_id'];
+
+            $stmt = $conn->prepare("INSERT INTO usuarios (loja_id, nome, email, senha_hash) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("isss", $loja_id, $nome, $email, $senha_hash);
+
+            if ($stmt->execute()) {
+                $msg = "Funcionário cadastrado com sucesso!";
+            } else {
+                $msg = "Erro ao cadastrar: " . $stmt->error;
+            }
         }
     }
 } else {
