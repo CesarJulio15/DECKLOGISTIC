@@ -64,7 +64,6 @@
       <ul>
         <li><b>Ctrl + F</b>: Buscar produtos.</li>
         <li><b>Ctrl + R</b>: Atualizar relatórios.</li>
-        <li><b>Ctrl + L</b>: Ir para login.</li>
       </ul>
     </div>
 
