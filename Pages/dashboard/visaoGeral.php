@@ -299,6 +299,38 @@ function explicacaoAnomalia(detalhe, score) {
 
 
 
+
+// Popup estilizado para feedback da IA
+function showIAPopup(msg, success=true) {
+  let popup = document.getElementById('ia-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'ia-popup';
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.background = success ? 'linear-gradient(120deg, #232526 60%, #232526 120%)' : '#2d1a1a';
+    popup.style.color = '#fff';
+    popup.style.padding = '32px 28px 22px 28px';
+    popup.style.borderRadius = '16px';
+    popup.style.boxShadow = '0 8px 32px rgba(0,0,0,0.35)';
+    popup.style.zIndex = '9999';
+    popup.style.fontSize = '1.1rem';
+    popup.style.textAlign = 'center';
+    popup.style.maxWidth = '90vw';
+    popup.style.minWidth = '260px';
+    popup.style.fontWeight = '500';
+    popup.style.letterSpacing = '0.2px';
+    popup.innerHTML = `<span id="ia-popup-msg">${msg}</span><br><button id="close-ia-popup" style="margin-top:18px;padding:8px 22px;border:none;border-radius:8px;background:#ff9900;color:#fff;font-weight:600;font-size:1rem;cursor:pointer;box-shadow:0 2px 8px #ff990033;transition:background 0.2s;">OK</button>`;
+    document.body.appendChild(popup);
+    document.getElementById('close-ia-popup').onclick = () => popup.remove();
+  } else {
+    document.getElementById('ia-popup-msg').innerHTML = msg;
+    popup.style.display = 'block';
+  }
+}
+
 async function executarIA() {
   const btn = document.getElementById("btnExecutarIA");
   btn.disabled = true;
@@ -317,13 +349,27 @@ async function executarIA() {
       btn.disabled = false;
       btn.textContent = "Executar IA";
     }, 800); // delay para UX
+    // Mensagem amigável e simples
+    let msgPopup = '';
     if (data && data.output) {
-      alert("IA executada!\n\nSaída:\n" + data.output);
+      if (data.output.includes('anomalia') && data.output.match(/\d+ anomalia/)) {
+        const qtd = data.output.match(/(\d+) anomalia/)[1];
+        if (parseInt(qtd) === 0) {
+          msgPopup = 'Nenhuma nova anomalia foi encontrada. Tudo normal!';
+        } else {
+          msgPopup = `Análise concluída!<br><b>${qtd}</b> nova(s) anomalia(s) registrada(s).`;
+        }
+      } else if (data.output.toLowerCase().includes('erro')) {
+        msgPopup = 'Ocorreu um erro ao rodar a análise. Tente novamente.';
+      } else {
+        msgPopup = 'Análise concluída!';
+      }
+      showIAPopup(msgPopup, true);
     }
   } catch (e) {
     btn.disabled = false;
     btn.textContent = "Executar IA";
-    alert("Erro ao executar IA: " + e);
+    showIAPopup('Erro ao executar a IA. Tente novamente.', false);
   }
 }
 
