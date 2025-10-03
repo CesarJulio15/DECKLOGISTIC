@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include __DIR__ . '/../../conexao.php';
+include __DIR__ . '/../../header.php';
 
 // Verifica login
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login'])) {

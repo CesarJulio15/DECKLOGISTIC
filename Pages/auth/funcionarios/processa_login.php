@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../../conexao.php';
+include __DIR__ . '/../../../header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);

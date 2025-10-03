@@ -1,5 +1,6 @@
 <?php
 session_start();
+include __DIR__ . '/../../header.php';
 
 // Verifica se usuário não é loja
 if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {

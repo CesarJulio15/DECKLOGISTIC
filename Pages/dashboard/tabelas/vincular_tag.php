@@ -1,5 +1,6 @@
 <?php
 include '../../../conexao.php';
+include '../../../header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $produto_id = intval($_POST['produto_id'] ?? 0);
