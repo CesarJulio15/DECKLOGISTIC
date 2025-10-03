@@ -73,6 +73,68 @@ $lojaId = $_SESSION['loja_id'];
 
   <!-- Dashboard Cards -->
   <div class="dashboard">
+    <!-- Card de Recomendações de Reabastecimento -->
+    <div class="card card-reabastecimento" id="cardReabastecimento" style="grid-column: span 2; min-height: 300px; height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;">
+      <h3 style="margin-bottom: 2px;">Sugestão de Reabastecimento</h3>
+      <div style="font-size:13px;color:#ff9900;margin-bottom:10px;">Baseado em previsão de vendas e giro dos produtos</div>
+      <div id="reabastecimentoLista" style="flex:1;min-height:120px;max-height:320px;overflow-y:auto;position:relative;background:transparent;"></div>
+      <button class="btn-modern" onclick="executarReabastecimento()" id="btnExecutarReabastecimento" style="align-self:flex-end;margin-top:12px;">Executar IA de Reabastecimento</button>
+    </div>
+<style>
+/* Card de reabastecimento ocupa 2 colunas no grid */
+.card-reabastecimento {
+  grid-column: span 2;
+  min-height: 320px;
+  background: #181818;
+  border: 1.5px solid #ff9900;
+  box-shadow: 0 4px 24px rgba(255,153,0,0.10);
+  position: relative;
+}
+#reabastecimentoLista ul {
+  background: #232526;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255,153,0,0.07);
+  border: 1px solid #2a2a2a;
+  margin: 0;
+  padding: 0;
+}
+#reabastecimentoLista li {
+  border-bottom: 1px solid #2a2a2a;
+  padding: 16px 22px 12px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent;
+  border-radius: 10px;
+  margin: 0;
+  transition: background 0.2s;
+}
+#reabastecimentoLista li:last-child {
+  border-bottom: none;
+}
+#reabastecimentoLista span {
+  word-break: break-word;
+}
+.reabastecimento-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+.reabastecimento-erro {
+  color: #ff6b6b;
+  text-align: center;
+  margin: 20px 0;
+}
+.reabastecimento-vazio {
+  color: #adb5bd;
+  text-align: center;
+  margin: 20px 0;
+}
+@media (max-width: 900px) {
+  .card-reabastecimento { grid-column: span 1; }
+}
+</style>
     <div class="card">
           <h3>Valor do Estoque Atual</h3>
       <div id="totalEstoque" class="value">
@@ -109,9 +171,15 @@ $lojaId = $_SESSION['loja_id'];
     <h3>Anomalias de Vendas</h3>
 
     <div id="anomaliasVendas" style="min-height:90px;max-height:220px;overflow-y:auto;transition:background 0.2s;position:relative;">
-        <div id="spinnerAnomalia" style="display:none;justify-content:center;align-items:center;height:80px;position:absolute;top:0;left:0;width:100%;background:#fff;z-index:2;">
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16" stroke="#1a1b1b" stroke-width="4" opacity="0.2"/><path d="M36 20a16 16 0 0 1-16 16" stroke="#1a1b1b" stroke-width="4"><animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="1s" repeatCount="indefinite"/></path></svg>
-      </div>
+    <div id="spinnerAnomalia" class="reabastecimento-spinner" style="display:none;position:relative;">
+        <svg width='40' height='40' viewBox='0 0 40 40' fill='none'>
+            <circle cx='20' cy='20' r='16' stroke='#ff9900' stroke-width='4' opacity='0.18'/>
+            <path d='M36 20a16 16 0 0 1-16 16' stroke='#ff9900' stroke-width='4'>
+                <animateTransform attributeName='transform' type='rotate' from='0 20 20' to='360 20 20' dur='1s' repeatCount='indefinite'/>
+            </path>
+        </svg>
+    </div>
+
       <p id="anomaliaMsg">Clique para ver as anomalias...</p>
       <div id="anomaliasLista"></div>
         </div>
@@ -386,7 +454,47 @@ document.getElementById("cardAnomalias").addEventListener("click", function(e) {
 loadProdutosMaisVendidos();
 
 
+async function loadReabastecimento() {
+  const lista = document.getElementById("reabastecimentoLista");
+  lista.innerHTML = `<div class='reabastecimento-spinner'><svg width='40' height='40' viewBox='0 0 40 40' fill='none'><circle cx='20' cy='20' r='16' stroke='#ff9900' stroke-width='4' opacity='0.18'/><path d='M36 20a16 16 0 0 1-16 16' stroke='#ff9900' stroke-width='4'><animateTransform attributeName='transform' type='rotate' from='0 20 20' to='360 20 20' dur='1s' repeatCount='indefinite'/></path></svg></div>`;
+  try {
+    const res = await fetch('/DECKLOGISTIC/api/run_reabastecimento.php');
+    const data = await res.json();
+    if (!data || !data.recomendacoes) {
+      lista.innerHTML = `<div class='reabastecimento-erro'>Erro ao buscar recomendações.</div>`;
+      return;
+    }
+    if (data.recomendacoes.length === 0) {
+      lista.innerHTML = `<div class='reabastecimento-vazio'>Nenhuma sugestão de reabastecimento encontrada.<br>Todos os produtos estão com estoque adequado ou sem dados suficientes.</div>`;
+      return;
+    }
+    const ul = document.createElement('ul');
+    data.recomendacoes.forEach(r => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span style='font-weight:600;color:#ff9900;font-size:15px;'>${r.nome ? r.nome : 'Produto ' + r.produto_id}</span>
+        <span style='color:#fff;font-size:13px;'>Sugestão: <b>${r.quantidade}</b> unidade(s)</span>
+        <span style='color:#adb5bd;font-size:12px;'>Demanda prevista: ${r.demanda}</span>
+      `;
+      ul.appendChild(li);
+    });
+    lista.innerHTML = '';
+    lista.appendChild(ul);
+  } catch (e) {
+    lista.innerHTML = `<div class='reabastecimento-erro'>Erro ao buscar recomendações.</div>`;
+  }
+}
 
+async function executarReabastecimento() {
+  const btn = document.getElementById("btnExecutarReabastecimento");
+  btn.disabled = true;
+  btn.textContent = "Executando...";
+  await loadReabastecimento();
+  btn.disabled = false;
+  btn.textContent = "Executar IA de Reabastecimento";
+}
+// Carrega recomendações ao abrir a página
+loadReabastecimento();
 
 
 

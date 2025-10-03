@@ -18,7 +18,7 @@ if len(sys.argv) > 1:
 else:
     loja_id = 1  # fallback para testes
 
-# Conexão MySQL (senha com caractere especial escapado)
+# Conexão MySQL (senha com caractere especial esca  pado)
 DB_URI = "mysql+pymysql://root:Home%40spSENAI2025!@localhost:3306/decklog_db"
 engine = sqlalchemy.create_engine(DB_URI)
 
