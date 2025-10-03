@@ -144,11 +144,42 @@ input[type="text"]:focus, .search:focus {
     top: 0;
     right: 0;
     width: 260px;
-    height: 100%;
+    height: 100vh;
     background: rgba(15,15,15,0.7);
     backdrop-filter: blur(15px);
     border-left: 2px solid rgba(255,255,255,0.1);
     color: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    z-index: 100;
+    transition: box-shadow 0.2s;
+}
+
+.sidebar-tags-destaque {
+    z-index: 10003 !important;
+    box-shadow: -2px 0 16px 0 rgba(0,0,0,0.25);
+    background: rgba(15,15,15,0.95) !important;
+}
+
+#help-btn-tag {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 101;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .tags-sidebar h2 {

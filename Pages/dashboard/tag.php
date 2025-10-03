@@ -98,7 +98,7 @@ $stmt->close();
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tags</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
+<link rel="icon" href="../../img/logo2.svg" type="image/x-icon" />
 <link rel="stylesheet" href="../../assets/tag.css">
 <link rel="stylesheet" href="../../assets/sidebar.css">
 <style>
@@ -106,6 +106,114 @@ $stmt->close();
 .context-menu ul { list-style:none; margin:0; padding:5px 0; }
 .context-menu li { padding:10px; cursor:pointer; transition:background 0.2s; }
 .context-menu li:hover { background:#f0f0f0; }
+/* Overlay e blur para dicas */
+#overlay-blur-tag {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;   /* Blur fica abaixo da sidebar */
+}
+
+.sidebar-tags-destaque {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 10010 !important; /* acima do blur */
+    background: rgba(15,15,15,0.95) !important;
+    box-shadow: -2px 0 16px 0 rgba(0,0,0,0.25);
+}
+
+#overlay-tag-1 {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  right: 32px;
+  bottom: 32px;
+  width: auto;
+  height: auto;
+  justify-content: flex-end;
+  align-items: flex-end;
+  background: none;
+}
+#overlay-tag-2 {
+  display: none;
+  position: absolute;
+  z-index: 10001;
+  background: none;
+  width: auto;
+  height: auto;
+  left: unset;
+  right: 290px; /* próximo à sidebar */
+  top: 80px;
+}
+.welcome-card-tag {
+  background: #000;
+  color: #fff;
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  max-width: 340px;
+  text-align: left;
+}
+.welcome-card-tag h2 {
+  font-size: 22px;
+  margin-bottom: 18px;
+}
+.welcome-card-tag p {
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+.welcome-card-tag button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #ff9900;
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+}
+/* Botão de ajuda fixo na sidebar */
+.tags-sidebar {
+  position: absolute; /* deixa seguir o fluxo da página */
+  top: 0;
+  right: 0;
+  width: 260px;
+  height: 100%; /* pega a altura do conteúdo */
+  min-height: 100vh; /* garante que ocupa pelo menos a tela inteira */
+  background: rgba(15,15,15,0.7);
+  backdrop-filter: blur(15px);
+  border-left: 2px solid rgba(255,255,255,0.1);
+  color: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  z-index: 100;
+}
+#help-btn-tag {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 101;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Sidebar destacada acima do blur no overlay 2 */
 </style>
 </head>
 <body>
@@ -182,6 +290,7 @@ $stmt->close();
                 </div>
             <?php endforeach; ?>
         </div>
+         <button id="help-btn-tag">?</button>
     </div>
 </div>
 
@@ -198,6 +307,23 @@ $stmt->close();
         <li id="renameTag">Renomear</li>
         <li id="deleteTag">Excluir</li>
     </ul>
+</div>
+
+<!-- Blur e overlays de dicas -->
+<div id="overlay-blur-tag"></div>
+<div id="overlay-tag-1">
+  <div class="welcome-card-tag">
+    <h2>TAGS</h2>
+    <p>Nessa página você consegue criar tags para os seus produtos, criando um estoque organizado e detalhado.</p>
+    <button id="btnProximoTag">Próximo</button>
+  </div>
+</div>
+<div id="overlay-tag-2">
+  <div class="welcome-card-tag">
+    <h2>SUA LISTA</h2>
+    <p>Aqui são exibidas suas tags criadas, também é possível editar e excluir tags já criadas.</p>
+    <button id="btnFecharTag">Entendi</button>
+  </div>
 </div>
 
 <script>
@@ -269,6 +395,52 @@ document.getElementById("renameTag").addEventListener("click", () => {
     document.getElementById("rename_tag_nome").value = novoNome;
     document.getElementById("renameForm").submit();
 });
+
+// --- Dicas/Overlay Tag ---
+const helpBtnTag = document.getElementById('help-btn-tag');
+const overlayBlurTag = document.getElementById('overlay-blur-tag');
+const overlayTag1 = document.getElementById('overlay-tag-1');
+const overlayTag2 = document.getElementById('overlay-tag-2');
+const btnProximoTag = document.getElementById('btnProximoTag');
+const btnFecharTag = document.getElementById('btnFecharTag');
+const sidebarTags = document.querySelector('.tags-sidebar');
+
+function showBlurTag() {
+  overlayBlurTag.style.display = 'block';
+}
+function hideBlurTag() {
+  overlayBlurTag.style.display = 'none';
+}
+
+helpBtnTag.addEventListener('click', () => {
+  showBlurTag();
+  overlayTag1.style.display = 'flex';
+});
+
+btnProximoTag.addEventListener('click', () => {
+    overlayTag1.style.display = 'none';
+    overlayTag2.style.display = 'flex';
+    if (sidebarTags) {
+        sidebarTags.classList.add('sidebar-tags-destaque');
+    }
+});
+
+btnFecharTag.addEventListener('click', () => {
+    overlayTag2.style.display = 'none';
+    hideBlurTag();
+    if (sidebarTags) {
+        sidebarTags.classList.remove('sidebar-tags-destaque');
+    }
+});
+</script>
+<!-- Botão de ajuda dentro da sidebar -->
+<script>
+if(document.querySelector('.tags-sidebar') && !document.getElementById('help-btn-tag')){
+  const btn = document.createElement('button');
+  btn.id = 'help-btn-tag';
+  btn.innerText = '?';
+  document.querySelector('.tags-sidebar').appendChild(btn);
+}
 </script>
 </body>
 </html>
