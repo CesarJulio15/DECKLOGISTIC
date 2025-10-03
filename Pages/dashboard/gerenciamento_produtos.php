@@ -606,7 +606,7 @@ if ($stmt) {
 
   <aside class="sidebar">
     <div class="logo-area">
-      <img src="../../img/logoDecklogistic.webp" alt="Logo">
+      <img src="../../img/logo2.svg" alt="Logo">
     </div>
 
     <nav class="nav-section">
@@ -619,7 +619,7 @@ if ($stmt) {
         <hr>
 
         <ul class="nav-list middle-section">
-          <li><a href="/Pages/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span>Visão Geral</a></li>
+          <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span>Visão Geral</a></li>
           <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span>Operações</a></li>
           <li><a  class="active" href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span>Produtos</a></li>
           <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span>Tags</a></li>

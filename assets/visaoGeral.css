@@ -16,7 +16,7 @@ body {
   margin-left: 220px;
   padding: 30px;
   display: grid;  /* Usando Grid para alinhar os cards lado a lado */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));  /* Cards de 280px no mínimo, preenchendo o espaço */
+  grid-template-columns: repeat(5, 1fr); /* 5 colunas para permitir span 2.5 */
   gap: 20px;  /* Espaçamento entre os cards */
   width: calc(100% - 220px);  /* Ajuste da largura considerando a sidebar */
   background: transparent;

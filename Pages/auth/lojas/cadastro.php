@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro | DeckLogistic</title>
   <link rel="stylesheet" href="../../../assets/cadastro.css">
-  <link rel="icon" href="../img/logoDecklogistic.webp" type="image/x-icon" />
+  <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 
 <link rel="manifest" href="/decklogistic/manifest.json">
 <meta name="theme-color" content="#0d6efd">

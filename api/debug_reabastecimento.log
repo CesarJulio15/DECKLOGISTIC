@@ -1,0 +1,19 @@
+16:12:33 - cmdstanpy - INFO - Chain [1] start processing
+16:12:33 - cmdstanpy - INFO - Chain [1] done processing
+16:12:33 - cmdstanpy - INFO - Chain [1] start processing
+16:12:33 - cmdstanpy - INFO - Chain [1] done processing
+16:12:33 - cmdstanpy - INFO - Chain [1] start processing
+16:12:33 - cmdstanpy - INFO - Chain [1] done processing
+Rodando previsao de reabastecimento...
+Produto 27: dados insuficientes para previsao.
+Produto 28: dados insuficientes para previsao.
+Produto 29: dados insuficientes para previsao.
+Produto 30 (teste): Reabasteca 180 unidades (demanda prevista: 185)
+Produto 31: dados insuficientes para previsao.
+Produto 32 (ad): Reabasteca 10611 unidades (demanda prevista: 10624)
+Produto 51: dados insuficientes para previsao.
+Produto 55: dados insuficientes para previsao.
+Produto 61: dados insuficientes para previsao.
+Produto 75: dados insuficientes para previsao.
+Produto 76 (Ap): Reabasteca 0 unidades (demanda prevista: -2037)
+Produto 77: dados insuficientes para previsao.

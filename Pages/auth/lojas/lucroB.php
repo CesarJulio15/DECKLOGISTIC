@@ -1,5 +1,6 @@
 <?php
-include __DIR__ . '../../../../conexao.php';
+session_start();
+include __DIR__ . "/../../../conexao.php";
 include __DIR__ . '/../../../header.php';
 
 $filtro = $_GET['filtro'] ?? 'dia';
@@ -24,11 +25,16 @@ function getDataField($filtro) {
 
 $dataField = getDataField($filtro);
 
-// Consulta principal
+// ID da loja logada
+$lojaId = $_SESSION['loja_id'] ?? 0;
+$whereLoja = $lojaId ? " WHERE loja_id = " . intval($lojaId) : "";
+
+// Consulta receita e custo agrupado
 $sql = "SELECT $dataField AS periodo,
                SUM(valor_total) AS receita,
                SUM(custo_total) AS custo
         FROM vendas
+        $whereLoja
         GROUP BY $dataField
         ORDER BY periodo ASC";
 
@@ -40,11 +46,11 @@ $dadosCusto = [];
 
 while ($row = mysqli_fetch_assoc($res)) {
     $labels[] = $row['periodo'];
-    $dadosReceita[] = (float)$row['receita'];
-    $dadosCusto[] = (float)$row['custo'];
+    $dadosReceita[] = (float)($row['receita'] ?? 0);
+    $dadosCusto[] = (float)($row['custo'] ?? 0);
 }
 
-// Totais para o filtro atual
+// Condição para totais
 $condicao = match($filtro) {
     'bimestre' => "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/2)+1,2,'0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/2)+1,2,'0'))",
     'trimestre' => "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/3)+1,2,'0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/3)+1,2,'0'))",
@@ -63,18 +69,27 @@ $tituloFiltro = match($filtro) {
     default => 'Dia'
 };
 
-// Totais
-$sqlReceita = "SELECT SUM(valor_total) AS total_receita FROM vendas WHERE $condicao";
-$receita = mysqli_fetch_assoc(mysqli_query($conn, $sqlReceita))['total_receita'] ?? 0;
+// Receita e custo totais para o filtro atual
+$sqlReceita = "SELECT SUM(valor_total) AS total_receita 
+               FROM vendas 
+               WHERE $condicao " . ($lojaId ? "AND loja_id = " . intval($lojaId) : "");
 
-$sqlCusto = "SELECT SUM(custo_total) AS total_custo FROM vendas WHERE $condicao";
-$custo = mysqli_fetch_assoc(mysqli_query($conn, $sqlCusto))['total_custo'] ?? 0;
+$rowReceita = mysqli_fetch_assoc(mysqli_query($conn, $sqlReceita));
+$receita = $rowReceita['total_receita'] ?? 0;
+
+$sqlCusto = "SELECT SUM(custo_total) AS total_custo 
+             FROM vendas 
+             WHERE $condicao " . ($lojaId ? "AND loja_id = " . intval($lojaId) : "");
+
+$rowCusto = mysqli_fetch_assoc(mysqli_query($conn, $sqlCusto));
+$custo = $rowCusto['total_custo'] ?? 0;
 
 // Lucro e variação
 $lucro = $receita - $custo;
 $percentual = 0;
 $seta = "↑";
 $classe = "positivo";
+
 if ($receita > 0) {
     $percentual = ($lucro / $receita) * 100;
     if ($percentual < 0) {
@@ -83,6 +98,8 @@ if ($receita > 0) {
     }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
