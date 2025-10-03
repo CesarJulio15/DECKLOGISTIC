@@ -44,6 +44,15 @@ def detectar_anomalias(df, janela=7, z_thresh=1):
     return df
 
 def salvar_anomalias(df, loja_id):
+    # Checa se já existe anomalia igual antes de inserir
+    select_sql = """
+        SELECT COUNT(*) FROM anomalias
+        WHERE loja_id = :loja_id
+          AND tipo_anomalia = :tipo_anomalia
+          AND data_ocorrencia = :data_ocorrencia
+          AND ABS(score - :score) < 0.01
+          AND metodo = :metodo
+    """
     insert_sql = """
         INSERT INTO anomalias (loja_id, produto_id, tipo_anomalia, data_ocorrencia, detalhe, score, metodo)
         VALUES (:loja_id, NULL, :tipo_anomalia, :data_ocorrencia, :detalhe, :score, :metodo)
@@ -53,20 +62,24 @@ def salvar_anomalias(df, loja_id):
         print("Nenhuma anomalia encontrada.")
         return
 
-    params = []
-    for _, r in anomalias.iterrows():
-        params.append({
-            'loja_id': loja_id,
-            'tipo_anomalia': 'vendas_acima_abaixo',
-            'data_ocorrencia': r['data_venda'].date(),
-            'detalhe': f"Venda {r['valor_dia']}, média {r['media']:.2f}",
-            'score': float(r['zscore']),
-            'metodo': 'zscore'
-        })
-
+    novas = []
     with engine.begin() as conn:
-        conn.execute(sqlalchemy.text(insert_sql), params)
-    print(f"{len(params)} anomalias salvas.")
+        for _, r in anomalias.iterrows():
+            params = {
+                'loja_id': loja_id,
+                'tipo_anomalia': 'vendas_acima_abaixo',
+                'data_ocorrencia': r['data_venda'].date(),
+                'detalhe': f"Venda {r['valor_dia']}, média {r['media']:.2f}",
+                'score': float(r['zscore']),
+                'metodo': 'zscore'
+            }
+            res = conn.execute(sqlalchemy.text(select_sql), params)
+            existe = res.scalar() > 0
+            if not existe:
+                novas.append(params)
+        if novas:
+            conn.execute(sqlalchemy.text(insert_sql), novas)
+    print(f"{len(novas)} anomalias novas salvas.")
 
 # --- Execução ---
 vendas = carregar_vendas(loja_id)

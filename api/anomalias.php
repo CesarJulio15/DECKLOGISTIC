@@ -1,9 +1,9 @@
 <?php
-session_start(); // sempre no início
+session_start(); 
 include __DIR__ . '/../conexao.php';
 header('Content-Type: application/json');
 
-$lojaId = $_SESSION['loja_id'] ?? 0; // pega direto da sessão
+$lojaId = $_SESSION['loja_id'] ?? 0; 
 
 $sql = "SELECT data_ocorrencia, detalhe, score
         FROM anomalias

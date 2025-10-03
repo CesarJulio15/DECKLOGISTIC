@@ -104,13 +104,49 @@ $lojaId = $_SESSION['loja_id'];
     </div>
   </div>
 
-  <div class="card">
-  <h3>Anomalias de Vendas</h3>
-  <div id="anomaliasVendas">
-    <p>Carregando...</p>
+
+  <div class="card" id="cardAnomalias" style="overflow:hidden;">
+    <h3>Anomalias de Vendas</h3>
+
+    <div id="anomaliasVendas" style="min-height:90px;max-height:220px;overflow-y:auto;transition:background 0.2s;position:relative;">
+        <div id="spinnerAnomalia" style="display:none;justify-content:center;align-items:center;height:80px;position:absolute;top:0;left:0;width:100%;background:#fff;z-index:2;">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16" stroke="#1a1b1b" stroke-width="4" opacity="0.2"/><path d="M36 20a16 16 0 0 1-16 16" stroke="#1a1b1b" stroke-width="4"><animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="1s" repeatCount="indefinite"/></path></svg>
+      </div>
+      <p id="anomaliaMsg">Clique para ver as anomalias...</p>
+      <div id="anomaliasLista"></div>
+        </div>
+        <button class="btn-modern" onclick="executarIA()" id="btnExecutarIA">Executar</button>
+      </div>
+    </div>
   </div>
-  <button class="btn-modern" onclick="executarIA()">Executar IA</button>
-</div>
+  <style>
+  /* Estilo extra para lista de anomalias */
+  #anomaliasLista ul {
+    background: linear-gradient(90deg, #f7f8fa 60%, #e9ecef 100%);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(30,32,37,0.07);
+    border: 1px solid #e0e0e0;
+  }
+  #anomaliasLista li {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 18px 10px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: transparent;
+    border-radius: 10px;
+    margin: 4px 0;
+  }
+  #anomaliasLista li:last-child {
+    border-bottom: none;
+  }
+  #anomaliasLista span {
+    word-break: break-word;
+  }
+  </style>
+    </div>
+    <button class="btn-modern" onclick="executarIA()" id="btnExecutarIA">Executar IA</button>
+  </div>
 
 </div>
 
@@ -155,57 +191,152 @@ async function loadProdutosMaisVendidos() {
   }
 }
 
-// Anomalias de Vendas
+
+
+// Anomalias de Vendas - spinner fixo, lista separada
 async function loadAnomalias() {
+  const div = document.getElementById("anomaliasVendas");
+  const spinner = document.getElementById("spinnerAnomalia");
+  const msg = document.getElementById("anomaliaMsg");
+  const lista = document.getElementById("anomaliasLista");
+
+  spinner.style.display = "flex";
+  msg.style.display = "none";
+  lista.innerHTML = '';
+
+  // fundo do container também escuro
+  div.style.background = "#121212";
+  div.style.borderRadius = "14px";
+  div.style.padding = "12px";
+  div.style.boxShadow = "0 4px 16px rgba(0,0,0,0.6)";
+
   try {
     const data = await fetch(`/DECKLOGISTIC/api/anomalias.php?loja_id=${lojaId}`).then(r => r.json());
+    spinner.style.display = "none";
 
-    const div = document.getElementById("anomaliasVendas");
-    div.innerHTML = '';
-
-    if (data.length === 0) {
-      div.innerHTML = '<p>Nenhuma anomalia detectada</p>';
+    if (!data || data.length === 0) {
+      msg.style.display = "block";
+      msg.style.color = "#ccc";
+      msg.textContent = "Nenhuma anomalia detectada nos últimos dias.";
+      lista.innerHTML = '';
       return;
     }
 
-    const table = document.createElement('table');
-    table.setAttribute('border', '1');
-    table.setAttribute('cellpadding', '10');
-    table.setAttribute('cellspacing', '0');
+    msg.style.display = "none";
 
-    const headerRow = document.createElement('tr');
-    headerRow.innerHTML = '<th>Data</th><th>Detalhe</th><th>Score</th>';
-    table.appendChild(headerRow);
+    // Layout dark e moderno
+    const list = document.createElement('ul');
+    list.style.listStyle = 'none';
+    list.style.padding = '8px 0';
+    list.style.margin = '0';
+    list.style.background = '#1a1a1a'; // leve contraste fosco
+    list.style.borderRadius = '12px';
+    list.style.border = '1px solid #2a2a2a';
+    list.style.overflow = 'hidden';
 
-    data.forEach(a => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${a.data_ocorrencia}</td>
-                       <td>${a.detalhe}</td>
-                       <td>${a.score.toFixed(2)}</td>`;
-      table.appendChild(row);
+    data.forEach((a, index) => {
+      const li = document.createElement('li');
+      li.style.padding = '16px 22px';
+      li.style.display = 'flex';
+      li.style.flexDirection = 'column';
+      li.style.gap = '6px';
+      li.style.transition = 'background 0.25s ease, transform 0.15s ease';
+
+      // efeito hover elegante
+      li.addEventListener('mouseenter', () => {
+        li.style.background = '#2a2a2a';
+        li.style.transform = 'translateX(4px)';
+      });
+      li.addEventListener('mouseleave', () => {
+        li.style.background = 'transparent';
+        li.style.transform = 'translateX(0)';
+      });
+
+      // divisor fosco
+      if (index < data.length - 1) {
+        li.style.borderBottom = '1px solid #2f2f2f';
+      }
+
+      li.innerHTML = `
+        <span style="font-weight:600;color:#f8f9fa;font-size:15px;letter-spacing:0.3px;">
+          ${formatarData(a.data_ocorrencia)}
+        </span>
+        <span style="color:#ff6b6b;font-size:13px;font-weight:500;line-height:1.5;">
+          ${explicacaoAnomalia(a.detalhe, a.score)}
+        </span>
+        <span style="color:#adb5bd;font-size:12px;">
+        </span>
+      `;
+
+      list.appendChild(li);
     });
 
-    div.appendChild(table);
+    lista.appendChild(list);
+
   } catch (err) {
+    spinner.style.display = "none";
+    msg.style.display = "block";
+    msg.style.color = "#ff6b6b";
+    msg.textContent = "Erro ao carregar anomalias";
+    lista.innerHTML = '';
     console.error("Erro ao carregar anomalias:", err);
   }
 }
 
+function formatarData(data) {
+  // yyyy-mm-dd para dd/mm/yyyy
+  if (!data) return '';
+  const d = new Date(data);
+  if (isNaN(d)) return data;
+  return d.toLocaleDateString('pt-BR');
+}
+
+function explicacaoAnomalia(detalhe, score) {
+  if (score > 0) return `Venda muito acima do esperado. (${detalhe})`;
+  if (score < 0) return `Venda muito abaixo do esperado. (${detalhe})`;
+  return detalhe;
+}
+
+
+
 async function executarIA() {
+  const btn = document.getElementById("btnExecutarIA");
+  btn.disabled = true;
+  btn.textContent = "Executando...";
+  const spinner = document.getElementById("spinnerAnomalia");
+  const msg = document.getElementById("anomaliaMsg");
+  const lista = document.getElementById("anomaliasLista");
+  spinner.style.display = "flex";
+  msg.style.display = "none";
+  lista.innerHTML = '';
   try {
     const res = await fetch(`/DECKLOGISTIC/api/run_anomalias.php`);
     const data = await res.json();
-    alert("IA executada!\n\nSaída:\n" + data.output);
-    loadAnomalias(); // recarrega tabela
+    setTimeout(() => {
+      loadAnomalias();
+      btn.disabled = false;
+      btn.textContent = "Executar IA";
+    }, 800); // delay para UX
+    if (data && data.output) {
+      alert("IA executada!\n\nSaída:\n" + data.output);
+    }
   } catch (e) {
+    btn.disabled = false;
+    btn.textContent = "Executar IA";
     alert("Erro ao executar IA: " + e);
   }
 }
 
-// Chama a função ao carregar a página
-loadAnomalias();
 
-// Chama a função ao carregar a página
+// Clique no card de anomalias carrega as anomalias
+document.getElementById("cardAnomalias").addEventListener("click", function(e) {
+  // Evita disparar ao clicar no botão
+  if (e.target && e.target.id === "btnExecutarIA") return;
+  loadAnomalias();
+});
+
+// Carrega ao abrir a página (pode deixar só a mensagem inicial)
+// loadAnomalias();
 loadProdutosMaisVendidos();
 
 
