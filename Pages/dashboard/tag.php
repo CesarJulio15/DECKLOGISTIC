@@ -1,7 +1,6 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-include __DIR__ . '/../../header.php';
 
 $tipo_login = $_SESSION['tipo_login'] ?? 'funcionario';
 $loja_id = $_SESSION['loja_id'] ?? null;
@@ -107,114 +106,11 @@ $stmt->close();
 .context-menu ul { list-style:none; margin:0; padding:5px 0; }
 .context-menu li { padding:10px; cursor:pointer; transition:background 0.2s; }
 .context-menu li:hover { background:#f0f0f0; }
-/* Overlay e blur para dicas */
-#overlay-blur-tag {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
-  z-index: 9999;
-}
-#overlay-tag-1 {
-  display: none;
-  position: fixed;
-  z-index: 10000;
-  right: 32px;
-  bottom: 32px;
-  width: auto;
-  height: auto;
-  justify-content: flex-end;
-  align-items: flex-end;
-  background: none;
-}
-#overlay-tag-2 {
-  display: none;
-  position: absolute;
-  z-index: 10001;
-  background: none;
-  width: auto;
-  height: auto;
-  left: unset;
-  right: 290px; /* próximo à sidebar */
-  top: 80px;
-}
-.welcome-card-tag {
-  background: #000;
-  color: #fff;
-  padding: 24px 32px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  max-width: 340px;
-  text-align: left;
-}
-.welcome-card-tag h2 {
-  font-size: 22px;
-  margin-bottom: 18px;
-}
-.welcome-card-tag p {
-  font-size: 15px;
-  margin-bottom: 18px;
-}
-.welcome-card-tag button {
-  padding: 8px 18px;
-  border: none;
-  border-radius: 6px;
-  background: #ff9900;
-  color: #fff;
-  cursor: pointer;
-  font-size: 15px;
-}
-/* Botão de ajuda fixo na sidebar */
-.tags-sidebar {
-  position: relative;
-}
-#help-btn-tag {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #ff6600;
-  color: #fff;
-  border: none;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 10002;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-/* Sidebar destacada acima do blur no overlay 2 */
-.sidebar-tags-destaque {
-  position: relative !important;
-  z-index: 10003 !important;
-}
 </style>
-<!-- Blur e overlays de dicas -->
-<div id="overlay-blur-tag"></div>
-<div id="overlay-tag-1">
-  <div class="welcome-card-tag">
-    <h2>TAGS</h2>
-    <p>Nessa página você consegue criar tags para os seus produtos, criando um estoque organizado e detalhado.</p>
-    <button id="btnProximoTag">Próximo</button>
-  </div>
-</div>
-<div id="overlay-tag-2">
-  <div class="welcome-card-tag">
-    <h2>SUAS TAGS</h2>
-    <p>Aqui são exibidas suas tags criadas, também é possível editar e excluir tags já criadas.</p>
-    <button id="btnFecharTag">Entendi</button>
-  </div>
-</div>
 </head>
 <body>
 <aside class="sidebar">
-    <div class="logo-area"><img src="../../img/logo2.svg" alt="Logo"></div>
+    <div class="logo-area"><img src="../../img/logoDecklogistic.webp" alt="Logo"></div>
     <nav class="nav-section">
         <div class="nav-menus">
             <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
@@ -286,7 +182,6 @@ $stmt->close();
                 </div>
             <?php endforeach; ?>
         </div>
-        <button id="help-btn-tag">?</button>
     </div>
 </div>
 
@@ -373,38 +268,6 @@ document.getElementById("renameTag").addEventListener("click", () => {
     document.getElementById("rename_tag_id").value = selectedTagId;
     document.getElementById("rename_tag_nome").value = novoNome;
     document.getElementById("renameForm").submit();
-});
-// --- Dicas/Overlay Tag ---
-const helpBtnTag = document.getElementById('help-btn-tag');
-const overlayBlurTag = document.getElementById('overlay-blur-tag');
-const overlayTag1 = document.getElementById('overlay-tag-1');
-const overlayTag2 = document.getElementById('overlay-tag-2');
-const btnProximoTag = document.getElementById('btnProximoTag');
-const btnFecharTag = document.getElementById('btnFecharTag');
-const sidebarTags = document.querySelector('.tags-sidebar');
-
-function showBlurTag() {
-  overlayBlurTag.style.display = 'block';
-}
-function hideBlurTag() {
-  overlayBlurTag.style.display = 'none';
-}
-
-helpBtnTag.addEventListener('click', () => {
-  showBlurTag();
-  overlayTag1.style.display = 'flex';
-});
-
-btnProximoTag.addEventListener('click', () => {
-  overlayTag1.style.display = 'none';
-  overlayTag2.style.display = 'flex';
-  if (sidebarTags) sidebarTags.classList.add('sidebar-tags-destaque');
-});
-
-btnFecharTag.addEventListener('click', () => {
-  overlayTag2.style.display = 'none';
-  hideBlurTag();
-  if (sidebarTags) sidebarTags.classList.remove('sidebar-tags-destaque');
 });
 </script>
 </body>
