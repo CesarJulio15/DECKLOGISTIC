@@ -72,9 +72,41 @@ $lojaId = $_SESSION['loja_id'];
 </style>
 
   <!-- Dashboard Cards -->
-  <div class="dashboard">
-    <!-- Card de Recomendações de Reabastecimento -->
-    <div class="card card-reabastecimento" id="cardReabastecimento" style="grid-column: span 2; min-height: 300px; height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;">
+  <div class="dashboard dashboard-custom">
+    <div class="card card-valorEstoque">
+      <h3>Valor do Estoque Atual</h3>
+      <div id="totalEstoque" class="value">
+        <?php include '../../api/valorTotalEstoque.php'; ?>
+      </div>
+      <div id="chartTotal" style="height:60px; margin-top:10px;"></div>
+    </div>
+    <div class="card card-custoEstoque">
+      <h3>Custo do Estoque Atual</h3>
+      <div id="totalEstoque" class="value">
+        <?php include '../../api/custoTotalEstoque.php'; ?>
+      </div>
+      <div id="chartTotal" style="height:60px; margin-top:10px;"></div>
+    </div>
+    <div class="card card-margemLucro">
+      <h3>Margem de Lucro Média</h3>
+      <div id="totalEstoque" class="value">
+        <?php include '../../api/margemMediaProdutos.php'; ?>
+      </div>
+      <div id="chartTotal" style="height:60px; margin-top:10px;"></div>
+    </div>
+    <div class="card card-produtosMaisVendidos" style="grid-column: span 2;">
+      <h3>Produtos Mais Vendidos</h3>
+      <div id="produtosMaisVendidos">
+        <?php include '../../api/produtosMaisVendidos.php'; ?>
+      </div>
+    </div>
+    <div class="card card-anomalias" id="cardAnomalias" style="grid-column: span 2.5; min-height: 300px; height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;">
+      <h3 style="margin-bottom: 2px;">Anomalias de Vendas</h3>
+      <div style="font-size:13px;color:#ff9900;margin-bottom:10px;">Detecta dias com vendas muito acima ou abaixo do normal</div>
+      <div id="anomaliasVendas" style="flex:1;min-height:120px;max-height:320px;overflow-y:auto;position:relative;background:transparent;"></div>
+      <button class="btn-modern" onclick="executarIA()" id="btnExecutarIA" style="align-self:flex-end;margin-top:12px;">Executar IA de Anomalias</button>
+    </div>
+    <div class="card card-reabastecimento" id="cardReabastecimento" style="grid-column: span 2.5; min-height: 300px; height: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;">
       <h3 style="margin-bottom: 2px;">Sugestão de Reabastecimento</h3>
       <div style="font-size:13px;color:#ff9900;margin-bottom:10px;">Baseado em previsão de vendas e giro dos produtos</div>
       <div id="reabastecimentoLista" style="flex:1;min-height:120px;max-height:320px;overflow-y:auto;position:relative;background:transparent;"></div>
@@ -135,58 +167,61 @@ $lojaId = $_SESSION['loja_id'];
   .card-reabastecimento { grid-column: span 1; }
 }
 </style>
-    <div class="card">
-          <h3>Valor do Estoque Atual</h3>
-      <div id="totalEstoque" class="value">
-        <?php include '../../api/valorTotalEstoque.php'; ?> <!-- Inclui o cálculo do valor do estoque -->
-      </div>
-      <div id="chartTotal" style="height:60px; margin-top:10px;"></div>
-    </div>
-      
-    
-    <div class="card">
-          <h3>Custo do Estoque Atual</h3>
-      <div id="totalEstoque" class="value">
-        <?php include '../../api/custoTotalEstoque.php'; ?> <!-- Inclui o cálculo do valor do estoque -->
-      </div>
-      <div id="chartTotal" style="height:60px; margin-top:10px;"></div>
-    </div>
-
-     <div class="card">
-          <h3>Margem de Lucro Média</h3>
-      <div id="totalEstoque" class="value">
-        <?php include '../../api/margemMediaProdutos.php'; ?> <!-- Inclui o cálculo do valor do estoque -->
-      </div>
-      <div id="chartTotal" style="height:60px; margin-top:10px;"></div>
-    </div>
-    <div class="card">
-    <h3>Produtos Mais Vendidos</h3>
-    <div id="produtosMaisVendidos">
-        <?php include '../../api/produtosMaisVendidos.php'; ?> <!-- Inclui o cálculo dos produtos mais vendidos -->
-    </div>
-  </div>
-
-
-  <div class="card" id="cardAnomalias" style="overflow:hidden;">
-    <h3>Anomalias de Vendas</h3>
-
-    <div id="anomaliasVendas" style="min-height:90px;max-height:220px;overflow-y:auto;transition:background 0.2s;position:relative;">
-    <div id="spinnerAnomalia" class="reabastecimento-spinner" style="display:none;position:relative;">
-        <svg width='40' height='40' viewBox='0 0 40 40' fill='none'>
-            <circle cx='20' cy='20' r='16' stroke='#ff9900' stroke-width='4' opacity='0.18'/>
-            <path d='M36 20a16 16 0 0 1-16 16' stroke='#ff9900' stroke-width='4'>
-                <animateTransform attributeName='transform' type='rotate' from='0 20 20' to='360 20 20' dur='1s' repeatCount='indefinite'/>
-            </path>
-        </svg>
-    </div>
-
-      <p id="anomaliaMsg">Clique para ver as anomalias...</p>
-      <div id="anomaliasLista"></div>
-        </div>
-        <button class="btn-modern" onclick="executarIA()" id="btnExecutarIA">Executar</button>
-      </div>
-    </div>
-  </div>
+<style>
+/* Card de anomalias igual ao de reabastecimento */
+.card-anomalias {
+  grid-column: span 2;
+  min-height: 320px;
+  background: #181818;
+  border: 1.5px solid #ff9900;
+  box-shadow: 0 4px 24px rgba(255,153,0,0.10);
+  position: relative;
+}
+#anomaliasVendas ul {
+  background: #232526;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255,153,0,0.07);
+  border: 1px solid #2a2a2a;
+  margin: 0;
+  padding: 0;
+}
+#anomaliasVendas li {
+  border-bottom: 1px solid #2a2a2a;
+  padding: 16px 22px 12px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent;
+  border-radius: 10px;
+  margin: 0;
+  transition: background 0.2s;
+}
+#anomaliasVendas li:last-child {
+  border-bottom: none;
+}
+#anomaliasVendas span {
+  word-break: break-word;
+}
+.anomalias-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+.anomalias-erro {
+  color: #ff6b6b;
+  text-align: center;
+  margin: 20px 0;
+}
+.anomalias-vazio {
+  color: #adb5bd;
+  text-align: center;
+  margin: 20px 0;
+}
+@media (max-width: 900px) {
+  .card-anomalias { grid-column: span 1; }
+}
+</style>
   <style>
   /* Estilo extra para lista de anomalias */
   #anomaliasLista ul {
@@ -261,92 +296,31 @@ async function loadProdutosMaisVendidos() {
 
 
 
-// Anomalias de Vendas - spinner fixo, lista separada
+
+// Anomalias de Vendas - formato igual ao card de reabastecimento
 async function loadAnomalias() {
   const div = document.getElementById("anomaliasVendas");
-  const spinner = document.getElementById("spinnerAnomalia");
-  const msg = document.getElementById("anomaliaMsg");
-  const lista = document.getElementById("anomaliasLista");
-
-  spinner.style.display = "flex";
-  msg.style.display = "none";
-  lista.innerHTML = '';
-
-  // fundo do container também escuro
-  div.style.background = "#121212";
-  div.style.borderRadius = "14px";
-  div.style.padding = "12px";
-  div.style.boxShadow = "0 4px 16px rgba(0,0,0,0.6)";
-
+  div.innerHTML = `<div class='anomalias-spinner'><svg width='40' height='40' viewBox='0 0 40 40' fill='none'><circle cx='20' cy='20' r='16' stroke='#ff9900' stroke-width='4' opacity='0.18'/><path d='M36 20a16 16 0 0 1-16 16' stroke='#ff9900' stroke-width='4'><animateTransform attributeName='transform' type='rotate' from='0 20 20' to='360 20 20' dur='1s' repeatCount='indefinite'/></path></svg></div>`;
   try {
     const data = await fetch(`/DECKLOGISTIC/api/anomalias.php?loja_id=${lojaId}`).then(r => r.json());
-    spinner.style.display = "none";
-
     if (!data || data.length === 0) {
-      msg.style.display = "block";
-      msg.style.color = "#ccc";
-      msg.textContent = "Nenhuma anomalia detectada nos últimos dias.";
-      lista.innerHTML = '';
+      div.innerHTML = `<div class='anomalias-vazio'>Nenhuma anomalia detectada nos últimos dias.</div>`;
       return;
     }
-
-    msg.style.display = "none";
-
-    // Layout dark e moderno
-    const list = document.createElement('ul');
-    list.style.listStyle = 'none';
-    list.style.padding = '8px 0';
-    list.style.margin = '0';
-    list.style.background = '#1a1a1a'; // leve contraste fosco
-    list.style.borderRadius = '12px';
-    list.style.border = '1px solid #2a2a2a';
-    list.style.overflow = 'hidden';
-
-    data.forEach((a, index) => {
+    const ul = document.createElement('ul');
+    data.forEach(a => {
       const li = document.createElement('li');
-      li.style.padding = '16px 22px';
-      li.style.display = 'flex';
-      li.style.flexDirection = 'column';
-      li.style.gap = '6px';
-      li.style.transition = 'background 0.25s ease, transform 0.15s ease';
-
-      // efeito hover elegante
-      li.addEventListener('mouseenter', () => {
-        li.style.background = '#2a2a2a';
-        li.style.transform = 'translateX(4px)';
-      });
-      li.addEventListener('mouseleave', () => {
-        li.style.background = 'transparent';
-        li.style.transform = 'translateX(0)';
-      });
-
-      // divisor fosco
-      if (index < data.length - 1) {
-        li.style.borderBottom = '1px solid #2f2f2f';
-      }
-
       li.innerHTML = `
-        <span style="font-weight:600;color:#f8f9fa;font-size:15px;letter-spacing:0.3px;">
-          ${formatarData(a.data_ocorrencia)}
-        </span>
-        <span style="color:#ff6b6b;font-size:13px;font-weight:500;line-height:1.5;">
-          ${explicacaoAnomalia(a.detalhe, a.score)}
-        </span>
-        <span style="color:#adb5bd;font-size:12px;">
-        </span>
+        <span style='font-weight:600;color:#ff9900;font-size:15px;'>${formatarData(a.data_ocorrencia)}</span>
+        <span style='color:#fff;font-size:13px;'>${explicacaoAnomalia(a.detalhe, a.score)}</span>
+        <span style='color:#adb5bd;font-size:12px;'>Score: ${a.score.toFixed(2)}</span>
       `;
-
-      list.appendChild(li);
+      ul.appendChild(li);
     });
-
-    lista.appendChild(list);
-
+    div.innerHTML = '';
+    div.appendChild(ul);
   } catch (err) {
-    spinner.style.display = "none";
-    msg.style.display = "block";
-    msg.style.color = "#ff6b6b";
-    msg.textContent = "Erro ao carregar anomalias";
-    lista.innerHTML = '';
+    div.innerHTML = `<div class='anomalias-erro'>Erro ao carregar anomalias</div>`;
     console.error("Erro ao carregar anomalias:", err);
   }
 }
@@ -403,19 +377,16 @@ async function executarIA() {
   const btn = document.getElementById("btnExecutarIA");
   btn.disabled = true;
   btn.textContent = "Executando...";
-  const spinner = document.getElementById("spinnerAnomalia");
-  const msg = document.getElementById("anomaliaMsg");
-  const lista = document.getElementById("anomaliasLista");
-  spinner.style.display = "flex";
-  msg.style.display = "none";
-  lista.innerHTML = '';
+  // Mostra spinner no card de anomalias
+  const div = document.getElementById("anomaliasVendas");
+  div.innerHTML = `<div class='anomalias-spinner'><svg width='40' height='40' viewBox='0 0 40 40' fill='none'><circle cx='20' cy='20' r='16' stroke='#ff9900' stroke-width='4' opacity='0.18'/><path d='M36 20a16 16 0 0 1-16 16' stroke='#ff9900' stroke-width='4'><animateTransform attributeName='transform' type='rotate' from='0 20 20' to='360 20 20' dur='1s' repeatCount='indefinite'/></path></svg></div>`;
   try {
     const res = await fetch(`/DECKLOGISTIC/api/run_anomalias.php`);
     const data = await res.json();
     setTimeout(() => {
       loadAnomalias();
       btn.disabled = false;
-      btn.textContent = "Executar IA";
+      btn.textContent = "Executar IA de Anomalias";
     }, 800); // delay para UX
     // Mensagem amigável e simples
     let msgPopup = '';
@@ -436,21 +407,21 @@ async function executarIA() {
     }
   } catch (e) {
     btn.disabled = false;
-    btn.textContent = "Executar IA";
+    btn.textContent = "Executar IA de Anomalias";
     showIAPopup('Erro ao executar a IA. Tente novamente.', false);
   }
 }
 
 
+
 // Clique no card de anomalias carrega as anomalias
 document.getElementById("cardAnomalias").addEventListener("click", function(e) {
-  // Evita disparar ao clicar no botão
   if (e.target && e.target.id === "btnExecutarIA") return;
   loadAnomalias();
 });
 
-// Carrega ao abrir a página (pode deixar só a mensagem inicial)
-// loadAnomalias();
+// Carrega ao abrir a página
+loadAnomalias();
 loadProdutosMaisVendidos();
 
 
