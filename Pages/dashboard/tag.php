@@ -1,7 +1,6 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-include __DIR__ . '/../../header.php';
 
 $tipo_login = $_SESSION['tipo_login'] ?? 'funcionario';
 $loja_id = $_SESSION['loja_id'] ?? null;
@@ -111,7 +110,7 @@ $stmt->close();
 </head>
 <body>
 <aside class="sidebar">
-    <div class="logo-area"><img src="../../img/logo2.svg" alt="Logo"></div>
+    <div class="logo-area"><img src="../../img/logoDecklogistic.webp" alt="Logo"></div>
     <nav class="nav-section">
         <div class="nav-menus">
             <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
