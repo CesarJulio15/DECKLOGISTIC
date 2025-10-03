@@ -15,7 +15,7 @@
   <div class="right-side">
     <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
     <div class="form-container">
-      <h1>Olá Novamente!</h1>
+      <h1>Olá Funcionario!</h1>
 
       <!-- Mostra erro, se existir -->
       <?php
@@ -30,8 +30,8 @@
         <input type="password" name="senha" placeholder="Insira sua Senha" required>
 
         <div class="login-link">
-          Ainda não tem uma conta para funcionário?
-          <a href="cadastroFuncionario.php">Cadastrar</a>
+          Ainda não tem uma conta para sua empresa?
+          <a href="../lojas/cadastro.php">Cadastrar</a>
         </div>
         <button type="submit" class="btn">Continuar</button>
       </form>
