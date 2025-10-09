@@ -52,10 +52,10 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="#hero" class="active">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#about">Sobre</a></li>
+          <li><a href="#features">Funcionalidades</a></li>
+          <li><a href="#services">Serviços</a></li>
+          <li><a href="#pricing">Preços</a></li>
           <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="#">Dropdown 1</a></li>
@@ -73,12 +73,12 @@
               <li><a href="#">Dropdown 4</a></li>
             </ul>
           </li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#contact">Contato</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="btn-getstarted" href="index.html#about">Get Started</a>
+      <a class="btn-getstarted" href="index.html#about">Começar</a>
 
     </div>
   </header>
@@ -92,28 +92,28 @@
 
           <div class="hero-main-content text-center">
             <h1 class="hero-title" data-aos="zoom-in" data-aos-delay="200">
-              Transform Your Workflow With<br>
-              <span class="typed" data-typed-items="Advanced Analytics,Seamless Integration,Robust Security"></span>
+              Transforme Seu Fluxo de Trabalho Com<br>
+              <span class="typed" data-typed-items="Análises Avançadas,Integração,Segurança Robusta"></span>
             </h1>
 
             <p class="hero-description" data-aos="fade-up" data-aos-delay="300">
-              Our innovative platform empowers businesses to enhance their productivity and achieve unparalleled operational efficiency across diverse industries.
+              Nossa plataforma inovadora capacita empresas a aumentar sua produtividade e alcançar eficiência operacional sem precedentes em diversos setores.
             </p>
 
             <div class="hero-actions" data-aos="fade-up" data-aos-delay="400">
               <a href="#" class="action-btn primary">
-                <span>Discover More Today</span>
+                <span>Descubra Mais Hoje</span>
                 <i class="bi bi-arrow-right"></i>
               </a>
               <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="action-btn secondary glightbox">
                 <i class="bi bi-play-circle"></i>
-                <span>Watch a Quick Demo</span>
+                <span>Assista a uma Demonstração Rápida</span>
               </a>
             </div>
 
             <div class="hero-image-showcase" data-aos="fade-up" data-aos-delay="500">
               <div class="image-wrapper">
-                <img src="assets/img/about/about-18.webp" class="img-fluid" alt="Strategic Overview">
+                <img src="assets/img/about/arthurHorizontal.webp" class="img-fluid" alt="Strategic Overview">
                 <div class="floating-card card-1" data-aos="fade-right" data-aos-delay="600">
                   <div class="card-content">
                     <div class="card-icon">
@@ -153,53 +153,55 @@
         <div class="row align-items-center justify-content-between g-lg-5">
           <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
             <div class="image-wrapper">
-              <img src="assets/img/about/about-portrait-7.webp" class="img-fluid rounded" alt="About Us Image">
+              <img src="assets/img/about/fotoDeckers.webp" class="img-fluid rounded" alt="About Us Image">
             </div>
           </div>
 
           <div class="col-lg-6" data-aos="fade-left" data-aos-delay="300">
             <div class="content">
-              <h2 class="mb-4">Our Story</h2>
-              <h5 class="mb-4">Crafting innovative solutions since 2010</h5>
+              <h2 class="mb-4">Nossa História</h2>
+              <h5 class="mb-4">Criando soluções inovadoras desde 2024</h5>
 
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vel mauris in magna fringilla finibus. Suspendisse potenti. Integer ut fringilla mi, a aliquam risus. Maecenas ac nibh magna. Aenean fringilla lobortis ex, sit amet iaculis eros facilisis nec.</p>
+              <p>Somos uma equipe formada durante o curso de Análise e Desenvolvimento de Sistemas em 2024. Desde o início, buscamos unir aprendizado e prática, desenvolvendo projetos nas áreas de programação, redes, segurança da informação e banco de dados.
+Ao longo do caminho, aprimoramos nossas habilidades em linguagens como JavaScript, PHP, MySQL e C++, além de explorar mobile e computação em nuvem com AWS.
+Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e agendamento, sempre com o objetivo de entregar tecnologia de qualidade e valor real aos nossos clientes.</p>
 
               <div class="features-list mt-5" data-aos="fade-up" data-aos-delay="400">
                 <div class="row g-4">
                   <div class="col-md-6">
                     <div class="feature-item">
                       <i class="bi bi-award"></i>
-                      <h5>Excellence</h5>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                      <h5>Excelência</h5>
+                      <p>Buscamos sempre a qualidade em cada projeto, com dedicação e atenção aos detalhes para entregar resultados que superem expectativas.</p>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="feature-item">
                       <i class="bi bi-lightbulb"></i>
-                      <h5>Innovation</h5>
-                      <p>Proin vel mauris in magna fringilla finibus.</p>
+                      <h5>Inovação</h5>
+                      <p>Exploramos novas ideias e tecnologias para criar soluções criativas e eficientes, acompanhando as tendências do mercado.</p>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="feature-item">
                       <i class="bi bi-people"></i>
-                      <h5>Community</h5>
-                      <p>Suspendisse potenti. Integer ut fringilla mi.</p>
+                      <h5>Comunidade</h5>
+                      <p>Valorizamos o trabalho em equipe e o impacto positivo que a tecnologia pode gerar nas pessoas e nas empresas ao nosso redor.</p>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="feature-item">
                       <i class="bi bi-graph-up-arrow"></i>
-                      <h5>Growth</h5>
-                      <p>Maecenas ac nibh magna. Aenean fringilla lobortis ex.</p>
+                      <h5>Crescimento</h5>
+                      <p>Acreditamos no aprendizado contínuo como caminho para evoluir, aprimorando nossas habilidades e expandindo nossos horizontes.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div class="mt-5" data-aos="fade-up" data-aos-delay="600">
-                <a href="#" class="btn btn-primary me-3">Learn More</a>
-                <a href="#" class="btn btn-outline-primary">Contact Us</a>
+                <a href="#" class="btn btn-primary me-3">Saiba Mais</a>
+                <a href="#" class="btn btn-outline-primary">Entre em Contato</a>
               </div>
             </div>
           </div>
@@ -214,8 +216,8 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>Features</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <h2>Funcionalidades</h2>
+        <p>Unidos pela tecnologia, movidos pela inovação</p>
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -223,20 +225,20 @@
         <div class="row align-items-center mb-5">
           <div class="col-lg-6" data-aos="fade-right" data-aos-delay="150">
             <div class="intro-content">
-              <h2>Powerful features to accelerate growth</h2>
-              <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+              <h2>Recursos poderosos para acelerar o crescimento</h2>
+              <p>Oferecemos ferramentas e soluções que otimizam processos, aumentam a eficiência e ajudam sua empresa a alcançar novos resultados.</p>
               <div class="feature-stats">
                 <div class="stat-item">
                   <span class="stat-number">150+</span>
-                  <span class="stat-label">Features</span>
+                  <span class="stat-label">Funcionalidades</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-number">99.9%</span>
-                  <span class="stat-label">Uptime</span>
+                  <span class="stat-label">Disponibilidade</span>
                 </div>
                 <div class="stat-item">
                   <span class="stat-number">24/7</span>
-                  <span class="stat-label">Support</span>
+                  <span class="stat-label">Suporte</span>
                 </div>
               </div>
             </div>
@@ -255,11 +257,11 @@
               <div class="feature-icon">
                 <i class="bi bi-lightning-charge"></i>
               </div>
-              <h4>Lightning Fast Performance</h4>
-              <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint.</p>
+              <h4>Desempenho Ultrarrápido</h4>
+              <p>Soluções otimizadas para garantir velocidade, estabilidade e uma experiência fluida em qualquer ambiente digital.</p>
               <div class="feature-tags">
-                <span class="tag">Speed</span>
-                <span class="tag">Optimization</span>
+                <span class="tag">Velocidade</span>
+                <span class="tag">Otimização</span>
               </div>
             </div>
           </div>
@@ -270,11 +272,11 @@
               <div class="feature-icon">
                 <i class="bi bi-shield-check"></i>
               </div>
-              <h4>Enterprise Security</h4>
-              <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed.</p>
+              <h4>Segurança Empresarial</h4>
+              <p>Proteção avançada de dados e sistemas, assegurando confiabilidade e tranquilidade em cada operação.</p>
               <div class="feature-tags">
-                <span class="tag">Secure</span>
-                <span class="tag">Protected</span>
+                <span class="tag">Segurança</span>
+                <span class="tag">Protegido</span>
               </div>
             </div>
           </div>
@@ -285,11 +287,11 @@
               <div class="feature-icon">
                 <i class="bi bi-people-fill"></i>
               </div>
-              <h4>Team Collaboration</h4>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+              <h4>Colaboração em Equipe</h4>
+              <p>Ferramentas que conectam pessoas e projetos, facilitando o trabalho conjunto e a produtividade do time.</p>
               <div class="feature-tags">
-                <span class="tag">Teamwork</span>
-                <span class="tag">Sync</span>
+                <span class="tag">Trabalho em Equipe</span>
+                <span class="tag">Sincronização</span>
               </div>
             </div>
           </div>
@@ -300,10 +302,10 @@
               <div class="feature-icon">
                 <i class="bi bi-graph-up-arrow"></i>
               </div>
-              <h4>Advanced Analytics</h4>
-              <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis.</p>
+              <h4>Análises Avançadas</h4>
+              <p>Transforme dados em decisões inteligentes com relatórios e métricas que impulsionam o crescimento.</p>
               <div class="feature-tags">
-                <span class="tag">Data</span>
+                <span class="tag">Dados</span>
                 <span class="tag">Insights</span>
               </div>
             </div>
@@ -315,8 +317,8 @@
               <div class="feature-icon">
                 <i class="bi bi-gear-fill"></i>
               </div>
-              <h4>Smart Automation</h4>
-              <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam.</p>
+              <h4>Automação Inteligente</h4>
+              <p>Simplifique processos com automações baseadas em IA que economizam tempo e reduzem erros.</p>
               <div class="feature-tags">
                 <span class="tag">AI</span>
                 <span class="tag">Workflow</span>
@@ -330,11 +332,11 @@
               <div class="feature-icon">
                 <i class="bi bi-cloud-arrow-up"></i>
               </div>
-              <h4>Cloud Integration</h4>
-              <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo nemo enim ipsam.</p>
+              <h4>Integração de Sistemas</h4>
+              <p>Conectamos diferentes plataformas e aplicações para garantir que seus dados e processos funcionem de forma unificada e eficiente.</p>
               <div class="feature-tags">
-                <span class="tag">Cloud</span>
-                <span class="tag">Scalable</span>
+                <span class="tag">Eficiente</span>
+                <span class="tag">Escalável</span>
               </div>
             </div>
           </div>
@@ -358,7 +360,7 @@
                   <i class="bi bi-rocket-takeoff"></i>
                 </div>
                 <div class="tab-content">
-                  <h5>Innovation</h5>
+                  <h5>Inovação</h5>
                   <span>Cutting-edge solutions</span>
                 </div>
               </a>
@@ -370,8 +372,8 @@
                   <i class="bi bi-shield-shaded"></i>
                 </div>
                 <div class="tab-content">
-                  <h5>Security</h5>
-                  <span>Advanced protection</span>
+                  <h5>Segurança</h5>
+                  <span>Proteção avançada</span>
                 </div>
               </a>
             </li><!-- End tab nav item -->
@@ -383,7 +385,7 @@
                 </div>
                 <div class="tab-content">
                   <h5>Performance</h5>
-                  <span>Lightning fast speed</span>
+                  <span>Velocidade "relâmpago"</span>
                 </div>
               </a>
             </li><!-- End tab nav item -->
@@ -394,8 +396,8 @@
                   <i class="bi bi-heart-pulse"></i>
                 </div>
                 <div class="tab-content">
-                  <h5>Support</h5>
-                  <span>24/7 assistance</span>
+                  <h5>Suporte</h5>
+                  <span>Atendimento 24/7</span>
                 </div>
               </a>
             </li><!-- End tab nav item -->
@@ -412,8 +414,8 @@
                     <div class="icon-badge">
                       <i class="bi bi-rocket-takeoff"></i>
                     </div>
-                    <h3>Innovation Excellence</h3>
-                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis.</p>
+                    <h3>Excelência em Inovação</h3>
+                    <p>Conectamos diferentes plataformas e aplicações para garantir que seus dados e processos funcionem de forma unificada e eficiente.</p>
 
                     <div class="feature-grid">
                       <div class="feature-item">
@@ -449,7 +451,7 @@
                       </div>
                     </div>
 
-                    <a href="#" class="btn-primary">Learn More <i class="bi bi-arrow-right"></i></a>
+                    <a href="#" class="btn-primary">Saiba Mais <i class="bi bi-arrow-right"></i></a>
                   </div>
                 </div>
 
@@ -460,8 +462,8 @@
                       <div class="floating-card">
                         <i class="bi bi-graph-up-arrow"></i>
                         <div class="card-content">
-                          <span>Performance</span>
-                          <strong>+85% Improvement</strong>
+                          <span>Desempenho</span>
+                          <strong>+85% de Melhoria</strong>
                         </div>
                       </div>
                     </div>
@@ -479,7 +481,7 @@
                     <div class="icon-badge">
                       <i class="bi bi-shield-shaded"></i>
                     </div>
-                    <h3>Advanced Security</h3>
+                    <h3>Segurança Avançada</h3>
                     <p>Neque porro quisquam est qui dolorem ipsum quia dolor sit amet consectetur adipisci velit sed quia non numquam eius modi tempora incidunt ut labore.</p>
 
                     <div class="feature-grid">
@@ -516,7 +518,7 @@
                       </div>
                     </div>
 
-                    <a href="#" class="btn-primary">Learn More <i class="bi bi-arrow-right"></i></a>
+                    <a href="#" class="btn-primary">Saiba Mais <i class="bi bi-arrow-right"></i></a>
                   </div>
                 </div>
 
@@ -527,8 +529,8 @@
                       <div class="floating-card">
                         <i class="bi bi-shield-check"></i>
                         <div class="card-content">
-                          <span>Security</span>
-                          <strong>Military Grade</strong>
+                          <span>Segurança</span>
+                          <strong>Grau Militar</strong>
                         </div>
                       </div>
                     </div>
