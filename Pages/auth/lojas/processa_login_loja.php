@@ -51,3 +51,4 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
     header("Location: loginLoja.php");
     exit;
 }
+ 
