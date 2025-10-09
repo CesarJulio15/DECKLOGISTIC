@@ -98,7 +98,6 @@ if ($tagVincResult) {
 
 /* Botão flutuante */
 #dica-btn-flutuante {
-
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -111,7 +110,7 @@ if ($tagVincResult) {
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 10002;
+  z-index: 1299; /* abaixo do blur das overlays (z-index: 1300/1400), sempre atrás do blur */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,18 +142,37 @@ if ($tagVincResult) {
     z-index: 1;
     pointer-events: none;
 }
-#dica-overlay-1 .dica-card {
+#dica-overlay-1 .dica-card,
+#dica-overlay-2 .dica-card {
     background: #222;
     color: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.22);
     padding: 22px 28px;
-    max-width: 320px;
+    max-width: 340px;
     font-size: 15px;
     pointer-events: auto;
     position: relative;
     margin-bottom: 10px;
     z-index: 2;
+    text-align: left;
+}
+#dica-overlay-1 .dica-card h3,
+#dica-overlay-2 .dica-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+#dica-overlay-1 .dica-card button,
+#dica-overlay-2 .dica-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
 }
 
 /* Overlay 2 */
@@ -255,7 +273,7 @@ if ($tagVincResult) {
     <div class="welcome-card">
         <h2>Seja bem-vindo!</h2>
         <p>Essa é a página de produtos. Aqui você pode gerenciar seus itens e tags.</p>
-        <button id="close-welcome">Entendi</button>
+        <button id="close-welcome">Próximo</button>
     </div>
 </div>
 
@@ -946,9 +964,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </html>
 
 <!-- Botão de dica flutuante -->
-<button id="dica-btn-flutuante" title="Dica rápida">
- ?
-</button>
+<button id="dica-btn-flutuante" title="Dica rápida">?</button>
 
 <!-- Overlay 1: Dica inicial -->
 <div id="dica-overlay-1" style="display:none;">
@@ -985,7 +1001,7 @@ document.addEventListener('DOMContentLoaded', function() {
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 10002;
+  z-index: 1299; /* abaixo do blur das overlays (z-index: 1300/1400), sempre atrás do blur */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1016,18 +1032,37 @@ document.addEventListener('DOMContentLoaded', function() {
     z-index: 1;
     pointer-events: none;
 }
-#dica-overlay-1 .dica-card {
+#dica-overlay-1 .dica-card,
+#dica-overlay-2 .dica-card {
     background: #222;
     color: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.22);
     padding: 22px 28px;
-    max-width: 320px;
+    max-width: 340px;
     font-size: 15px;
     pointer-events: auto;
     position: relative;
     margin-bottom: 10px;
     z-index: 2;
+    text-align: left;
+}
+#dica-overlay-1 .dica-card h3,
+#dica-overlay-2 .dica-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+#dica-overlay-1 .dica-card button,
+#dica-overlay-2 .dica-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
 }
 
 /* Overlay 2 */
@@ -1163,6 +1198,6 @@ document.querySelectorAll('.dica-card').forEach(card => {
 </script>
 </body>
 </html>
-</script>
-</body>
+</html>
+</html>
 </html>

@@ -266,7 +266,7 @@ $lojaId = $_SESSION['loja_id'];
     <div class="dica-blur-bg"></div>
     <div class="dica-card" id="dica-card-1">
         <h3>Dica rápida</h3>
-        <p>Esta página mostra um resumo do seu estoque, vendas, anomalias e sugestões de reabastecimento. Use os cards para visualizar os principais indicadores e acione a IA para análises automáticas.</p>
+        <p>Esta página mostra um resumo do seu estoque, vendas, anomalias e sugestões de reabastecimento.</p>
         <button id="dica-avancar-1">Avançar</button>
     </div>
 </div>
@@ -371,8 +371,6 @@ $lojaId = $_SESSION['loja_id'];
     pointer-events: none;
 }
 #dica-overlay-2 .dica-card {
-    position: absolute;
-    z-index: 3000; /* Bem acima do blur e dos botões */
     background: #222;
     color: #fff;
     border-radius: 12px;
@@ -380,10 +378,23 @@ $lojaId = $_SESSION['loja_id'];
     padding: 22px 28px;
     max-width: 340px;
     font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+    text-align: left;
+}
+#dica-overlay-1 .dica-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
 }
 #dica-overlay-2 .dica-card h3 {
     font-size: 1.1rem;
-    margin-bottom: 8px;
+    margin-bottom: 15px;
+}
+#dica-overlay-2 .dica-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
 }
 #dica-overlay-2 .dica-card button {
     margin-top: 12px;

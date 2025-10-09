@@ -138,7 +138,7 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
   top: 0;
 }
 .welcome-card-estoque {
-  background: #000;
+  background: #222;
   color: #fff;
   padding: 24px 32px;
   border-radius: 12px;
@@ -147,8 +147,8 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
   text-align: left;
 }
 .welcome-card-estoque h2 {
-  font-size: 22px;
-  margin-bottom: 18px;
+  font-size: 20px;
+  margin-bottom: 15px;
 }
 .welcome-card-estoque p {
   font-size: 15px;
@@ -177,7 +177,7 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 10002;
+  z-index: 9998; /* abaixo do blur (z-index: 9999), sempre atrás do blur */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -231,16 +231,16 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
 <div id="overlay-blur-estoque"></div>
 <div id="overlay-estoque-1">
   <div class="welcome-card-estoque">
-    <h2>ESTOQUE</h2>
+    <h2>Estoque</h2>
     <p>Nessa página você tem acesso aos dados e estatísticas do seu estoque de produtos.</p>
     <button id="btnProximoEstoque">Próximo</button>
   </div>
 </div>
 <div id="overlay-estoque-2">
   <div class="welcome-card-estoque">
-    <h2>GRÁFICOS</h2>
+    <h2>Gráficos</h2>
     <p>Aqui você tem acesso a dados exclusivos do seu estoque.</p>
-    <button id="btnFecharEstoque">Entendi</button>
+    <button id="btnFecharEstoque">Próximo</button>
   </div>
 </div>
 <button id="help-btn-estoque">?</button>
@@ -654,4 +654,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 </body>
-</html>       
+</html>

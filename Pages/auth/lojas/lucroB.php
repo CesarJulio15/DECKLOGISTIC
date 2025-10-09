@@ -107,10 +107,10 @@ if ($receita > 0) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lucro Bruto - Decklogistic</title>
-<link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
+<link rel="icon" href="../../../img/logo2.svg" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/sidebar.css">
 <link rel="stylesheet" href="../../../assets/lucroB.css">
-<link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
+<link rel="icon" href="../../img/logo2.svg" type="image/x-icon" />
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
@@ -119,7 +119,7 @@ if ($receita > 0) {
   <div class="sidebar">
     <link rel="stylesheet" href="../../../assets/sidebar.css">
     <div class="logo-area">
-      <img src="../../../img/logoDecklogistic.webp" alt="Logo">
+      <img src="../../../img/logo2.svg" alt="Logo">
     </div>
     <nav class="nav-section">
       <div class="nav-menus">
