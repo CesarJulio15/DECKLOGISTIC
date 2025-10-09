@@ -84,6 +84,6 @@ Contributions are welcome! Feel free to open issues or submit pull requests.
 Distributed under the MIT License. See `LICENSE` for more information.
 
 python -m venv .venv
-.venv\Scripts\Activate no Windows
+.venv\Scripts\Activate
 pip install -r requirements.txt
 
