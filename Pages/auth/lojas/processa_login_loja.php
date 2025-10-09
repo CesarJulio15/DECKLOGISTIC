@@ -36,7 +36,7 @@ if (!empty($_POST['email']) && !empty($_POST['senha'])) {
             // Apenas loja por enquanto
             // $_SESSION['tipo_login'] = 'empresa'; 
 
-            header("Location: ../../../index.php");
+            header("Location: ../../../direcionamento.php");
             exit;
         }
     }
