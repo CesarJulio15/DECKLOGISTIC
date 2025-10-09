@@ -82,3 +82,8 @@ Contributions are welcome! Feel free to open issues or submit pull requests.
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
+python -m venv .venv
+.venv\Scripts\Activate no Windows
+pip install -r requirements.txt
+
