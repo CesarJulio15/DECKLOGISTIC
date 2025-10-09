@@ -66,7 +66,7 @@ if ($nome && $email && $senha && $senha2) {
     .input-container i {
       position: absolute;
       top: 50%;
-      left: 10px;
+        left: 10px;
       transform: translateY(-50%);
       color: #777;
     }
