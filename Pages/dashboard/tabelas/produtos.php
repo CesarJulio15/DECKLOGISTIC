@@ -1029,16 +1029,6 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-bottom: 10px;
     z-index: 2;
 }
-#dica-overlay-1 .dica-card button {
-    margin-top: 12px;
-    background: #ff6600 !important;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 7px 18px;
-    cursor: pointer;
-    font-weight: bold;
-}
 
 /* Overlay 2 */
 #dica-overlay-2 {
@@ -1170,6 +1160,9 @@ document.querySelectorAll('.dica-card').forEach(card => {
         e.stopPropagation();
     });
 });
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
