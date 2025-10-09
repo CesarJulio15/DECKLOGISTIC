@@ -256,7 +256,163 @@ $lojaId = $_SESSION['loja_id'];
 
 </div>
 
+<!-- Botão de dica flutuante -->
+<button id="dica-btn-flutuante" title="Dica rápida">
+    <i class="fa-solid fa-lightbulb">?</i>
+</button>
+
+<!-- Overlay 1: Dica inicial -->
+<div id="dica-overlay-1" style="display:none;">
+    <div class="dica-blur-bg"></div>
+    <div class="dica-card" id="dica-card-1">
+        <h3>Dica rápida</h3>
+        <p>Esta página mostra um resumo do seu estoque, vendas, anomalias e sugestões de reabastecimento. Use os cards para visualizar os principais indicadores e acione a IA para análises automáticas.</p>
+        <button id="dica-avancar-1">Avançar</button>
+    </div>
 </div>
+
+<!-- Overlay 2: Dica sobre IA de Anomalias -->
+<div id="dica-overlay-2" style="display:none;">
+    <div class="dica-blur-bg"></div>
+    <div class="dica-card" id="dica-card-2">
+        <h3>IA de Anomalias</h3>
+        <p>O botão <b>Executar IA de Anomalias</b> analisa suas vendas e destaca dias fora do padrão. Use para identificar oportunidades ou problemas rapidamente.</p>
+        <button id="dica-fechar-2">Fechar</button>
+    </div>
+</div>
+
+<style>
+/* Botão flutuante */
+#dica-btn-flutuante {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 101;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#dica-btn-flutuante:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.28);
+}
+
+/* Overlay 1 */
+#dica-overlay-1 {
+    position: fixed;
+    right: 90px;
+    bottom: 90px;
+    z-index: 1300;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    pointer-events: none;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+}
+#dica-overlay-1 .dica-blur-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    backdrop-filter: blur(10px);
+    background: rgba(0,0,0,0.25);
+    z-index: 1;
+    pointer-events: none;
+}
+#dica-overlay-1 .dica-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 320px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+}
+#dica-overlay-1 .dica-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Overlay 2 */
+#dica-overlay-2 {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 1400;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+#dica-overlay-2 .dica-blur-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    backdrop-filter: blur(10px);
+    background: rgba(0,0,0,0.25);
+    z-index: 1;
+    pointer-events: none;
+}
+#dica-overlay-2 .dica-card {
+    position: absolute;
+    z-index: 3000; /* Bem acima do blur e dos botões */
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+}
+#dica-overlay-2 .dica-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+#dica-overlay-2 .dica-card button {
+    margin-top: 12px;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Destaca botão IA de Anomalias */
+#dica-overlay-2.active #btnExecutarIA {
+    position: relative !important;
+    z-index: 2500 !important;
+    box-shadow: 0 0 0 5px #fff, 0 0 0 10px #ff6600;
+    outline: 2px solid #ff6600;
+    transition: box-shadow 0.2s;
+    pointer-events: auto !important;
+    filter: none !important;
+}
+
+/* Garante que outros elementos fiquem borrados */
+#dica-overlay-2.active > *:not(.dica-card):not(.dica-blur-bg):not(#btnExecutarIA) {
+    filter: blur(2px);
+    pointer-events: none;
+}
+</style>
 
 <script>
   const lojaId = <?= $lojaId ?>;
@@ -472,6 +628,62 @@ loadReabastecimento();
 
 
 
+// Dica flutuante
+const dicaBtn = document.getElementById('dica-btn-flutuante');
+const dicaOverlay1 = document.getElementById('dica-overlay-1');
+const dicaAvancar1 = document.getElementById('dica-avancar-1');
+const dicaOverlay2 = document.getElementById('dica-overlay-2');
+const dicaCard2 = document.getElementById('dica-card-2');
+const dicaFechar2 = document.getElementById('dica-fechar-2');
+const btnExecutarIA = document.getElementById('btnExecutarIA');
+
+dicaBtn.addEventListener('click', function() {
+    dicaOverlay1.style.display = 'flex';
+});
+
+dicaAvancar1.addEventListener('click', function() {
+    dicaOverlay1.style.display = 'none';
+
+    // Posiciona o card próximo ao botão Executar IA de Anomalias
+    const rectIA = btnExecutarIA.getBoundingClientRect();
+    const top = rectIA.top + window.scrollY - 70;
+    const left = rectIA.right + window.scrollX + 30;
+
+    dicaCard2.style.top = top + 'px';
+    dicaCard2.style.left = left + 'px';
+
+    dicaOverlay2.style.display = 'flex';
+    dicaOverlay2.classList.add('active');
+
+    btnExecutarIA.style.zIndex = 2500;
+    btnExecutarIA.style.pointerEvents = 'auto';
+});
+
+dicaFechar2.addEventListener('click', function() {
+    dicaOverlay2.style.display = 'none';
+    dicaOverlay2.classList.remove('active');
+    btnExecutarIA.style.zIndex = '';
+    btnExecutarIA.style.pointerEvents = '';
+});
+
+// Fecha overlays ao clicar fora do card
+document.addEventListener('click', function(e) {
+    if (dicaOverlay1.style.display === 'flex' && !e.target.closest('#dica-card-1') && !e.target.closest('#dica-btn-flutuante')) {
+        dicaOverlay1.style.display = 'none';
+    }
+    if (dicaOverlay2.style.display === 'flex' && !e.target.closest('#dica-card-2')) {
+        dicaOverlay2.style.display = 'none';
+        dicaOverlay2.classList.remove('active');
+        btnExecutarIA.style.zIndex = '';
+    }
+});
+
+// Impede propagação do clique dentro dos cards
+document.querySelectorAll('.dica-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});
 </script>
 
 </body>

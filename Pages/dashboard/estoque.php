@@ -109,9 +109,45 @@ onmouseout="this.style.background='linear-gradient(135deg, rgba(255,153,0,0.9), 
   width: 100vw;
   height: 100vh;
   background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(10px); /* igual produtos.php */
   z-index: 9999;
 }
+
+/* Card das overlays igual produtos.php */
+.welcome-card-estoque {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+    text-align: left;
+}
+.welcome-card-estoque h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+.welcome-card-estoque p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+.welcome-card-estoque button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
 /* Overlay 1: canto inferior direito */
 #overlay-estoque-1 {
   display: none;
@@ -654,4 +690,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 </body>
-</html>       
+</html>
