@@ -218,7 +218,7 @@ $stmt->close();
 </head>
 <body>
 <aside class="sidebar">
-    <div class="logo-area"><img src="../../img/logoDecklogistic.webp" alt="Logo"></div>
+    <div class="logo-area"><img src="../../img/logo2.svg" alt="Logo"></div>
     <nav class="nav-section">
         <div class="nav-menus">
             <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>

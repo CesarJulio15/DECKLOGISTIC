@@ -223,7 +223,6 @@ $result = $conn->query($sqlComLimit);
 <?php endif; ?>
 
 <?php if ($tipo_login === 'empresa'): ?>
-<button id="btnApagar"><i class="fa fa-trash"></i> Apagar Histórico</button>
 <?php endif; ?>
 
 <section>
