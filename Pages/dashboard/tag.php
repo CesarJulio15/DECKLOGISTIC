@@ -117,11 +117,24 @@ $stmt->close();
     backdrop-filter: blur(10px); /* igual produtos.php */
     z-index: 9999;
 }
-/* Blur na segunda overlay não cobre a sidebar das tags */
-#overlay-blur-tag.active-tag-2 {
-    right: 260px;
-    left: 0;
-    width: calc(100vw - 260px);
+/* Botão de ajuda fixo no canto inferior direito, sempre atrás do blur */
+#help-btn-tag {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 9998; /* abaixo do blur (z-index: 9999), atrás do overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Card das overlays igual produtos.php */
@@ -162,13 +175,20 @@ $stmt->close();
 /* Sidebar destacada acima do blur no overlay 2 */
 .sidebar-tags-destaque {
     position: fixed !important;
-    top: 0 !important;
     right: 0 !important;
+    top: 0 !important; /* Mantém a sidebar fixa no topo */
     width: 260px !important;
     height: 100vh !important;
-    z-index: 10010 !important; /* acima do blur */
+    z-index: 10010 !important;
     background: rgba(15,15,15,0.95) !important;
     box-shadow: -2px 0 16px 0 rgba(0,0,0,0.25);
+    border-left: 3px solid #ff6600;
+    transition: box-shadow 0.2s, border-left 0.2s;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    margin-top: 0 !important; /* Garante que não haja deslocamento */
 }
 
 #overlay-tag-1 {
@@ -194,14 +214,40 @@ $stmt->close();
   right: 290px; /* próximo à sidebar */
   top: 80px;
 }
+.welcome-card-tag {
+  background: #222;
+  color: #fff;
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  max-width: 340px;
+  text-align: left;
+}
+.welcome-card-tag h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+.welcome-card-tag p {
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+.welcome-card-tag button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #ff6600;
+  color: #fff;
+  cursor: pointer;
+  font-size: 15px;
+}
 /* Botão de ajuda fixo na sidebar */
 .tags-sidebar {
-  position: absolute; /* deixa seguir o fluxo da página */
+  position: absolute;
   top: 0;
   right: 0;
   width: 260px;
-  height: 100%; /* pega a altura do conteúdo */
-  min-height: 100vh; /* garante que ocupa pelo menos a tela inteira */
+  height: 100%;
+  min-height: 100vh;
   background: rgba(15,15,15,0.7);
   backdrop-filter: blur(15px);
   border-left: 2px solid rgba(255,255,255,0.1);
@@ -211,24 +257,7 @@ $stmt->close();
   justify-content: flex-start;
   z-index: 100;
 }
-#help-btn-tag {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #ff6600;
-  color: #fff;
-  border: none;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 101;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Sidebar destacada acima do blur no overlay 2 */
 </style>
 </head>
 <body>
@@ -328,16 +357,16 @@ $stmt->close();
 <div id="overlay-blur-tag"></div>
 <div id="overlay-tag-1">
   <div class="welcome-card-tag">
-    <h2>TAGS</h2>
+    <h2>Tags</h2>
     <p>Nessa página você consegue criar tags para os seus produtos, criando um estoque organizado e detalhado.</p>
     <button id="btnProximoTag">Próximo</button>
   </div>
 </div>
 <div id="overlay-tag-2">
   <div class="welcome-card-tag">
-    <h2>SUA LISTA</h2>
+    <h2>Sua lista</h2>
     <p>Aqui são exibidas suas tags criadas, também é possível editar e excluir tags já criadas.</p>
-    <button id="btnFecharTag">Entendi</button>
+    <button id="btnFecharTag">Próximo</button>
   </div>
 </div>
 
@@ -452,12 +481,19 @@ btnFecharTag.addEventListener('click', () => {
 </script>
 <!-- Botão de ajuda dentro da sidebar -->
 <script>
-if(document.querySelector('.tags-sidebar') && !document.getElementById('help-btn-tag')){
+if(!document.getElementById('help-btn-tag')){
   const btn = document.createElement('button');
   btn.id = 'help-btn-tag';
   btn.innerText = '?';
-  document.querySelector('.tags-sidebar').appendChild(btn);
+  btn.type = 'button';
+  document.body.appendChild(btn);
 }
 </script>
+</body>
+</html>
+</body>
+</html>
+</body>
+</html>
 </body>
 </html>
