@@ -11,7 +11,7 @@ if (!isset($_SESSION['loja_id'])) {
 $lojaId = intval($_SESSION['loja_id']);
 
 // Caminho completo do Python (no ambiente virtual)
-$python = '"C:\\xampp\\htdocs\\DECKLOGISTIC\\venv\\Scripts\\python.exe"';
+$python = '"C:\\xampp\\htdocs\\DECKLOGISTIC\\.venv\\Scripts\\python.exe"';
 $script = __DIR__ . "/../ml/detectar_anomalias_vendas.py";
 
 // Comando para executar Python passando o ID da loja

@@ -114,10 +114,52 @@ $stmt->close();
     width: 100vw;
     height: 100vh;
     background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(4px);
-    z-index: 9999;   /* Blur fica abaixo da sidebar */
+    backdrop-filter: blur(10px); /* igual produtos.php */
+    z-index: 9999;
+}
+/* Blur na segunda overlay não cobre a sidebar das tags */
+#overlay-blur-tag.active-tag-2 {
+    right: 260px;
+    left: 0;
+    width: calc(100vw - 260px);
 }
 
+/* Card das overlays igual produtos.php */
+.welcome-card-tag {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+    text-align: left;
+}
+.welcome-card-tag h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+.welcome-card-tag p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+.welcome-card-tag button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Sidebar destacada acima do blur no overlay 2 */
 .sidebar-tags-destaque {
     position: fixed !important;
     top: 0 !important;
@@ -151,32 +193,6 @@ $stmt->close();
   left: unset;
   right: 290px; /* próximo à sidebar */
   top: 80px;
-}
-.welcome-card-tag {
-  background: #000;
-  color: #fff;
-  padding: 24px 32px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  max-width: 340px;
-  text-align: left;
-}
-.welcome-card-tag h2 {
-  font-size: 22px;
-  margin-bottom: 18px;
-}
-.welcome-card-tag p {
-  font-size: 15px;
-  margin-bottom: 18px;
-}
-.welcome-card-tag button {
-  padding: 8px 18px;
-  border: none;
-  border-radius: 6px;
-  background: #ff9900;
-  color: #fff;
-  cursor: pointer;
-  font-size: 15px;
 }
 /* Botão de ajuda fixo na sidebar */
 .tags-sidebar {
@@ -213,12 +229,11 @@ $stmt->close();
   align-items: center;
   justify-content: center;
 }
-/* Sidebar destacada acima do blur no overlay 2 */
 </style>
 </head>
 <body>
 <aside class="sidebar">
-    <div class="logo-area"><img src="../../img/logoDecklogistic.webp" alt="Logo"></div>
+    <div class="logo-area"><img src="../../img/logo2.svg" alt="Logo"></div>
     <nav class="nav-section">
         <div class="nav-menus">
             <?php $currentPage = basename($_SERVER['PHP_SELF']); ?>
@@ -420,6 +435,7 @@ helpBtnTag.addEventListener('click', () => {
 btnProximoTag.addEventListener('click', () => {
     overlayTag1.style.display = 'none';
     overlayTag2.style.display = 'flex';
+    overlayBlurTag.classList.add('active-tag-2'); // Adiciona classe para blur lateral
     if (sidebarTags) {
         sidebarTags.classList.add('sidebar-tags-destaque');
     }
@@ -428,6 +444,7 @@ btnProximoTag.addEventListener('click', () => {
 btnFecharTag.addEventListener('click', () => {
     overlayTag2.style.display = 'none';
     hideBlurTag();
+    overlayBlurTag.classList.remove('active-tag-2'); // Remove classe do blur
     if (sidebarTags) {
         sidebarTags.classList.remove('sidebar-tags-destaque');
     }
