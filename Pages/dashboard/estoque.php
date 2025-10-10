@@ -197,17 +197,28 @@ async function loadEntradaSaidaProdutos() {
 // ---------- Histórico Estoque ----------
 async function loadHistoricoEstoque() {
   try {
-    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`../../api/historico_estoque_6meses.php?loja_id=${lojaId}`).then(r => r.json());
     if (!Array.isArray(data.series)) return;
+
     const chart = new CanvasJS.Chart("chartHistorico", {
-      animationEnabled:true, theme:"light2",
-      title:{text:"Histórico de Estoque (últimos 6 meses)"},
-      axisY:{title:"Quantidade Total"},
-      data:[{type:"column", dataPoints:data.series.map(d=>({label:d.mes,y:+d.total}))}]
+      animationEnabled: true,
+      theme: "light2",
+      title: { text: "Histórico de Estoque (últimos 6 meses)" },
+      axisY: { title: "Quantidade Total" },
+      data: [
+        {
+          type: "column",
+          dataPoints: data.series.map(d => ({ label: d.mes, y: +d.estoque }))
+        }
+      ]
     });
+
     chart.render();
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 }
+
 
 // ---------- Reabastecidos ----------
 async function loadProdutosReabastecidos() {
