@@ -341,6 +341,30 @@ hr {
   color: #fff;
 }
 
+.btn-modern {
+  background: linear-gradient(135deg, rgba(255,153,0,0.9), rgba(255,200,0,0.9));
+  color: #fff;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255,170,0,0.4);
+}
+
+.btn-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255,170,0,0.6);
+  filter: brightness(1.1);
+}
+
+.btn-modern:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(255,170,0,0.4);
+}
+
 
 /* Modal - garantir que fique acima de tudo */
 #modalHistorico {
