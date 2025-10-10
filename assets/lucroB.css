@@ -98,7 +98,13 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
+  height: 400px; 
+}
+
+#grafico {
+    width: 100%;
+    min-height: 400px;
+    max-height: 600px;
 }
 
 /* Botão toggle */

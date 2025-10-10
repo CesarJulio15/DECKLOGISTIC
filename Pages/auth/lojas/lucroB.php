@@ -110,7 +110,7 @@ if ($receita > 0) {
 <link rel="stylesheet" href="../../../assets/sidebar.css">
 <link rel="stylesheet" href="../../../assets/lucroB.css">
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body>
 
@@ -203,33 +203,18 @@ if ($receita > 0) {
     </div>
 
 <script>
-document.getElementById('toggleView').addEventListener('click', () => {
-    const grafico = document.getElementById('grafico');
-    const tabela = document.getElementById('tabela-container');
-    const btn = document.getElementById('toggleView');
-
-    if (tabela.style.display === 'none') {
-        grafico.style.display = 'none';
-        tabela.style.display = 'block';
-        btn.innerText = 'Ver Gráfico';
-    } else {
-        grafico.style.display = 'block';
-        tabela.style.display = 'none';
-        btn.innerText = 'Ver Tabela';
-    }
-});
-
-const filtroSelect = document.getElementById('filtro');
-filtroSelect.addEventListener('change', function() {
-    localStorage.setItem('viewState', document.getElementById('tabela-container').style.display);
-    this.form.submit();
-});
-
 document.addEventListener("DOMContentLoaded", () => {
-    const tabela = document.getElementById('tabela-container');
     const grafico = document.getElementById('grafico');
+    const tabela = document.getElementById('tabela-container');
     const btn = document.getElementById('toggleView');
+    const filtroSelect = document.getElementById('filtro');
 
+    // Garantir que o container do gráfico tem dimensões
+    grafico.style.width = "100%";
+    grafico.style.height = "400px"; // você pode ajustar
+    grafico.style.minHeight = "400px";
+
+    // Restaurar estado toggle
     const estado = localStorage.getItem('viewState');
     if(estado === 'block') {
         tabela.style.display = 'block';
@@ -240,19 +225,117 @@ document.addEventListener("DOMContentLoaded", () => {
         grafico.style.display = 'block';
         btn.innerText = 'Ver Tabela';
     }
-});
 
-// ApexCharts
-var options = {
-    chart: { type: 'line', height: 350 },
-    series: [
-        { name: 'Receita', data: <?php echo json_encode($dadosReceita); ?> },
-        { name: 'Custo', data: <?php echo json_encode($dadosCusto); ?> }
-    ],
-    xaxis: { categories: <?php echo json_encode($labels); ?> }
-};
-var chart = new ApexCharts(document.querySelector("#grafico"), options);
-chart.render();
+    // Toggle botão
+    btn.addEventListener('click', () => {
+        if(tabela.style.display === 'none') {
+            grafico.style.display = 'none';
+            tabela.style.display = 'block';
+            btn.innerText = 'Ver Gráfico';
+        } else {
+            grafico.style.display = 'block';
+            tabela.style.display = 'none';
+            btn.innerText = 'Ver Tabela';
+            initChart(); // inicializa gráfico ao tornar visível
+        }
+        localStorage.setItem('viewState', tabela.style.display);
+    });
+
+    // Submit do filtro
+    filtroSelect.addEventListener('change', function() {
+        localStorage.setItem('viewState', tabela.style.display);
+        this.form.submit();
+    });
+
+    // Função de inicialização do gráfico
+    function initChart() {
+        if (!grafico.echartsInstance) {
+            const myChart = echarts.init(grafico);
+
+            const option = {
+                title: {
+                    text: 'Receita x Custo',
+                    left: 'center',
+                    textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e0e0e0' }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    textStyle: { color: '#fff' }
+                },
+                legend: {
+                    bottom: 0,
+                    textStyle: { color: '#e0e0e0' },
+                    data: ['Receita', 'Custo']
+                },
+                grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: <?php echo json_encode($labels); ?>,
+                    axisLine: { lineStyle: { color: '#aaa' } },
+                    axisLabel: { color: '#e0e0e0' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#e0e0e0' }
+                },
+                series: [
+                    {
+                        name: 'Receita',
+                        type: 'line',
+                        smooth: true,
+                        data: <?php echo json_encode($dadosReceita); ?>,
+                        lineStyle: { color: '#4caf50', width: 3 },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(76,175,80,0.4)' },
+                                { offset: 1, color: 'rgba(76,175,80,0)' }
+                            ])
+                        },
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        itemStyle: {             
+                        color: '#aaffadff'  
+                        }
+                    },
+                    {
+                        name: 'Custo',
+                        type: 'line',
+                        smooth: true,
+                        data: <?php echo json_encode($dadosCusto); ?>,
+                        lineStyle: { color: '#f44336', width: 3 },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(244,67,54,0.3)' },
+                                { offset: 1, color: 'rgba(244,67,54,0)' }
+                            ])
+                        },
+                        symbol: 'square',
+                        symbolSize: 6,
+                        itemStyle: {             
+                        color: '#f79c96ff'  
+                        }
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+            grafico.echartsInstance = myChart;
+
+            window.addEventListener('resize', () => myChart.resize());
+        } else {
+            grafico.echartsInstance.resize();
+        }
+    }
+
+    // Inicializar gráfico se visível
+    if(grafico.style.display !== 'none') {
+        initChart();
+    }
+});
 </script>
 
 </main>
