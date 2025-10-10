@@ -238,7 +238,7 @@ if ($tagVincResult) {
         <hr>
         <ul class="nav-list middle-section">
           <li><a href="../visaoGeral.php"><span><img src="../../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="../../dashboard/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+          <li><a href="../../dashboard/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Operações"></span> Histórico</a></li>
           <li class="active"><a href="../../dashboard/tabelas/produtos.php"><span><img src="../../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
           <li><a href="../tag.php"><span><img src="../../../img/tag.svg" alt="Tags"></span> Tags</a></li>
         </ul>
@@ -1029,16 +1029,6 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-bottom: 10px;
     z-index: 2;
 }
-#dica-overlay-1 .dica-card button {
-    margin-top: 12px;
-    background: #ff6600 !important;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 7px 18px;
-    cursor: pointer;
-    font-weight: bold;
-}
 
 /* Overlay 2 */
 #dica-overlay-2 {
@@ -1170,6 +1160,9 @@ document.querySelectorAll('.dica-card').forEach(card => {
         e.stopPropagation();
     });
 });
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>

@@ -302,7 +302,7 @@ $lojaId = $_SESSION['loja_id'];
   <div class="welcome-card">
        <h2>Finanças</h2>
     <p>Essa é a área de finanças da sua empresa, aqui você vai gerir e analisará detalhadamente o desempenho econômico da sua empresa.</p>
-    <button id="closeOverlay1">Entendi</button>
+    <button id="closeOverlay1">Próximo</button>
   </div>
 </div>
 
@@ -311,7 +311,7 @@ $lojaId = $_SESSION['loja_id'];
   <div class="welcome-card">
      <h2>Ver detalhes</h2>
     <p>Aqui você pode analisar os gráficos referentes a lucro bruto, lucro líquido e margem de lucro.</p>
-    <button id="closeOverlay2">Entendi</button>
+    <button id="closeOverlay2">Próximo</button>
   </div>
 </div>
 
@@ -359,49 +359,6 @@ $lojaId = $_SESSION['loja_id'];
     z-index: 10001;
     justify-content: center;
     align-items: center;
-}
-
-/* Card das overlays igual produtos.php */
-#welcome-overlay .welcome-card,
-#overlay-financas .welcome-card,
-#overlay-graficos .welcome-card {
-    background: #222;
-    color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
-    padding: 22px 28px;
-    max-width: 340px;
-    font-size: 15px;
-    pointer-events: auto;
-    position: relative;
-    margin-bottom: 10px;
-    z-index: 2;
-    text-align: left;
-}
-#welcome-overlay .welcome-card h2,
-#overlay-financas .welcome-card h2,
-#overlay-graficos .welcome-card h2 {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-}
-#welcome-overlay .welcome-card p,
-#overlay-financas .welcome-card p,
-#overlay-graficos .welcome-card p {
-    font-size: 15px;
-    margin-bottom: 18px;
-}
-#welcome-overlay .welcome-card button,
-#overlay-financas .welcome-card button,
-#overlay-graficos .welcome-card button {
-    margin-top: 12px;
-    background: #ff6600 !important;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 7px 18px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 15px;
 }
 
 /* Overlay de finanças */
@@ -452,7 +409,8 @@ $lojaId = $_SESSION['loja_id'];
     z-index: -1;  /* fica atrás do card */
 }
 
-/* Overlay gráfico */
+/* Overlay de gráficos */
+/* Card do overlay gráfico */
 #overlay-graficos .welcome-card h2 {
     margin-bottom: 20px; /* espaço abaixo do título */
     font-size: 24px;
@@ -506,8 +464,51 @@ $lojaId = $_SESSION['loja_id'];
     z-index: -1;
 }
 
-</style>
-<button id="help-btn" style="
+/* Card das overlays igual produtos.php */
+#welcome-overlay .welcome-card,
+#overlay-financas .welcome-card,
+#overlay-graficos .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+    text-align: left;
+}
+#welcome-overlay .welcome-card h2,
+#overlay-financas .welcome-card h2,
+#overlay-graficos .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+#welcome-overlay .welcome-card p,
+#overlay-financas .welcome-card p,
+#overlay-graficos .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+#welcome-overlay .welcome-card button,
+#overlay-financas .welcome-card button,
+#overlay-graficos .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Botão de ajuda flutuante */
+#help-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -520,11 +521,13 @@ $lojaId = $_SESSION['loja_id'];
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
-    z-index: 10000;
+    z-index: 9998; /* abaixo do blur (z-index: 9999), sempre atrás do blur */
     display: flex;
     align-items: center;
     justify-content: center;
-">?</button>
+}
+</style>
+<button id="help-btn">?</button>
 
 <script>
 const helpBtn = document.getElementById('help-btn');
