@@ -1,6 +1,5 @@
 <?php 
 include '../../../conexao.php'; 
-include '../../../header.php';
 session_start();
 
 // Verifica se está logado
