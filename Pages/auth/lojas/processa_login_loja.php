@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../../../conexao.php';
-include __DIR__ . '/../../../header.php';
+
 
 
 if (!empty($_POST['email']) && !empty($_POST['senha'])) {

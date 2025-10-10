@@ -1,19 +1,5 @@
 <?php
 session_start();
-include __DIR__ . '/../../header.php';
-
-// Verifica se usuário não é loja
-if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
-    echo "<script>
-        alert('Faça login como loja para acessar.');
-        if(document.referrer) {
-            window.location.href = document.referrer;
-        } else {
-            window.history.back();
-        }
-    </script>";
-    exit;
-}
 
 $lojaId = $_SESSION['loja_id'];
 ?>
@@ -23,7 +9,7 @@ $lojaId = $_SESSION['loja_id'];
   <meta charset="UTF-8">
   <title>Finanças - Decklogistic</title>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon"/>
   <link rel="stylesheet" href="../../assets/financas.css">
   <link rel="stylesheet" href="../../assets/sidebar.css">
   
