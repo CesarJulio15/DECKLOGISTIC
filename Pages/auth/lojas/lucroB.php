@@ -267,88 +267,78 @@
         });
 
         // Função de inicialização do gráfico
-        function initChart() {
-            if (!grafico.echartsInstance) {
-                const myChart = echarts.init(grafico);
+function initChart() {
+    if (!grafico.echartsInstance) {
+        const myChart = echarts.init(grafico);
 
-                const option = {
-                    title: {
-                        text: 'Receita x Custo',
-                        left: 'center',
-                        textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e0e0e0' }
-                    },
-                    tooltip: {
-                        trigger: 'axis',
-                        backgroundColor: 'rgba(0,0,0,0.7)',
-                        textStyle: { color: '#fff' }
-                    },
-                    legend: {
-                        bottom: 0,
-                        textStyle: { color: '#e0e0e0' },
-                        data: ['Receita', 'Custo']
-                    },
-                    grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
-                    xAxis: {
-                        type: 'category',
-                        boundaryGap: false,
-                        data: <?php echo json_encode($labels); ?>,
-                        axisLine: { lineStyle: { color: '#aaa' } },
-                        axisLabel: { color: '#e0e0e0' }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        axisLine: { show: false },
-                        splitLine: { lineStyle: { color: '#333' } },
-                        axisLabel: { color: '#e0e0e0' }
-                    },
-                    series: [
-                        {
-                            name: 'Receita',
-                            type: 'line',
-                            smooth: true,
-                            data: <?php echo json_encode($dadosReceita); ?>,
-                            lineStyle: { color: '#4caf50', width: 3 },
-                            areaStyle: {
-                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                    { offset: 0, color: 'rgba(76,175,80,0.4)' },
-                                    { offset: 1, color: 'rgba(76,175,80,0)' }
-                                ])
-                            },
-                            symbol: 'circle',
-                            symbolSize: 6,
-                            itemStyle: {             
-                            color: '#aaffadff'  
-                            }
-                        },
-                        {
-                            name: 'Custo',
-                            type: 'line',
-                            smooth: true,
-                            data: <?php echo json_encode($dadosCusto); ?>,
-                            lineStyle: { color: '#f44336', width: 3 },
-                            areaStyle: {
-                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                    { offset: 0, color: 'rgba(244,67,54,0.3)' },
-                                    { offset: 1, color: 'rgba(244,67,54,0)' }
-                                ])
-                            },
-                            symbol: 'square',
-                            symbolSize: 6,
-                            itemStyle: {             
-                            color: '#f79c96ff'  
-                            }
-                        }
-                    ]
-                };
+        // Calcular lucro bruto por ponto
+        const dadosLucro = <?php echo json_encode(array_map(function($r, $c){ return $r - $c; }, $dadosReceita, $dadosCusto)); ?>;
 
-                myChart.setOption(option);
-                grafico.echartsInstance = myChart;
+        const option = {
+            title: {
+                text: 'Receita x Custo x Lucro Bruto',
+                left: 'center',
+                textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e0e0e0' }
+            },
+            tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.7)', textStyle: { color: '#fff' } },
+            legend: {
+                bottom: 0,
+                textStyle: { color: '#e0e0e0' },
+                data: ['Receita', 'Custo', 'Lucro Bruto']
+            },
+            grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: <?php echo json_encode($labels); ?>,
+                axisLine: { lineStyle: { color: '#aaa' } },
+                axisLabel: { color: '#e0e0e0' }
+            },
+            yAxis: {
+                type: 'value',
+                axisLine: { show: false },
+                splitLine: { lineStyle: { color: '#333' } },
+                axisLabel: { color: '#e0e0e0' }
+            },
+            series: [
+                {
+                    name: 'Receita',
+                    type: 'line',
+                    smooth: true,
+                    data: <?php echo json_encode($dadosReceita); ?>,
+                    lineStyle: { color: '#4caf50', width: 3 },
+                    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(76,175,80,0.4)'},{offset:1,color:'rgba(76,175,80,0)'}]) },
+                    symbol: 'circle', symbolSize: 6, itemStyle: { color: '#aaffadff' }
+                },
+                {
+                    name: 'Custo',
+                    type: 'line',
+                    smooth: true,
+                    data: <?php echo json_encode($dadosCusto); ?>,
+                    lineStyle: { color: '#f44336', width: 3 },
+                    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(244,67,54,0.3)'},{offset:1,color:'rgba(244,67,54,0)'}]) },
+                    symbol: 'square', symbolSize: 6, itemStyle: { color: '#f79c96ff' }
+                },
+                {
+                    name: 'Lucro Bruto',
+                    type: 'line',
+                    smooth: true,
+                    data: dadosLucro,
+                    lineStyle: { color: '#FFD700', width: 3 },
+                    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(255,215,0,0.4)'},{offset:1,color:'rgba(255,215,0,0)'}]) },
+                    symbol: 'diamond', symbolSize: 6, itemStyle: { color: '#fdf2b2ff' }
+                }
+            ]
+        };
 
-                window.addEventListener('resize', () => myChart.resize());
-            } else {
-                grafico.echartsInstance.resize();
-            }
-        }
+        myChart.setOption(option);
+        grafico.echartsInstance = myChart;
+        window.addEventListener('resize', () => myChart.resize());
+    } else {
+        grafico.echartsInstance.resize();
+    }
+}
+
 
         // Inicializar gráfico se visível
         if(grafico.style.display !== 'none') {

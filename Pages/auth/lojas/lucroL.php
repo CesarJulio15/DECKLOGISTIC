@@ -260,7 +260,7 @@ btn.addEventListener('click', () => {
 
     const btnVoltar = document.getElementById('btnVoltar');
 btnVoltar.addEventListener('click', () => {
-    history.back(); // volta para a página anterior
+    history.back(); 
 });
 
 </script>
