@@ -1,7 +1,6 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-include __DIR__ . '/../../header.php';
 
 // Verifica login
 if (!isset($_SESSION['usuario_id'])) {
@@ -20,7 +19,7 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
   <title>Estoque - Decklogistic</title>
   <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
   <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
-  <link rel="stylesheet" href="../../assets/estoque.css?v=2">
+  <link rel="stylesheet" href="../../assets/estoque.css">
     <link rel="stylesheet" href="../../assets/sidebar.css">
 </head>
 <body>
