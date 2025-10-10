@@ -1,15 +1,31 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-// Verifique a chave correta da sessão
-if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
-    echo json_encode(["error" => "Loja não autenticada"]);
-    exit; 
-    
+
+// Permite empresa ou funcionario visualizar
+if (!isset($_SESSION['loja_id']) || !in_array($_SESSION['tipo_login'] ?? '', ['empresa', 'funcionario'])) {
+    // Exibe mensagem amigável se não autenticado
+    echo "<!DOCTYPE html>
+    <html lang='pt-br'>
+    <head>
+      <meta charset='UTF-8'>
+      <title>Não autenticado</title>
+      <style>
+        body { background: #181818; color: #fff; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .msg { background: #232323; padding: 32px 24px; border-radius: 12px; box-shadow: 0 4px 24px #0003; text-align: center; }
+        a { color: #FF7F00; text-decoration: underline; }
+      </style>
+    </head>
+    <body>
+      <div class='msg'>
+        <h2>Você não está autenticado!</h2>
+        <p>Faça login novamente para acessar a Visão Geral.</p>
+        <a href='../../login.php'>Ir para o login</a>
+      </div>
+    </body>
+    </html>";
+    exit;
 }
-
-
-
 $lojaId = $_SESSION['loja_id'];
 ?>
 <!DOCTYPE html>
@@ -694,6 +710,10 @@ document.querySelectorAll('.dica-card').forEach(card => {
         e.stopPropagation();
     });
 });
+</script>
+
+</body>
+</html>
 </script>
 
 </body>
