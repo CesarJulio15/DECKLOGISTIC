@@ -250,6 +250,7 @@
   <div class="form-group" style="display: flex; gap: 10px; margin-top: 30px;">
     <button type="button" onclick="location.href='cadastro.php'">Voltar</button>
     <button type="submit" style="width: 200px;">Prosseguir</button>
+    <button type="button" class="btn" onclick="window.history.back()">Fechar</button>
   </div>
 </form>
 
