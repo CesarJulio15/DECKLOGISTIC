@@ -106,7 +106,7 @@ if ($receita > 0) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lucro Bruto - Decklogistic</title>
-<link rel="icon" href="../../../img/logo2.svg" type="image/x-icon" />
+<link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/sidebar.css">
 <link rel="stylesheet" href="../../../assets/lucroB.css">
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
