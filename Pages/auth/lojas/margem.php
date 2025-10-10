@@ -71,7 +71,7 @@ $mediaMargem = count($margens) > 0 ? array_sum($margens) / count($margens) : 0;
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Margem de Lucro - Decklogistic</title>
-<link rel="icon" href="../../../img/logo2.svg" type="image/x-icon" />
+<link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/sidebar.css">
 <link rel="stylesheet" href="../../../assets/lucroB.css">
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>

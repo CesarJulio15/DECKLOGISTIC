@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <title>Termos de Uso - DeckLogistic</title>
     <link rel="stylesheet" href="assets/termosUso.css">
+    <link rel="icon" href="img/logoDecklogistic.webp" type="image/x-icon" />
 </head>
 <body>
 <div class="container">

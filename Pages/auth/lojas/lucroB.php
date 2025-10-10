@@ -109,7 +109,7 @@ if ($receita > 0) {
 <link rel="icon" href="../../../img/logo2.svg" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/sidebar.css">
 <link rel="stylesheet" href="../../../assets/lucroB.css">
-<link rel="icon" href="../../img/logo2.svg" type="image/x-icon" />
+<link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
