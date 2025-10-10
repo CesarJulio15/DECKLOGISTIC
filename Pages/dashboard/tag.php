@@ -328,12 +328,12 @@ $stmt->close();
         <h2>Tags Criadas</h2>
         <div class="tags-list">
             <?php foreach ($tags as $tag): ?>
-                <div class="tag-item" data-id="<?= $tag['id'] ?>">
-                    <span class="tag-icon">
-                      <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor'] ?: '#ffffffff') ?>;"></i>
-                    </span>
-                    <span class="tag-name"><?= htmlspecialchars($tag['nome']) ?></span>
-                </div>
+              <div class="tag-item" data-id="<?= $tag['id'] ?>">
+    <span class="tag-icon">
+        <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor'] ?: '#ffffffff') ?>;"></i>
+    </span>
+    <span class="tag-name"><?= htmlspecialchars($tag['nome']) ?></span>
+</div>
             <?php endforeach; ?>
         </div>
          <button id="help-btn-tag">?</button>
