@@ -1,6 +1,5 @@
 <?php
 session_start();
-include __DIR__ . '/../../../header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validação mínima
