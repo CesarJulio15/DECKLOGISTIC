@@ -693,33 +693,32 @@ if ($stmt) {
     </div>
 
     <!-- tabela produtos -->
-    <div class="table-wrap" style="margin-top:18px">
-      <table>
-        <thead>
-          <tr><th>ID</th><th>Produto</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr>
-        </thead>
-        <tbody>
-          <?php if (count($produtos) === 0): ?>
-            <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
-          <?php else: ?>
-            <?php foreach($produtos as $p): ?>
-              <tr data-id="<?= $p['id'] ?>" data-nome="<?= htmlspecialchars($p['nome']) ?>" data-preco="<?= $p['preco_unitario'] ?>" data-quantidade="<?= $p['quantidade_estoque'] ?>">
-                <td><?= $p['id'] ?></td>
-                <td><?= htmlspecialchars($p['nome']) ?></td>
-                <td>R$ <?= number_format($p['preco_unitario'],2,',','.') ?></td>
-                <td><?= $p['quantidade_estoque'] ?></td>
-                    <td class="actions-cell">
-                    <button class="btn icon editBtn" type="button" title="Editar">Editar</button>
-                    <button class="btn icon buyBtn" type="button" title="Comprar">Entrada</button>
-                    <button class="btn icon sellBtn" type="button" title="Vender">Saída</button>
-                    <button class="btn icon deleteBtn" type="button" title="Apagar">Excluir</button>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
+<div class="table-wrap" style="margin-top:18px">
+  <table>
+    <thead>
+      <tr><th>Produto</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr>
+    </thead>
+    <tbody>
+      <?php if (count($produtos) === 0): ?>
+        <tr><td colspan="4">Nenhum produto cadastrado.</td></tr>
+      <?php else: ?>
+        <?php foreach($produtos as $p): ?>
+          <tr data-id="<?= $p['id'] ?>" data-nome="<?= htmlspecialchars($p['nome']) ?>" data-preco="<?= $p['preco_unitario'] ?>" data-quantidade="<?= $p['quantidade_estoque'] ?>">
+            <td><?= htmlspecialchars($p['nome']) ?></td>
+            <td>R$ <?= number_format($p['preco_unitario'],2,',','.') ?></td>
+            <td><?= $p['quantidade_estoque'] ?></td>
+            <td class="actions-cell">
+              <button class="btn icon editBtn" type="button" title="Editar">Editar</button>
+              <button class="btn icon buyBtn" type="button" title="Comprar">Entrada</button>
+              <button class="btn icon sellBtn" type="button" title="Vender">Saída</button>
+              <button class="btn icon deleteBtn" type="button" title="Apagar">Excluir</button>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </tbody>
+  </table>
+</div>
 
   </main>
 </div>
