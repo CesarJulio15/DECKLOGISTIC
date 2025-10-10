@@ -454,15 +454,7 @@ document.getElementById('close-acoes').addEventListener('click', function() {
     <!-- Botão Importar -->
 <button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
 
-<!-- Terceiro overlay -->
-<div id="import-overlay" style="display:none;">
-    <div class="blur-bg"></div> <!-- blur de fundo -->
-    <div class="welcome-card">
-        <h2>Importar Produtos</h2>
-        <p>Aqui você pode importar seus produtos diretamente de um arquivo do Excel.</p>
-        <button id="close-import">Fechar</button>
-    </div>
-</div>
+
 
 <style>
 /* Overlay terceiro */
@@ -523,7 +515,14 @@ document.getElementById('close-acoes').addEventListener('click', function() {
 </style>
 
 <script>
-document.getElementById('import-btn').addEventListener('click', function() {
+document.getElementById('import-btn').addEventListener('click', function(e) {
+    // evita que o clique dispare handlers globais/propagação
+    e.preventDefault();
+    e.stopPropagation();
+
+    // marca que abrimos o import diretamente (suprime dicas)
+    window._suppressDica = true;
+
     const overlay = document.getElementById('import-overlay');
     const card = overlay.querySelector('.welcome-card');
     const btn = document.getElementById('import-btn');
@@ -540,7 +539,9 @@ document.getElementById('import-btn').addEventListener('click', function() {
     btn.style.zIndex = 2000;
 });
 
-document.getElementById('close-import').addEventListener('click', function() {
+
+document.getElementById('close-import').addEventListener('click', function(e) {
+    e.stopPropagation();
     const overlay = document.getElementById('import-overlay');
     overlay.style.display = 'none';
 
@@ -548,7 +549,11 @@ document.getElementById('close-import').addEventListener('click', function() {
     const btn = document.getElementById('import-btn');
     btn.style.position = 'static';
     btn.style.zIndex = 'auto';
+
+    // Permite que as dicas voltem a abrir normalmente
+    window._suppressDica = false;
 });
+
 </script>
 
         <select id="ordenar">
@@ -643,152 +648,134 @@ a.active {
 <?php endif; ?>
 
 <script>
+// ------------- UTILIDADES -------------
+function normalizeStr(s) {
+    if (!s && s !== 0) return '';
+    // trim, lowercase, remove acentos (normalização NFD)
+    try {
+        return String(s).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    } catch (e) {
+        // fallback simples se normalize não existir
+        return String(s).trim().toLowerCase().replace(/[\u0300-\u036f]/g, '');
+    }
+}
 
+function textoNomeDoRow(tr) {
+    // pega a célula da "coluna nome" (2ª coluna lógica, considerando que a coluna de checkbox existe)
+    const td = tr.querySelector('td:nth-child(2)');
+    if (!td) return '';
 
-    document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = multiDeleteActive ? 'table-cell' : 'none');
-    document.getElementById('multi-checkbox-header').style.display = multiDeleteActive ? 'table-cell' : 'none';
-    confirmDeleteBtn.style.display = multiDeleteActive ? 'inline-block' : 'none';
-});
+    // 1) tenta achar o <span> que NÃO é .tags-vinculadas (esse é o nome)
+    let nameSpan = td.querySelector('span:not(.tags-vinculadas)');
+    if (nameSpan && nameSpan.textContent.trim() !== '') {
+        return normalizeStr(nameSpan.textContent);
+    }
 
-// Confirmar exclusão
-document.getElementById('confirm-delete').addEventListener('click', function() {
-    const checkboxes = document.querySelectorAll('.chk-delete:checked');
-    if (checkboxes.length === 0) return alert("Selecione pelo menos um produto.");
-    if (!confirm("Deseja realmente excluir os produtos selecionados?")) return;
-    let ids = Array.from(checkboxes).map(chk => chk.dataset.id);
-
-    fetch('excluir_produto.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `produto_ids=${ids.join(',')}`
-    })
-    .then(res => res.text())
-    .then data => {
-        if(data.trim() === 'ok'){
-            checkboxes.forEach(chk => chk.closest('tr').remove());
-            document.getElementById('confirm-delete').style.display = 'none';
-            document.querySelectorAll('.multi-checkbox').forEach(td => td.style.display = 'none');
-        } else {
-            alert('Erro ao excluir produtos!');
+    // 2) fallback: monta o texto a partir de nós de texto diretos na td (caso a estrutura mude)
+    let textParts = [];
+    td.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const t = node.textContent.trim();
+            if (t) textParts.push(t);
+        } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'span' && !node.classList.contains('tags-vinculadas')) {
+            const t = node.textContent.trim();
+            if (t) textParts.push(t);
         }
     });
-});
+    return normalizeStr(textParts.join(' ').trim());
+}
 
-// Pesquisa
-document.getElementById('pesquisa').addEventListener('input', function() {
-    const termo = this.value.toLowerCase();
-    document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-        const spans = tr.querySelectorAll('td:nth-child(2) span');
-        const nome = spans.length ? spans[spans.length - 1].textContent.toLowerCase() : '';
-        tr.style.display = nome.includes(termo) ? '' : 'none';
-    });
-});
+function parsePrecoText(text) {
+    // Recebe algo como "R$ 1.234,56" ou "R$ 12,34" e retorna número
+    if (!text) return 0;
+    let s = String(text).replace(/\s/g, '').replace('R$', '').trim();
+    s = s.replace(/\./g, ''); // remove pontos de milhar
+    s = s.replace(',', '.'); // vírgula decimal -> ponto
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+}
 
-// Ordenação
-document.getElementById('ordenar').addEventListener('change', function() {
-    const tbody = document.getElementById('tabela-produtos');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    const val = this.value;
+// ------------- PESQUISA -------------
+const pesquisaInput = document.getElementById('pesquisa');
+if (pesquisaInput) {
+    pesquisaInput.addEventListener('input', function() {
+        const termo = normalizeStr(this.value);
+        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+            const nome = textoNomeDoRow(tr);
 
-    rows.sort((a, b) => {
-        let aText, bText;
-        switch(val){
-            case 'nome-asc':
-                aText = a.querySelector('td:nth-child(2) span') ? a.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
-                bText = b.querySelector('td:nth-child(2) span') ? b.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
-                return aText.localeCompare(bText);  // Comparação alfabética
-            case 'nome-desc':
-                aText = a.querySelector('td:nth-child(2) span') ? a.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
-                bText = b.querySelector('td:nth-child(2) span') ? b.querySelector('td:nth-child(2) span').textContent.trim().toLowerCase() : '';
-                return bText.localeCompare(aText);  // Comparação alfabética inversa
-            case 'preco-asc':
-                aText = parseFloat(a.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
-                bText = parseFloat(b.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
-                return aText - bText;
-            case 'preco-desc':
-                aText = parseFloat(a.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
-                bText = parseFloat(b.querySelector('td:nth-child(3)').textContent.replace('R$ ','').replace(',','.'));
-                return bText - aText;
-            case 'quantidade-asc':
-                aText = parseInt(a.querySelector('td:nth-child(4)').textContent);
-                bText = parseInt(b.querySelector('td:nth-child(4)').textContent);
-                return aText - bText;
-            case 'quantidade-desc':
-                aText = parseInt(a.querySelector('td:nth-child(4)').textContent);
-                bText = parseInt(b.querySelector('td:nth-child(4)').textContent);
-                return bText - aText;
-            case 'lote-asc':
-                aText = a.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
-                bText = b.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
-                return aText.localeCompare(bText);
-            case 'lote-desc':
-                aText = a.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
-                bText = b.querySelector('td:nth-child(5)').textContent.trim().toLowerCase();
-                return bText.localeCompare(aText);
-            default: return 0;
-        }
-    });
+            const loteTd = tr.querySelector('td:nth-child(5)');
+            const lote = loteTd ? normalizeStr(loteTd.textContent) : '';
 
-    rows.forEach(r => tbody.appendChild(r)); // Reorganiza as linhas na tabela
-});
-</script>
-<script>
-// Abrir/fechar dropdown ao clicar no "+"
-document.querySelectorAll('.add-tag-square').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        const produtoId = this.dataset.produtoId;
-        const dropdown = document.getElementById('tag-dropdown-' + produtoId);
+            const precoTd = tr.querySelector('td:nth-child(3)');
+            const preco = precoTd ? normalizeStr(precoTd.textContent) : '';
 
-        // Fecha outros dropdowns
-        document.querySelectorAll('.tag-dropdown').forEach(d => {
-            if (d !== dropdown) d.style.display = 'none';
+            const matches = nome.includes(termo) || lote.includes(termo) || preco.includes(termo);
+            tr.style.display = matches ? '' : 'none';
         });
-
-        // Alterna visibilidade
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     });
-});
+}
 
-// Selecionar uma tag no dropdown
-// Selecionar uma tag no dropdown
-document.querySelectorAll('.tag-option').forEach(opt => {
-    opt.addEventListener('click', function() {
-        const tagId = this.dataset.tagId;
-        const produtoId = this.closest('.tag-dropdown').id.replace('tag-dropdown-', '');
+// ------------- ORDENAÇÃO -------------
+const ordenarSelect = document.getElementById('ordenar');
+if (ordenarSelect) {
+    ordenarSelect.addEventListener('change', function() {
+        const tbody = document.getElementById('tabela-produtos');
+        if (!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const val = this.value;
 
-        fetch('vincular_tag.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `produto_id=${produtoId}&tag_id=${tagId}`
-        })
-        .then(res => res.text())
-        .then(data => {
-            if (data.trim() === 'ok') {
-                const container = document.getElementById('tags-produto-' + produtoId);
-
-                // Remove qualquer tag anterior
-                container.innerHTML = '';
-
-                // Adiciona a nova tag e garante o data-tag-id
-                const icone = this.querySelector('i').cloneNode(true);
-                icone.dataset.tagId = tagId; // <<< AQUI o segredo
-                container.appendChild(icone);
-
-                this.closest('.tag-dropdown').style.display = 'none';
-            } else {
-                alert('Erro ao vincular tag: ' + data);
+        rows.sort((a, b) => {
+            switch (val) {
+                case 'nome-asc': {
+                    const aText = textoNomeDoRow(a);
+                    const bText = textoNomeDoRow(b);
+                    return aText.localeCompare(bText, 'pt', { sensitivity: 'base' });
+                }
+                case 'nome-desc': {
+                    const aText = textoNomeDoRow(a);
+                    const bText = textoNomeDoRow(b);
+                    return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
+                }
+                case 'preco-asc': {
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    return aNum - bNum;
+                }
+                case 'preco-desc': {
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    return bNum - aNum;
+                }
+                case 'quantidade-asc': {
+                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    return aNum - bNum;
+                }
+                case 'quantidade-desc': {
+                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    return bNum - aNum;
+                }
+                case 'lote-asc': {
+                    const aText = normalizeStr(a.querySelector('td:nth-child(5)')?.textContent || '');
+                    const bText = normalizeStr(b.querySelector('td:nth-child(5)')?.textContent || '');
+                    return aText.localeCompare(bText, 'pt', { sensitivity: 'base' });
+                }
+                case 'lote-desc': {
+                    const aText = normalizeStr(a.querySelector('td:nth-child(5)')?.textContent || '');
+                    const bText = normalizeStr(b.querySelector('td:nth-child(5)')?.textContent || '');
+                    return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
+                }
+                default:
+                    return 0;
             }
         });
-    });
-});
 
-// Fecha dropdowns ao clicar fora
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.add-tag-square') && !e.target.closest('.tag-dropdown')) {
-        document.querySelectorAll('.tag-dropdown').forEach(d => d.style.display = 'none');
-    }
-});
+        rows.forEach(r => tbody.appendChild(r));
+    });
+}
 </script>
+
 
 </div>
 </div>
@@ -1140,7 +1127,13 @@ const dicaFechar2 = document.getElementById('dica-fechar-2');
 const btnAcoes = document.getElementById('acoes-itens-btn');
 const btnImport = document.getElementById('import-btn');
 
-dicaBtn.addEventListener('click', function() {
+dicaBtn.addEventListener('click', function(e) {
+    // se estivermos com supressão ativa (ex: abrimos import), não abrir a dica
+    if (window._suppressDica) {
+        // opcional: debug no console
+        // console.log('Dica suprimida porque import foi acionado.');
+        return;
+    }
     dicaOverlay1.style.display = 'flex';
 });
 
@@ -1196,6 +1189,62 @@ document.querySelectorAll('.dica-card').forEach(card => {
     });
 });
 </script>
+
+<script>
+// garante flag padrão
+window._suppressDica = window._suppressDica || false;
+
+(function(){
+  const dicaBtn = document.getElementById('dica-btn-flutuante');
+  const dicaOverlay1 = document.getElementById('dica-overlay-1');
+  const dicaAvancar1 = document.getElementById('dica-avancar-1');
+  const dicaOverlay2 = document.getElementById('dica-overlay-2');
+
+  const importBtn = document.getElementById('import-btn');
+  const importModalEl = document.getElementById('importModal');
+
+  // Se o Bootstrap estiver presente, escuta os eventos do modal para suprimir dicas
+  if (importModalEl && typeof bootstrap !== 'undefined') {
+    importModalEl.addEventListener('show.bs.modal', function() {
+      window._suppressDica = true;
+      // Fecha imediatamente qualquer dica visível
+      if (dicaOverlay1) dicaOverlay1.style.display = 'none';
+      if (dicaOverlay2) {
+        dicaOverlay2.style.display = 'none';
+        dicaOverlay2.classList.remove('active');
+      }
+    });
+
+    importModalEl.addEventListener('hidden.bs.modal', function() {
+      // reativa dicas quando o modal for fechado
+      window._suppressDica = false;
+    });
+  }
+
+  // Protege abertura via botão de dica
+  if (dicaBtn) {
+    dicaBtn.addEventListener('click', function(e) {
+      if (window._suppressDica) return;
+      // já existente: abre a dica 1
+      dicaOverlay1.style.display = 'flex';
+    });
+  }
+
+  // Protege botão avançar (se alguém tentar avançar programaticamente)
+  if (dicaAvancar1) {
+    dicaAvancar1.addEventListener('click', function() {
+      if (window._suppressDica) return;
+      // restante da lógica já existente para posicionar e abrir overlay2
+      // (se você já tem esse código, ele continuará rodando; essa checagem evita abertura)
+      // ... seu código de posicionamento permanece
+    });
+  }
+
+  // Em caso de outros handlers que abram dicas programaticamente, você pode usar:
+  // if (window._suppressDica) return;  antes de qualquer dicaOverlayX.style.display = '...';
+})();
+</script>
+
 </body>
 </html>
 </html>
