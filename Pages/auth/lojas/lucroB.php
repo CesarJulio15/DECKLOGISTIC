@@ -324,9 +324,9 @@ function initChart() {
                     type: 'line',
                     smooth: true,
                     data: dadosLucro,
-                    lineStyle: { color: '#FFD700', width: 3 },
-                    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(255,215,0,0.4)'},{offset:1,color:'rgba(255,215,0,0)'}]) },
-                    symbol: 'diamond', symbolSize: 6, itemStyle: { color: '#fdf2b2ff' }
+                    lineStyle: { color: '#2196f3', width: 3 },
+                    areaStyle: { color: 'rgba(33,150,243,0.3)' },
+                    symbol: 'diamond', symbolSize: 6, itemStyle: { color: '#a5d4faff' }
                 }
             ]
         };
@@ -347,8 +347,8 @@ function initChart() {
     });
 
     const btnVoltar = document.getElementById('btnVoltar');
-btnVoltar.addEventListener('click', () => {
-    history.back(); // volta para a página anterior
+    btnVoltar.addEventListener('click', () => {
+    history.back(); 
 });
 
     </script>
