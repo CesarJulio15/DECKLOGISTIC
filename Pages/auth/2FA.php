@@ -16,9 +16,9 @@ function gerarCodigo($destino) {
     $_SESSION['codigo2fa'] = rand(100000, 999999); // 6 dígitos
     $_SESSION['codigo_expira'] = time() + 300;     // expira em 5 min
     $_SESSION['tentativas_2fa'] = 0;               // reset tentativas
-    
-    // TESTE: exibe o código na tela
-    echo "<p style='color: lime; font-weight:bold;'>Código de teste: {$_SESSION['codigo2fa']}</p>";
+
+    // TESTE: exibe o código na tela, centralizado
+    echo "<div class='codigo-teste'><span>Código de teste:</span> <b>{$_SESSION['codigo2fa']}</b></div>";
 }
 
 $destino = $_SESSION['email'] ?? '';
@@ -91,6 +91,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Redefinir Senha | DeckLogistic</title>
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../assets/2FA.css">
+<style>
+/* Centraliza o código de teste */
+.codigo-teste {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255,127,0,0.10);
+    color: #ff7f00;
+    font-weight: 600;
+    font-size: 1.15rem;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    padding: 8px 0;
+    letter-spacing: 2px;
+}
+.form-senha {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    margin-top: 18px;
+}
+.form-senha input[type="password"] {
+    width: 100%;
+    max-width: 320px;
+}
+.form-senha .btn {
+    max-width: 320px;
+}
+@media (max-width: 480px) {
+    .form-senha input[type="password"], .form-senha .btn {
+        max-width: 98vw;
+    }
+}
+</style>
 <script>
     // Contador regressivo
     let expiraEm = <?= ($_SESSION['codigo_expira'] ?? time()) - time() ?>;
@@ -130,12 +165,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form method="POST" style="margin-top:10px;">
             <button type="submit" name="reenviar" class="btn secundario">Reenviar código</button>
+            <button type="button" onclick="location.href='config.php'" class="btn secundario">Voltar</button>
         </form>
     <?php else: ?>
-        <form method="POST">
+        <form method="POST" class="form-senha">
             <input type="password" name="senha" placeholder="Nova senha" required>
             <input type="password" name="senha_confirm" placeholder="Confirme a nova senha" required>
             <button type="submit" class="btn">Alterar Senha</button>
+            <button type="button" onclick="location.href='config.php'" class="btn">Voltar</button>
         </form>
     <?php endif; ?>
 </div>
