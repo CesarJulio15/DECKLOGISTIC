@@ -36,6 +36,7 @@
           <a href="../lojas/cadastro.php">Cadastrar</a>
         </div>
         <button type="submit" class="btn">Continuar</button>
+        <button type="button" class="btn" onclick="window.history.back()">Fechar</button>
       </form>
     </div>
   </div>

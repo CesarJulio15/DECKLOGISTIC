@@ -80,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
           <button type="submit" class="btn">Continuar</button>
+          <button type="button" onclick="location.href='../../../index.php'" class="btn">Voltar</button>
         </form>
       </div>
     </div>
