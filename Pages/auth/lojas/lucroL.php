@@ -69,9 +69,26 @@ $totalLucro = array_sum($dadosLucro);
 <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/sidebar.css">
 <link rel="stylesheet" href="../../../assets/lucroB.css">
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body>
+
+    <style>
+        .voltar-btn {
+        margin-top: 20px;
+        padding: 10px 15px;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        }
+
+        .voltar-btn:hover {
+            background: #555;
+        }
+    </style>
 
 <div class="content">
   <div class="sidebar">
@@ -124,6 +141,8 @@ $totalLucro = array_sum($dadosLucro);
     <div id="grafico"></div>
 
     <button id="toggleView" class="toggle-btn">Ver Tabela</button>
+    <button id="btnVoltar" class="voltar-btn">← Voltar</button>
+
     <div id="tabela-container" style="display:none;">
         <table>
             <thead>
@@ -152,39 +171,100 @@ document.addEventListener('DOMContentLoaded', () => {
     const grafico = document.getElementById('grafico');
     const tabela = document.getElementById('tabela-container');
 
-    // --- Alterna entre gráfico e tabela ---
-    btn.addEventListener('click', () => {
-        const mostrandoTabela = tabela.style.display === 'block';
-        tabela.style.display = mostrandoTabela ? 'none' : 'block';
-        grafico.style.display = mostrandoTabela ? 'block' : 'none';
-        btn.innerText = mostrandoTabela ? 'Ver Tabela' : 'Ver Gráfico';
-    });
+    // Garantir dimensões do gráfico
+    grafico.style.width = "100%";
+    grafico.style.height = "400px";
+    grafico.style.minHeight = "400px";
 
-    // --- Gráfico ApexCharts ---
-    const options = {
-        chart: {
-            type: 'line',
-            height: 350,
-            animations: { enabled: false }, // <== evita "flick"
-            toolbar: { show: false }
-        },
-        series: [{
-            name: 'Lucro Líquido',
-            data: <?php echo json_encode($dadosLucro); ?>
-        }],
-        xaxis: { categories: <?php echo json_encode($labels); ?> },
-        colors: ['#36A2EB'],
-        stroke: { width: 2, curve: 'smooth' },
-        markers: { size: 4 }
-    };
+    let myChart = null;
 
-    // Usa requestAnimationFrame pra garantir renderização estável
-    requestAnimationFrame(() => {
-        const chart = new ApexCharts(grafico, options);
-        chart.render();
-    });
+    function initChart() {
+        if (!myChart) {
+            myChart = echarts.init(grafico);
+
+            const option = {
+                title: {
+                    text: 'Lucro Líquido',
+                    left: 'center',
+                    textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e0e0e0' }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    textStyle: { color: '#fff' }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: <?php echo json_encode($labels); ?>,
+                    axisLine: { lineStyle: { color: '#aaa' } },
+                    axisLabel: { color: '#e0e0e0' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#e0e0e0' }
+                },
+                grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
+                series: [{
+                    name: 'Lucro Líquido',
+                    type: 'line',
+                    smooth: true,
+                    data: <?php echo json_encode($dadosLucro); ?>,
+                    lineStyle: { color: '#36A2EB', width: 3 },
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    itemStyle: { color: '#36A2EB' },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(54,162,235,0.3)' },
+                            { offset: 1, color: 'rgba(54,162,235,0)' }
+                        ])
+                    }
+                }]
+            };
+
+            myChart.setOption(option);
+
+            window.addEventListener('resize', () => myChart.resize());
+        } else {
+            // Forçar redraw correto quando o container estava escondido
+            setTimeout(() => myChart.resize(), 100);
+        }
+    }
+
+    // Alterna entre gráfico e tabela
+btn.addEventListener('click', () => {
+    const mostrandoTabela = tabela.style.display === 'block';
+    tabela.style.display = mostrandoTabela ? 'none' : 'block';
+    grafico.style.display = mostrandoTabela ? 'block' : 'none';
+    btn.innerText = mostrandoTabela ? 'Ver Tabela' : 'Ver Gráfico';
+
+    if (!mostrandoTabela) { // só quando for mostrar gráfico
+        // Se ainda não criou, inicializa
+        if (!grafico.echartsInstance) {
+            grafico.echartsInstance = echarts.init(grafico);
+            grafico.echartsInstance.setOption(option);
+            window.addEventListener('resize', () => grafico.echartsInstance.resize());
+        }
+        // Sempre redimensiona depois que fica visível
+        grafico.echartsInstance.resize();
+    }
 });
+
+    // Inicializa gráfico se estiver visível na carga
+    if (grafico.style.display !== 'none') {
+        initChart();
+    }
+});
+
+    const btnVoltar = document.getElementById('btnVoltar');
+btnVoltar.addEventListener('click', () => {
+    history.back(); // volta para a página anterior
+});
+
 </script>
+
 
 
 </main>
