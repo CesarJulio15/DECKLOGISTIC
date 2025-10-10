@@ -4,7 +4,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include __DIR__ . '/../../conexao.php';
-include __DIR__ . '/../../header.php';
 
 // Verifica login
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login'])) {
@@ -335,7 +334,8 @@ if ($stmt) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Gerenciamento de Produtos — Decklogistic</title>
-    <link rel="stylesheet" href="../../assets/sidebar.css">
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
+  <link rel="stylesheet" href="../../assets/sidebar.css">
 
   <style>
     /* ===== Reset + base ===== */

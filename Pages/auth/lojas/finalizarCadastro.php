@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../../../conexao.php';
-include __DIR__ . '/../../../header.php';
+
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['cadastro'])) {
