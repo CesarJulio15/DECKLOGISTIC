@@ -17,6 +17,8 @@ $tipo_login = $_SESSION['tipo_login']; // 'empresa' ou 'funcionario'
 // Define a loja_id corretamente
 if ($tipo_login === 'empresa') {
     $lojaId = $_SESSION['loja_id'] ?? 0;
+    // Se não houver funcionário, usa o próprio usuario_id da empresa
+    $responsavelId = $usuarioId;
 } else {
     $res = $conn->prepare("SELECT loja_id FROM usuarios WHERE id = ?");
     $res->bind_param("i", $usuarioId);
@@ -24,6 +26,7 @@ if ($tipo_login === 'empresa') {
     $row = $res->get_result()->fetch_assoc();
     $lojaId = $row['loja_id'] ?? 0;
     $res->close();
+    $responsavelId = $usuarioId;
 }
 
 if (!$lojaId) {
@@ -35,7 +38,7 @@ $msg = '';
 /* ======================================================
    TRATAMENTO DE AÇÕES (ADD / EDIT / DELETE / COMPRAR / VENDER)
    ====================================================== */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
 
     // --- ADICIONAR PRODUTO ---
@@ -46,6 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
         $estoque = intval($_POST['estoque'] ?? 0);
         $lote = '';
 
+        // Se for empresa e não houver funcionário, usuario_id = NULL
+        if ($tipo_login === 'empresa') {
+            $usuario_id_produto = null;
+        } else {
+            $usuario_id_produto = $usuarioId;
+        }
+
         $stmt = $conn->prepare("
             INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
             VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -54,7 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
             die("Erro prepare produto: " . $conn->error);
         }
 
-        $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuarioId);
+        // Se usuario_id_produto for null, use "i" e passe null, senão passe o id normalmente
+        if ($usuario_id_produto === null) {
+            $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
+        } else {
+            $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
+        }
         if (!$stmt->execute()) {
             die("Erro execute produto: " . $stmt->error);
         }
@@ -62,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
         $idNovoProduto = $stmt->insert_id;
         $stmt->close();
 
-        // Histórico
+        // Histórico (se empresa, usuario_id pode ser null)
         $stmtHist = $conn->prepare("
             INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
             VALUES (?, ?, ?, 'adicionado', ?, NOW())
@@ -71,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
             die("Erro prepare histórico: " . $conn->error);
         }
 
-        $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuarioId);
+        $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_produto);
         if (!$stmtHist->execute()) {
             die("Erro execute histórico: " . $stmtHist->error);
         }
@@ -121,25 +136,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
             $stmt->close();
         }
 
-        // Marca como excluído
-        $stmt = $conn->prepare(
-            "UPDATE produtos SET deletado_em = NOW(), usuario_exclusao_id = ? WHERE id = ? AND loja_id = ?"
-        );
-        if (!$stmt) die("Erro prepare apagar: " . $conn->error);
+        // Remove movimentações de estoque
+        $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
 
-        $stmt->bind_param("iii", $usuarioId, $id, $lojaId);
+        // Remove itens de venda
+        $stmt = $conn->prepare("DELETE FROM itens_venda WHERE produto_id=?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        // Remove histórico do produto
+        $stmt = $conn->prepare("DELETE FROM historico_produtos WHERE produto_id=?");
+        if ($stmt) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        // Apaga produto do banco
+        $stmt = $conn->prepare("DELETE FROM produtos WHERE id = ? AND loja_id = ?");
+        if (!$stmt) die("Erro prepare apagar: " . $conn->error);
+        $stmt->bind_param("ii", $id, $lojaId);
         if ($stmt->execute()) {
-            // Registra histórico de exclusão
-            $stmtHist = $conn->prepare("
-                INSERT INTO historico_produtos (produto_id, nome, quantidade, lote, acao, usuario_id, criado_em)
-                SELECT id, nome, quantidade_estoque, lote, 'excluido', ?, NOW()
-                FROM produtos WHERE id=? AND loja_id=?
-            ");
-            if ($stmtHist) {
-                $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
-                $stmtHist->execute();
-                $stmtHist->close();
-            }
             $msg = "🗑️ Produto apagado!";
         } else {
             $msg = "❌ Erro: " . $stmt->error;
@@ -284,7 +309,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {}
 
         $msg = "📤 Venda registrada com sucesso! (-$quantidade unidade(s))";
     }
-
+  }
 
 /* ======================================================
    BUSCA PRODUTOS (LISTAGEM)

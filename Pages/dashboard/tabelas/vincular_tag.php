@@ -1,29 +1,32 @@
 <?php
+header('Content-Type: text/plain');
 include '../../../conexao.php';
-include '../../../header.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $produto_id = intval($_POST['produto_id'] ?? 0);
-    $tag_id = intval($_POST['tag_id'] ?? 0);
+$produto_id = intval($_POST['produto_id'] ?? 0);
+$tag_id = intval($_POST['tag_id'] ?? 0);
 
-    if ($produto_id && $tag_id) {
-        // Remove qualquer tag anterior para esse produto (uma tag por produto)
-        $conn->query("DELETE FROM produto_tag WHERE produto_id = $produto_id");
-
-        // Insere a nova tag
-        $stmt = $conn->prepare("INSERT INTO produto_tag (produto_id, tag_id) VALUES (?, ?)");
-        $stmt->bind_param("ii", $produto_id, $tag_id);
-
-        if ($stmt->execute()) {
-            echo "ok";
-        } else {
-            echo "erro: " . $stmt->error;
-        }
-        $stmt->close();
-    } else {
-        echo "dados inválidos";
-    }
-} else {
-    echo "método inválido";
+if (!$produto_id || !$tag_id) {
+    echo "Erro: Dados inválidos";
+    exit;
 }
+
+// Remove tags anteriores (se quiser apenas uma por produto)
+$stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id = ?");
+$stmt->bind_param("i", $produto_id);
+$stmt->execute();
+$stmt->close();
+
+// Vincula nova tag
+$stmt = $conn->prepare("INSERT INTO produto_tag (produto_id, tag_id) VALUES (?, ?)");
+if (!$stmt) {
+    echo "Erro: " . $conn->error;
+    exit;
+}
+$stmt->bind_param("ii", $produto_id, $tag_id);
+if ($stmt->execute()) {
+    echo "ok";
+} else {
+    echo "Erro: " . $stmt->error;
+}
+$stmt->close();
 ?>
