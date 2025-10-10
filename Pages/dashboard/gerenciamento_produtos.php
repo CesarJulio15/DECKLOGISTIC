@@ -176,21 +176,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['produto_id'] ?? 0);
     $qtd = intval($_POST['quantidade'] ?? 0);
     $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
+    $custo_compra = isset($_POST['custo']) ? floatval($_POST['custo']) : null;
 
-    // 1. Atualiza estoque
-    $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
-    if (!$stmt) die("Erro prepare comprar: " . $conn->error);
-    $stmt->bind_param("iii", $qtd, $id, $lojaId);
-    $stmt->execute();
-    $stmt->close();
+    // Busca custo atual do produto
+    $stmtCusto = $conn->prepare("SELECT custo_unitario FROM produtos WHERE id=? AND loja_id=?");
+    $stmtCusto->bind_param("ii", $id, $lojaId);
+    $stmtCusto->execute();
+    $rowCusto = $stmtCusto->get_result()->fetch_assoc();
+    $custo_atual = isset($rowCusto['custo_unitario']) ? floatval($rowCusto['custo_unitario']) : 0;
+    $stmtCusto->close();
+
+    // Se for a primeira entrada (custo 0), atualiza o custo oficial
+    if ($custo_atual == 0 && $custo_compra !== null && $qtd > 0) {
+        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ?, custo_unitario = ? WHERE id=? AND loja_id=?");
+        $stmt->bind_param("idii", $qtd, $custo_compra, $id, $lojaId);
+        $stmt->execute();
+        $stmt->close();
+        $custo_mov = $custo_compra;
+    } else {
+        // Apenas atualiza o estoque, custo é só para a movimentação
+        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
+        $stmt->bind_param("iii", $qtd, $id, $lojaId);
+        $stmt->execute();
+        $stmt->close();
+        $custo_mov = $custo_compra !== null ? $custo_compra : $custo_atual;
+    }
 
     // 2. Registra movimentação de estoque
     $tipo = 'entrada';
     $stmt2 = $conn->prepare("
-        INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) 
-        VALUES (?, ?, ?, ?, ?, NOW())
+        INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario) 
+        VALUES (?, ?, ?, ?, ?, NOW(), ?)
     ");
-    $stmt2->bind_param("isisi", $id, $tipo, $qtd, $data, $usuarioId);
+    $stmt2->bind_param("isissi", $id, $tipo, $qtd, $data, $usuarioId, $custo_mov);
     $stmt2->execute();
     $stmt2->close();
 
@@ -803,6 +821,22 @@ function openModal(type, row) {
     modalPreco.style.display = 'none';
     modalEstoque.style.display = 'none';
     modalQuantidade.required = true;
+
+    // Adiciona campo de custo dinamicamente se não existir
+    let custoInput = document.getElementById('modalCusto');
+    if (!custoInput) {
+      custoInput = document.createElement('input');
+      custoInput.type = 'number';
+      custoInput.step = '0.01';
+      custoInput.name = 'custo';
+      custoInput.id = 'modalCusto';
+      custoInput.placeholder = 'Custo (R$)';
+      custoInput.required = true;
+      custoInput.style.marginLeft = '8px';
+      document.getElementById('rowQtd').appendChild(custoInput);
+    }
+    custoInput.value = row.dataset.custo || '';
+    custoInput.style.display = '';
   } else if (type === 'vender_produto') {
     modalTitle.textContent = 'Registrar venda (saída)';
     modalNome.style.display = 'none';

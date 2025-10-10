@@ -206,9 +206,14 @@ $lojaId = $_SESSION['loja_id'];
       document.getElementById('lucroLiquido').innerText = `R$ ${lucroLiquidoVal}`;
       document.getElementById('margemLucro').innerText = `${margemVal}%`;
 
-      const brutoSeries = Array.isArray(bruto.dados_receita) ? bruto.dados_receita.map(v => parseFloat(v) || 0) : [];
-      const liquidoSeries = Array.isArray(liquido.series) ? liquido.series.map(item => parseFloat(item.valor || item) || 0) : [];
-      const margemSeries = Array.isArray(margem.series) ? margem.series.map(item => parseFloat(item.valor || item) || 0) : [];
+      // Corrige o gráfico de lucro bruto para exibir corretamente como os outros
+      let brutoSeries = [];
+      if (Array.isArray(bruto.series)) {
+        brutoSeries = bruto.series.map(item => parseFloat(item.valor || item) || 0);
+      } else if (Array.isArray(bruto.dados_receita)) {
+        brutoSeries = bruto.dados_receita.map(v => parseFloat(v) || 0);
+      }
+      if (brutoSeries.length === 0) brutoSeries = [0,0,0,0,0,0];
 
       new ApexCharts(document.querySelector("#chartBruto"), {
         chart: { type: 'area', height: 60, sparkline: { enabled: true } },
@@ -217,6 +222,9 @@ $lojaId = $_SESSION['loja_id'];
         series: [{ data: brutoSeries }],
         colors: ['#10b981']
       }).render();
+
+      const liquidoSeries = Array.isArray(liquido.series) ? liquido.series.map(item => parseFloat(item.valor || item) || 0) : [];
+      const margemSeries = Array.isArray(margem.series) ? margem.series.map(item => parseFloat(item.valor || item) || 0) : [];
 
       new ApexCharts(document.querySelector("#chartLiquido"), {
         chart: { type: 'area', height: 60, sparkline: { enabled: true } },
