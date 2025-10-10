@@ -1,7 +1,6 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-include __DIR__ . '/../../header.php';
 
 // Verifica login
 if (!isset($_SESSION['usuario_id'])) {
@@ -20,7 +19,7 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
   <title>Estoque - Decklogistic</title>
   <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
   <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
-  <link rel="stylesheet" href="../../assets/estoque.css?v=2">
+  <link rel="stylesheet" href="../../assets/estoque.css">
     <link rel="stylesheet" href="../../assets/sidebar.css">
 </head>
 <body>
@@ -35,7 +34,7 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
     <nav class="nav-section">
       <div class="nav-menus">
        <ul class="nav-list top-section">
-    <li><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+    <li><a href="financas.p <span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
     <li  class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
 </ul>
         <hr>

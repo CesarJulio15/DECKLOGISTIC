@@ -1,5 +1,4 @@
 <?php session_start();
-include __DIR__ . '/../../../header.php';
  ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -36,6 +35,7 @@ include __DIR__ . '/../../../header.php';
           <a href="cadastro.php">Cadastrar</a>
         </div>
         <button type="submit" class="btn">Continuar</button>
+        <button type="button" class="btn" onclick="window.history.back()">Fechar</button>
       </form>
     </div>
   </div>

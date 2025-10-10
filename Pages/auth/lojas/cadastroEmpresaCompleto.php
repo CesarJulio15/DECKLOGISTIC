@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../../assets/cadastroEmpresa.css">
+  <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
   <title>Cadastro da Empresa</title>
   <script>
     // ===============================
@@ -249,6 +250,7 @@
   <div class="form-group" style="display: flex; gap: 10px; margin-top: 30px;">
     <button type="button" onclick="location.href='cadastro.php'">Voltar</button>
     <button type="submit" style="width: 200px;">Prosseguir</button>
+    <button type="button" class="btn" onclick="window.history.back()">Fechar</button>
   </div>
 </form>
 

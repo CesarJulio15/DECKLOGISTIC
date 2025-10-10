@@ -1,6 +1,5 @@
 <?php
 include __DIR__ . '/../../conexao.php';
-include __DIR__ . '/../../header.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'] ?? 0;

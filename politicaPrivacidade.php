@@ -1,6 +1,4 @@
 <?php
-// política de privacidade simples para um site PHP
-
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -8,6 +6,7 @@
     <meta charset="UTF-8">
     <title>Política de Privacidade</title>
  <link rel="stylesheet" href="assets/politicaPrivacidade.css">
+   <link rel="icon" href="img/logoDecklogistic.webp" type="image/x-icon" />
 </head>
 <body>
     <div class="container">

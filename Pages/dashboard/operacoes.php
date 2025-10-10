@@ -1,7 +1,6 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-include __DIR__ . '/../../header.php';
 
 $lojaId = $_SESSION['loja_id'] ?? 0;
 $usuarioId = $_SESSION['usuario_id'] ?? 0;
