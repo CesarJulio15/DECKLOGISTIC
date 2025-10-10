@@ -108,7 +108,6 @@ $stmt->close();
 .context-menu ul { list-style:none; margin:0; padding:5px 0; }
 .context-menu li { padding:10px; cursor:pointer; transition:background 0.2s; }
 .context-menu li:hover { background:#f0f0f0; }
-/* Overlay e blur para dicas */
 #overlay-blur-tag {
     display: none;
     position: fixed;
@@ -116,10 +115,9 @@ $stmt->close();
     width: 100vw;
     height: 100vh;
     background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px); /* igual produtos.php */
+    backdrop-filter: blur(10px);
     z-index: 9999;
 }
-/* Botão de ajuda fixo no canto inferior direito, sempre atrás do blur */
 #help-btn-tag {
   position: fixed;
   bottom: 20px;
@@ -133,13 +131,11 @@ $stmt->close();
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 9998; /* abaixo do blur (z-index: 9999), atrás do overlay */
+  z-index: 9998;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-/* Card das overlays igual produtos.php */
 .welcome-card-tag {
     background: #222;
     color: #fff;
@@ -173,12 +169,10 @@ $stmt->close();
     font-weight: bold;
     font-size: 15px;
 }
-
-/* Sidebar destacada acima do blur no overlay 2 */
 .sidebar-tags-destaque {
     position: fixed !important;
     right: 0 !important;
-    top: 0 !important; /* Mantém a sidebar fixa no topo */
+    top: 0 !important;
     width: 260px !important;
     height: 100vh !important;
     z-index: 10010 !important;
@@ -190,9 +184,8 @@ $stmt->close();
     flex-direction: column !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
-    margin-top: 0 !important; /* Garante que não haja deslocamento */
+    margin-top: 0 !important;
 }
-
 #overlay-tag-1 {
   display: none;
   position: fixed;
@@ -213,7 +206,7 @@ $stmt->close();
   width: auto;
   height: auto;
   left: unset;
-  right: 290px; /* próximo à sidebar */
+  right: 290px;
   top: 80px;
 }
 .welcome-card-tag {
@@ -242,7 +235,6 @@ $stmt->close();
   cursor: pointer;
   font-size: 15px;
 }
-/* Botão de ajuda fixo na sidebar */
 .tags-sidebar {
   position: absolute;
   top: 0;
@@ -259,7 +251,6 @@ $stmt->close();
   justify-content: flex-start;
   z-index: 100;
 }
-/* Sidebar destacada acima do blur no overlay 2 */
 </style>
 </head>
 <body>
@@ -290,24 +281,38 @@ $stmt->close();
 <div class="main">
     <form method="POST" style="flex:1;">
         <h1>Nova Tag</h1>
-    <div class="input-wrapper">
-    <p style="margin-left:0px; margin-bottom: 10px;">Escolha o nome da sua tag:</p>
-    <input type="text" name="tag_name" placeholder="Nome da Tag" required>
-</div>
+        
+        <div class="form-row-top">
+            <div class="name-section">
+                <p style="margin-left:0px; margin-bottom: 10px;">Escolha o nome da sua tag:</p>
+                <input type="text" name="tag_name" placeholder="Nome da Tag" required>
+            </div>
+            
+            <div class="actions-section">
+                <div class="color-action">
+                    <p style="margin-bottom: 10px;">Cor:</p>
+                    <input type="color" name="color" id="colorPicker" value="#ffffff">
+                </div>
+                
+                <div class="button-action">
+                    <p style="margin-bottom: 10px;">&nbsp;</p>
+                    <button type="submit" class="pronto">Pronto</button>
+                </div>
+            </div>
+        </div>
 
         <p style="margin-left:0px; margin-bottom: 10px;">Escolha um ícone que represente a sua tag:</p>
-      <div class="search-wrapper">
-    <input type="text" id="search" class="search" placeholder="Procurar ícone...">
-    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-</div>
-      
-
+        <div class="search-wrapper">
+            <input type="text" id="search" class="search" placeholder="Procurar ícone...">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
 
         <div class="icon-grid-wrapper">
             <div class="icon-grid" id="iconGrid">
                 <?php
-                 $icons = [
-         'fa-laptop'=>'Eletrônicos','fa-desktop'=>'Computadores','fa-tv'=>'TV e Áudio', 'fa-mobile'=>'Celulares','fa-tablet'=>'Tablets','fa-headphones'=>'Acessórios Eletrônicos', 'fa-headset'=>'Headsets','fa-camera'=>'Câmeras','fa-video'=>'Filmadoras', 'fa-microchip'=>'Hardware e Peças','fa-plug'=>'Energia e Carregadores', 'fa-microphone'=>'Áudio e Música','fa-satellite-dish'=>'Satélites e Comunicação', 'fa-server'=>'Servidores','fa-keyboard'=>'Teclados','fa-mouse'=>'Mouses','fa-burger'=>'Alimentos','fa-apple-alt'=>'Frutas','fa-carrot'=>'Legumes', 'fa-drumstick-bite'=>'Carnes','fa-fish'=>'Peixes','fa-bread-slice'=>'Padaria', 'fa-cheese'=>'Laticínios','fa-wine-glass'=>'Bebidas','fa-beer'=>'Cervejas', 'fa-cocktail'=>'Drinks','fa-wine-bottle'=>'Vinhos','fa-cookie'=>'Confeitaria', 'fa-ice-cream'=>'Sorvetes','fa-mug-hot'=>'Café e Chás','fa-seedling'=>'Orgânicos', 'fa-hotdog'=>'Lanches','fa-pizza-slice'=>'Pizzas','fa-couch'=>'Móveis','fa-bed'=>'Cama e Colchão','fa-chair'=>'Cadeiras', 'fa-bath'=>'Banheiro e Higiene','fa-lightbulb'=>'Iluminação','fa-paint-roller'=>'Decoração e Pintura', 'fa-blender'=>'Eletrodomésticos','fa-fan'=>'Climatização','fa-recycle'=>'Sustentabilidade', 'fa-box'=>'Embalagens','fa-door-open'=>'Portas','fa-sink'=>'Cozinha e Pias', 'fa-shirt'=>'Roupas','fa-tshirt'=>'Moda Casual','fa-shoe-prints'=>'Calçados', 'fa-gem'=>'Acessórios e Joias','fa-hat-cowboy'=>'Chapéus e Bonés','fa-glasses'=>'Óculos', 'fa-ring'=>'Anéis','fa-socks'=>'Meias','fa-soap'=>'Sabonetes e Limpeza', 'fa-heart'=>'Beleza e Cuidados','fa-spa'=>'Relaxamento & Spa', 'fa-stethoscope'=>'Equipamentos Médicos','fa-pills'=>'Medicamentos', 'fa-hospital'=>'Saúde','fa-syringe'=>'Vacinas','fa-dna'=>'Exames e Biotecnologia', 'fa-baby'=>'Bebês','fa-gamepad'=>'Brinquedos','fa-book'=>'Livros', 'fa-puzzle-piece'=>'Jogos Educativos','fa-school'=>'Material Escolar',  'fa-dog'=>'Pet','fa-cat'=>'Gatos','fa-bone'=>'Petiscos','fa-paw'=>'Acessórios Pets',  'fa-football'=>'Esportes','fa-basketball-ball'=>'Basquete','fa-running'=>'Fitness', 'fa-bicycle'=>'Bicicletas','fa-motorcycle'=>'Motos','fa-swimmer'=>'Natação', 'fa-dumbbell'=>'Academia','fa-futbol'=>'Futebol','fa-campground'=>'Camping', 'fa-hiking'=>'Trilhas','fa-fish'=>'Pesca','fa-golf-ball'=>'Golfe','fa-car'=>'Automotivo','fa-bus'=>'Ônibus e Passagens','fa-train'=>'Transportes', 'fa-plane'=>'Viagens','fa-ship'=>'Náutica','fa-truck'=>'Entrega e Caminhões', 'fa-gas-pump'=>'Combustível','fa-charging-station'=>'Carros Elétricos', 'fa-tools'=>'Oficinas','fa-warehouse'=>'Estoque e Garagem',  'fa-wrench'=>'Ferramentas','fa-hammer'=>'Construção','fa-screwdriver'=>'Pequenos Reparos', 'fa-hard-hat'=>'EPI e Segurança','fa-toolbox'=>'Caixa de Ferramentas','fa-ruler-combined'=>'Medidas', 'fa-ticket-alt'=>'Eventos e Ingressos','fa-theater-masks'=>'Teatro e Cultura', 'fa-film'=>'Cinema','fa-music'=>'Música','fa-guitar'=>'Instrumentos Musicais', 'fa-camera-retro'=>'Fotografia','fa-book-open'=>'Livros Abertos','fa-newspaper'=>'Jornais',  'fa-map'=>'Mapas e Turismo','fa-suitcase'=>'Mala e Bagagem','fa-hotel'=>'Hotelaria', 'fa-passport'=>'Documentação','fa-compass'=>'Exploração', 'fa-wallet'=>'Carteiras','fa-credit-card'=>'Cartões e Pagamentos', 'fa-money-bill'=>'Dinheiro','fa-coins'=>'Moedas','fa-university'=>'Banco', 'fa-percent'=>'Ofertas e Descontos','fa-star'=>'Promoções','fa-gift'=>'Presentes','fa-robot'=>'Robótica','fa-vr-cardboard'=>'Realidade Virtual', 'fa-space-shuttle'=>'Espaço e Astronomia', 'fa-brain'=>'IA & Machine Learning','fa-network-wired'=>'Redes', 'fa-cloud'=>'Nuvem','fa-code'=>'Programação' ];
+                $icons = [
+                    'fa-laptop'=>'Eletrônicos','fa-desktop'=>'Computadores','fa-tv'=>'TV e Áudio', 'fa-mobile'=>'Celulares','fa-tablet'=>'Tablets','fa-headphones'=>'Acessórios Eletrônicos', 'fa-headset'=>'Headsets','fa-camera'=>'Câmeras','fa-video'=>'Filmadoras', 'fa-microchip'=>'Hardware e Peças','fa-plug'=>'Energia e Carregadores', 'fa-microphone'=>'Áudio e Música','fa-satellite-dish'=>'Satélites e Comunicação', 'fa-server'=>'Servidores','fa-keyboard'=>'Teclados','fa-mouse'=>'Mouses','fa-burger'=>'Alimentos','fa-apple-alt'=>'Frutas','fa-carrot'=>'Legumes', 'fa-drumstick-bite'=>'Carnes','fa-fish'=>'Peixes','fa-bread-slice'=>'Padaria', 'fa-cheese'=>'Laticínios','fa-wine-glass'=>'Bebidas','fa-beer'=>'Cervejas', 'fa-cocktail'=>'Drinks','fa-wine-bottle'=>'Vinhos','fa-cookie'=>'Confeitaria', 'fa-ice-cream'=>'Sorvetes','fa-mug-hot'=>'Café e Chás','fa-seedling'=>'Orgânicos', 'fa-hotdog'=>'Lanches','fa-pizza-slice'=>'Pizzas','fa-couch'=>'Móveis','fa-bed'=>'Cama e Colchão','fa-chair'=>'Cadeiras', 'fa-bath'=>'Banheiro e Higiene','fa-lightbulb'=>'Iluminação','fa-paint-roller'=>'Decoração e Pintura', 'fa-blender'=>'Eletrodomésticos','fa-fan'=>'Climatização','fa-recycle'=>'Sustentabilidade', 'fa-box'=>'Embalagens','fa-door-open'=>'Portas','fa-sink'=>'Cozinha e Pias', 'fa-shirt'=>'Roupas','fa-tshirt'=>'Moda Casual','fa-shoe-prints'=>'Calçados', 'fa-gem'=>'Acessórios e Joias','fa-hat-cowboy'=>'Chapéus e Bonés','fa-glasses'=>'Óculos', 'fa-ring'=>'Anéis','fa-socks'=>'Meias','fa-soap'=>'Sabonetes e Limpeza', 'fa-heart'=>'Beleza e Cuidados','fa-spa'=>'Relaxamento & Spa', 'fa-stethoscope'=>'Equipamentos Médicos','fa-pills'=>'Medicamentos', 'fa-hospital'=>'Saúde','fa-syringe'=>'Vacinas','fa-dna'=>'Exames e Biotecnologia', 'fa-baby'=>'Bebês','fa-gamepad'=>'Brinquedos','fa-book'=>'Livros', 'fa-puzzle-piece'=>'Jogos Educativos','fa-school'=>'Material Escolar',  'fa-dog'=>'Pet','fa-cat'=>'Gatos','fa-bone'=>'Petiscos','fa-paw'=>'Acessórios Pets',  'fa-football'=>'Esportes','fa-basketball-ball'=>'Basquete','fa-running'=>'Fitness', 'fa-bicycle'=>'Bicicletas','fa-motorcycle'=>'Motos','fa-swimmer'=>'Natação', 'fa-dumbbell'=>'Academia','fa-futbol'=>'Futebol','fa-campground'=>'Camping', 'fa-hiking'=>'Trilhas','fa-fish'=>'Pesca','fa-golf-ball'=>'Golfe','fa-car'=>'Automotivo','fa-bus'=>'Ônibus e Passagens','fa-train'=>'Transportes', 'fa-plane'=>'Viagens','fa-ship'=>'Náutica','fa-truck'=>'Entrega e Caminhões', 'fa-gas-pump'=>'Combustível','fa-charging-station'=>'Carros Elétricos', 'fa-tools'=>'Oficinas','fa-warehouse'=>'Estoque e Garagem',  'fa-wrench'=>'Ferramentas','fa-hammer'=>'Construção','fa-screwdriver'=>'Pequenos Reparos', 'fa-hard-hat'=>'EPI e Segurança','fa-toolbox'=>'Caixa de Ferramentas','fa-ruler-combined'=>'Medidas', 'fa-ticket-alt'=>'Eventos e Ingressos','fa-theater-masks'=>'Teatro e Cultura', 'fa-film'=>'Cinema','fa-music'=>'Música','fa-guitar'=>'Instrumentos Musicais', 'fa-camera-retro'=>'Fotografia','fa-book-open'=>'Livros Abertos','fa-newspaper'=>'Jornais',  'fa-map'=>'Mapas e Turismo','fa-suitcase'=>'Mala e Bagagem','fa-hotel'=>'Hotelaria', 'fa-passport'=>'Documentação','fa-compass'=>'Exploração', 'fa-wallet'=>'Carteiras','fa-credit-card'=>'Cartões e Pagamentos', 'fa-money-bill'=>'Dinheiro','fa-coins'=>'Moedas','fa-university'=>'Banco', 'fa-percent'=>'Ofertas e Descontos','fa-star'=>'Promoções','fa-gift'=>'Presentes','fa-robot'=>'Robótica','fa-vr-cardboard'=>'Realidade Virtual', 'fa-space-shuttle'=>'Espaço e Astronomia', 'fa-brain'=>'IA & Machine Learning','fa-network-wired'=>'Redes', 'fa-cloud'=>'Nuvem','fa-code'=>'Programação'
+                ];
                 foreach($icons as $class => $label){
                     echo "<div class='icon-item' data-icon='$class' title='$label'><i class='fa-solid $class'></i></div>";
                 }
@@ -316,27 +321,21 @@ $stmt->close();
         </div>
 
         <input type="hidden" name="icon" id="selectedIcon">
-
-        <p>Escolha a cor do seu ícone</p>
-        <input type="color" name="color" id="colorPicker" value="#ffffff">
-
-        <br><br>
-        <button type="submit" class="pronto">Pronto</button>
     </form>
 
     <div class="tags-sidebar">
         <h2>Tags Criadas</h2>
         <div class="tags-list">
             <?php foreach ($tags as $tag): ?>
-              <div class="tag-item" data-id="<?= $tag['id'] ?>">
-    <span class="tag-icon">
-        <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor'] ?: '#ffffffff') ?>;"></i>
-    </span>
-    <span class="tag-name"><?= htmlspecialchars($tag['nome']) ?></span>
-</div>
+                <div class="tag-item" data-id="<?= $tag['id'] ?>">
+                    <span class="tag-icon">
+                        <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor'] ?: '#ffffffff') ?>;"></i>
+                    </span>
+                    <span class="tag-name"><?= htmlspecialchars($tag['nome']) ?></span>
+                </div>
             <?php endforeach; ?>
         </div>
-         <button id="help-btn-tag">?</button>
+        <button id="help-btn-tag">?</button>
     </div>
 </div>
 
@@ -355,7 +354,6 @@ $stmt->close();
     </ul>
 </div>
 
-<!-- Blur e overlays de dicas -->
 <div id="overlay-blur-tag"></div>
 <div id="overlay-tag-1">
   <div class="welcome-card-tag">
@@ -373,7 +371,6 @@ $stmt->close();
 </div>
 
 <script>
-// Selecionar ícone
 const icons = document.querySelectorAll('.icon-item');
 const selectedInput = document.getElementById('selectedIcon');
 const searchInput = document.getElementById('search');
@@ -386,7 +383,6 @@ icons.forEach(icon => {
     });
 });
 
-// Pesquisa de ícones
 searchInput.addEventListener('input', () => {
     const term = searchInput.value.toLowerCase();
     icons.forEach(icon => {
@@ -395,7 +391,6 @@ searchInput.addEventListener('input', () => {
     });
 });
 
-// MENU DE CONTEXTO
 const contextMenu = document.getElementById("contextMenu");
 let selectedTagId = null;
 
@@ -442,7 +437,6 @@ document.getElementById("renameTag").addEventListener("click", () => {
     document.getElementById("renameForm").submit();
 });
 
-// --- Dicas/Overlay Tag ---
 const helpBtnTag = document.getElementById('help-btn-tag');
 const overlayBlurTag = document.getElementById('overlay-blur-tag');
 const overlayTag1 = document.getElementById('overlay-tag-1');
@@ -466,7 +460,7 @@ helpBtnTag.addEventListener('click', () => {
 btnProximoTag.addEventListener('click', () => {
     overlayTag1.style.display = 'none';
     overlayTag2.style.display = 'flex';
-    overlayBlurTag.classList.add('active-tag-2'); // Adiciona classe para blur lateral
+    overlayBlurTag.classList.add('active-tag-2');
     if (sidebarTags) {
         sidebarTags.classList.add('sidebar-tags-destaque');
     }
@@ -475,27 +469,11 @@ btnProximoTag.addEventListener('click', () => {
 btnFecharTag.addEventListener('click', () => {
     overlayTag2.style.display = 'none';
     hideBlurTag();
-    overlayBlurTag.classList.remove('active-tag-2'); // Remove classe do blur
+    overlayBlurTag.classList.remove('active-tag-2');
     if (sidebarTags) {
         sidebarTags.classList.remove('sidebar-tags-destaque');
     }
 });
 </script>
-<!-- Botão de ajuda dentro da sidebar -->
-<script>
-if(!document.getElementById('help-btn-tag')){
-  const btn = document.createElement('button');
-  btn.id = 'help-btn-tag';
-  btn.innerText = '?';
-  btn.type = 'button';
-  document.body.appendChild(btn);
-}
-</script>
-</body>
-</html>
-</body>
-</html>
-</body>
-</html>
 </body>
 </html>
