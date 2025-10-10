@@ -3,4 +3,4 @@ __pycache__/
 *.pyc
 log_ia.txt
 debug_reabastecimento.log
-/vendor/
+/vendor/ 
