@@ -11,7 +11,7 @@
   <meta name="keywords" content="">
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
+  <link href="img/logoTeste.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Fonts -->
@@ -889,196 +889,196 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
 
     </section><!-- /Stats Section -->
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="pricing section">
+   <!-- Pricing Section -->
+<section id="pricing" class="pricing section">
 
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Pricing</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
-      </div><!-- End Section Title -->
+  <!-- Section Title -->
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Planos e Preços</h2>
+    <p>Soluções escaláveis para gestão de estoque, controle financeiro e logística — escolha o plano que melhor se adapta ao porte da sua empresa.</p>
+  </div><!-- End Section Title -->
 
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-        <div class="row gy-4">
-          <!-- Basic Plan -->
-          <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
-            <div class="pricing-card">
-              <div class="plan-header">
-                <div class="plan-icon">
-                  <i class="bi bi-box"></i>
-                </div>
-                <h3>Starter</h3>
-                <p>For individuals just getting started</p>
-              </div>
-              <div class="plan-pricing">
-                <div class="price">
-                  <span class="currency">$</span>
-                  <span class="amount">12</span>
-                  <span class="period">/month</span>
-                </div>
-              </div>
-              <div class="plan-features">
-                <ul>
-                  <li><i class="bi bi-check-circle-fill"></i> Nullam accumsan lorem</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Vestibulum auctor dapibus</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Nulla consequat massa</li>
-                  <li class="disabled"><i class="bi bi-x-circle-fill"></i> In enim justo rhoncus ut</li>
-                  <li class="disabled"><i class="bi bi-x-circle-fill"></i> Curabitur ullamcorper ultricies</li>
-                </ul>
-              </div>
-              <div class="plan-cta">
-                <a href="#" class="btn-plan">Choose Plan</a>
-              </div>
+    <div class="row gy-4">
+      <!-- Essencial -->
+      <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
+        <div class="pricing-card">
+          <div class="plan-header">
+            <div class="plan-icon">
+              <i class="bi bi-box"></i>
             </div>
-          </div><!-- End Basic Plan -->
-
-          <!-- Professional Plan -->
-          <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
-            <div class="pricing-card popular">
-              <div class="popular-tag">Most Popular</div>
-              <div class="plan-header">
-                <div class="plan-icon">
-                  <i class="bi bi-briefcase"></i>
-                </div>
-                <h3>Professional</h3>
-                <p>For small teams and growing businesses</p>
-              </div>
-              <div class="plan-pricing">
-                <div class="price">
-                  <span class="currency">$</span>
-                  <span class="amount">39</span>
-                  <span class="period">/month</span>
-                </div>
-              </div>
-              <div class="plan-features">
-                <ul>
-                  <li><i class="bi bi-check-circle-fill"></i> Donec quam felis ultricies</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Nam eget dui etiam rhoncus</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Maecenas tempus tellus</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Donec pede justo fringilla</li>
-                  <li class="disabled"><i class="bi bi-x-circle-fill"></i> Cras dapibus vivamus</li>
-                </ul>
-              </div>
-              <div class="plan-cta">
-                <a href="#" class="btn-plan">Choose Plan</a>
-              </div>
+            <h3>Essencial</h3>
+            <p>Controle básico para pequenas empresas e microempreendedores</p>
+          </div>
+          <div class="plan-pricing">
+            <div class="price">
+              <span class="currency">R$</span>
+              <span class="amount">49</span>
+              <span class="period">/mês</span>
             </div>
-          </div><!-- End Professional Plan -->
+          </div>
+          <div class="plan-features">
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Cadastro e movimentação de produtos</li>
+              <li><i class="bi bi-check-circle-fill"></i> Relatório de estoque e alertas de baixo estoque</li>
+              <li><i class="bi bi-check-circle-fill"></i> Lançamentos financeiros básicos (receitas e despesas)</li>
+              <li class="disabled"><i class="bi bi-x-circle-fill"></i> Integração com múltiplos armazéns</li>
+              <li class="disabled"><i class="bi bi-x-circle-fill"></i> Previsão de demanda</li>
+            </ul>
+          </div>
+          <div class="plan-cta">
+            <a href="#" class="btn-plan">Assinar Essencial</a>
+          </div>
+        </div>
+      </div><!-- End Essencial -->
 
-          <!-- Enterprise Plan -->
-          <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="400">
-            <div class="pricing-card">
-              <div class="plan-header">
-                <div class="plan-icon">
-                  <i class="bi bi-building"></i>
-                </div>
-                <h3>Enterprise</h3>
-                <p>For large organizations and corporations</p>
-              </div>
-              <div class="plan-pricing">
-                <div class="price">
-                  <span class="currency">$</span>
-                  <span class="amount">79</span>
-                  <span class="period">/month</span>
-                </div>
-              </div>
-              <div class="plan-features">
-                <ul>
-                  <li><i class="bi bi-check-circle-fill"></i> Etiam sit amet orci eget</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Pellentesque posuere vulputate</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Quisque rutrum aenean</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Fusce vulputate eleifend</li>
-                  <li><i class="bi bi-check-circle-fill"></i> Phasellus viverra nulla</li>
-                </ul>
-              </div>
-              <div class="plan-cta">
-                <a href="#" class="btn-plan">Choose Plan</a>
-              </div>
+      <!-- Profissional -->
+      <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
+        <div class="pricing-card popular">
+          <div class="popular-tag">Mais Escolhido</div>
+          <div class="plan-header">
+            <div class="plan-icon">
+              <i class="bi bi-briefcase"></i>
             </div>
-          </div><!-- End Enterprise Plan -->
+            <h3>Profissional</h3>
+            <p>Para equipes operacionais que precisam de automação e controle avançado</p>
+          </div>
+          <div class="plan-pricing">
+            <div class="price">
+              <span class="currency">R$</span>
+              <span class="amount">199</span>
+              <span class="period">/mês</span>
+            </div>
+          </div>
+          <div class="plan-features">
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Gestão de múltiplos armazéns e localizações</li>
+              <li><i class="bi bi-check-circle-fill"></i> Integração com sistemas contábeis / exportação CSV</li>
+              <li><i class="bi bi-check-circle-fill"></i> Relatórios financeiros detalhados e fluxo de caixa</li>
+              <li><i class="bi bi-check-circle-fill"></i> Controle de permissões por usuário e equipes</li>
+              <li class="disabled"><i class="bi bi-x-circle-fill"></i> Previsão de demanda por IA (opcional)</li>
+            </ul>
+          </div>
+          <div class="plan-cta">
+            <a href="#" class="btn-plan">Assinar Profissional</a>
+          </div>
+        </div>
+      </div><!-- End Profissional -->
+
+      <!-- Corporativo -->
+      <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="400">
+        <div class="pricing-card">
+          <div class="plan-header">
+            <div class="plan-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <h3>Corporativo</h3>
+            <p>Soluções completas para grandes operações e integração com ERPs</p>
+          </div>
+          <div class="plan-pricing">
+            <div class="price">
+              <span class="currency">R$</span>
+              <span class="amount">499</span>
+              <span class="period">/mês</span>
+            </div>
+          </div>
+          <div class="plan-features">
+            <ul>
+              <li><i class="bi bi-check-circle-fill"></i> Integração ERP e APIs personalizadas</li>
+              <li><i class="bi bi-check-circle-fill"></i> Previsão de demanda e otimização de rotas</li>
+              <li><i class="bi bi-check-circle-fill"></i> Relatórios financeiros avançados e conciliação bancária</li>
+              <li><i class="bi bi-check-circle-fill"></i> SLA, suporte técnico dedicado e treinamento</li>
+              <li><i class="bi bi-check-circle-fill"></i> Auditoria e trilha de auditoria por usuário</li>
+            </ul>
+          </div>
+          <div class="plan-cta">
+            <a href="#" class="btn-plan">Solicitar Demonstração</a>
+          </div>
+        </div>
+      </div><!-- End Corporativo -->
+    </div>
+
+  </div>
+
+</section><!-- /Pricing Section -->
+
+   <!-- Faq Section -->
+<section id="faq" class="faq section">
+
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+    <div class="row gy-4 justify-content-between">
+      <div class="col-lg-8">
+
+        <div class="faq-list">
+          <div class="faq-item faq-active" data-aos="fade-up" data-aos-delay="100">
+            <h3>O que é o DeckLogistic e qual problema ele resolve?</h3>
+            <div class="faq-content">
+              <p>
+                O DeckLogistic é um sistema de gestão para empresas que precisam controlar estoque e finanças de forma integrada. Ele centraliza cadastros, movimentações, pedidos e lançamentos financeiros, reduzindo perdas por falta de controle e facilitando a tomada de decisões com relatórios práticos.
+              </p>
+            </div>
+            <i class="bi bi-plus faq-toggle"></i>
+          </div><!-- End FAQ Item-->
+
+          <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
+            <h3>Como registrar uma entrada de estoque corretamente?</h3>
+            <div class="faq-content">
+              <p>
+                Para registrar uma entrada, acesse o módulo <strong>Produtos</strong>, selecione o fornecedor e adicione os itens com quantidade e custo unitário. Ao confirmar o recebimento o sistema atualiza o saldo do produto e, se configurado, gera automaticamente o lançamento financeiro correspondente.
+              </p>
+            </div>
+            <i class="bi bi-plus faq-toggle"></i>
+          </div><!-- End FAQ Item-->
+
+          <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+            <h3>Como o sistema calcula o valor do estoque (valuation)?</h3>
+            <div class="faq-content">
+              <p>
+                O valuation padrão utiliza o custo médio ponderado: ao cada nova entrada o custo médio do produto é recalculado (quantidade total × custo médio).
+            </div>
+            <i class="bi bi-plus faq-toggle"></i>
+          </div><!-- End FAQ Item-->
+
+          <div class="faq-item" data-aos="fade-up" data-aos-delay="400">
+            <h3>Como acompanhar o fluxo de caixa no DeckLogistic?</h3>
+            <div class="faq-content">
+              <p>
+                Use o módulo <strong>Financeiro</strong> para visualizar gráficos com receitas, despesas, lucro bruto, e mais.
+              </p>
+            </div>
+            <i class="bi bi-plus faq-toggle"></i>
+          </div><!-- End FAQ Item-->
+
+          <div class="faq-item" data-aos="fade-up" data-aos-delay="500">
+            <h3>O que fazer quando um produto está abaixo do estoque mínimo?</h3>
+            <div class="faq-content">
+              <p>
+                O sistema mostra alertas de <em>estoque baixo</em> no dashboard. Gere uma ordem de compra diretamente pelo botão rápido ou notifique o responsável para reabastecer.
+              </p>
+            </div>
+            <i class="bi bi-plus faq-toggle"></i>
+          </div><!-- End FAQ Item-->
+
         </div>
 
       </div>
 
-    </section><!-- /Pricing Section -->
-
-    <!-- Faq Section -->
-    <section id="faq" class="faq section">
-
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="row gy-4 justify-content-between">
-          <div class="col-lg-8">
-
-            <div class="faq-list">
-              <div class="faq-item faq-active" data-aos="fade-up" data-aos-delay="100">
-                <h3>Vivamus suscipit tortor eget felis porttitor volutpat?</h3>
-                <div class="faq-content">
-                  <p>
-                    Nulla quis lorem ut libero malesuada feugiat. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Curabitur aliquet quam id dui posuere blandit. Nulla porttitor accumsan tincidunt.
-                  </p>
-                </div>
-                <i class="bi bi-plus faq-toggle"></i>
-              </div><!-- End FAQ Item-->
-
-              <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
-                <h3>Curabitur aliquet quam id dui posuere blandit?</h3>
-                <div class="faq-content">
-                  <p>
-                    Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Proin eget tortor risus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar.
-                  </p>
-                </div>
-                <i class="bi bi-plus faq-toggle"></i>
-              </div><!-- End FAQ Item-->
-
-              <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
-                <h3>Sed porttitor lectus nibh ullamcorper sit amet?</h3>
-                <div class="faq-content">
-                  <p>
-                    Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Donec sollicitudin molestie malesuada. Vestibulum ac diam sit amet quam vehicula elementum.
-                  </p>
-                </div>
-                <i class="bi bi-plus faq-toggle"></i>
-              </div><!-- End FAQ Item-->
-
-              <div class="faq-item" data-aos="fade-up" data-aos-delay="400">
-                <h3>Nulla quis lorem ut libero malesuada feugiat?</h3>
-                <div class="faq-content">
-                  <p>
-                    Donec sollicitudin molestie malesuada. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel.
-                  </p>
-                </div>
-                <i class="bi bi-plus faq-toggle"></i>
-              </div><!-- End FAQ Item-->
-
-              <div class="faq-item" data-aos="fade-up" data-aos-delay="500">
-                <h3>Vestibulum ac diam sit amet quam vehicula elementum?</h3>
-                <div class="faq-content">
-                  <p>
-                    Praesent sapien massa, convallis a pellentesque nec, egestas non nisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula.
-                  </p>
-                </div>
-                <i class="bi bi-plus faq-toggle"></i>
-              </div><!-- End FAQ Item-->
-
-            </div>
-
-          </div>
-
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="faq-card">
-              <i class="bi bi-chat-dots-fill"></i>
-              <h3>Can't find answer to your question?</h3>
-              <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Vestibulum ac diam sit amet quam vehicula elementum sed sit amet dui. Curabitur aliquet quam id dui posuere blandit. Nulla quis lorem ut libero malesuada feugiat.</p>
-              <a href="#" class="btn btn-primary">Contact Us</a>
-            </div>
-          </div>
+      <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="faq-card">
+          <i class="bi bi-chat-dots-fill"></i>
+          <h3>Não encontrou a resposta para sua dúvida?</h3>
+<p>Entre em contato com a equipe do projeto para suporte técnico ou dúvidas sobre uso. Informe o módulo e descreva o problema — responderemos o mais breve possível.</p>
+               <a href="#contact" class="btn btn-primary">Tire suas dúvidas</a>
         </div>
-
       </div>
+    </div>
 
-    </section><!-- /Faq Section -->
+  </div>
+
+</section><!-- /Faq Section -->
+  
 
     <!-- Team Section -->
     <section id="team" class="team section">
@@ -1134,118 +1134,100 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
           <div class="swiper-wrapper">
 
             <div class="swiper-slide">
-              <div class="team-member">
-                <div class="member-image">
-                  <img src="assets/img/person/person-m-3.webp" class="img-fluid" alt="" loading="lazy">
-                  <div class="member-social">
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                  </div>
-                </div>
-                <div class="member-content">
-                  <h3>Marcus Wilson</h3>
-                  <span>Chief Technology Officer</span>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec.</p>
-                </div>
-              </div>
-            </div><!-- End slide item -->
+  <div class="team-member">
+    <div class="member-image">
+      <img src="assets/img/person/person-f-5.webp" class="img-fluid" alt="" loading="lazy">
+      <div class="member-social">
+        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <a href="#"><i class="bi bi-facebook"></i></a>
+        <a href="#"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="member-content">
+      <h3>Arthur Filipe</h3>
+      <span>Designer de Produto</span>
+      <p>Responsável por criar interfaces intuitivas e garantir que a experiência do usuário no DeckLogistic seja simples, moderna e eficiente em qualquer dispositivo.</p>
+    </div>
+  </div>
+</div><!-- End slide item -->
 
-            <div class="swiper-slide">
-              <div class="team-member">
-                <div class="member-image">
-                  <img src="assets/img/person/person-f-5.webp" class="img-fluid" alt="" loading="lazy">
-                  <div class="member-social">
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                  </div>
-                </div>
-                <div class="member-content">
-                  <h3>Sophia Reynolds</h3>
-                  <span>Product Designer</span>
-                  <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat.</p>
-                </div>
-              </div>
-            </div><!-- End slide item -->
+<div class="swiper-slide">
+  <div class="team-member">
+    <div class="member-image">
+      <img src="assets/img/person/person-m-8.webp" class="img-fluid" alt="" loading="lazy">
+      <div class="member-social">
+        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <a href="#"><i class="bi bi-facebook"></i></a>
+        <a href="#"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="member-content">
+      <h3>Gabriel Prudente</h3>
+         <span>Gerente de Projeto</span>
+      <p>Coordena o desenvolvimento do DeckLogistic, organiza as etapas do cronograma e assegura que todas as metas técnicas e acadêmicas sejam cumpridas.</p>
+    </div>
+  </div>
+</div><!-- End slide item -->
 
-            <div class="swiper-slide">
-              <div class="team-member">
-                <div class="member-image">
-                  <img src="assets/img/person/person-m-8.webp" class="img-fluid" alt="" loading="lazy">
-                  <div class="member-social">
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                  </div>
-                </div>
-                <div class="member-content">
-                  <h3>Daniel Chen</h3>
-                  <span>Marketing Specialist</span>
-                  <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.</p>
-                </div>
-              </div>
-            </div><!-- End slide item -->
+<div class="swiper-slide">
+  <div class="team-member">
+    <div class="member-image">
+      <img src="assets/img/person/person-f-9.webp" class="img-fluid" alt="" loading="lazy">
+      <div class="member-social">
+        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <a href="#"><i class="bi bi-facebook"></i></a>
+        <a href="#"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="member-content">
+      <h3>Guilherme Aparecido</h3>
+       <span>Designer de Interface (UI/UX)</span>
+      <p>Responsável pelo design visual das telas e pela padronização da identidade do projeto, garantindo que a navegação seja agradável e funcional.</p> 
+     </div>
+  </div>
+</div><!-- End slide item -->
 
-            <div class="swiper-slide">
-              <div class="team-member">
-                <div class="member-image">
-                  <img src="assets/img/person/person-f-9.webp" class="img-fluid" alt="" loading="lazy">
-                  <div class="member-social">
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                  </div>
-                </div>
-                <div class="member-content">
-                  <h3>Olivia Thompson</h3>
-                  <span>Lead Developer</span>
-                  <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.</p>
-                </div>
-              </div>
-            </div><!-- End slide item -->
+<div class="swiper-slide">
+  <div class="team-member">
+    <div class="member-image">
+      <img src="assets/img/person/person-m-12.webp" class="img-fluid" alt="" loading="lazy">
+      <div class="member-social">
+        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <a href="#"><i class="bi bi-facebook"></i></a>
+        <a href="#"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="member-content">
+      <h3>Júlio Cesar</h3>
+      <span>Especialista em Marketing</span>
+      <p>Cuida da comunicação visual e divulgação do projeto, mostrando como o DeckLogistic pode transformar o gerenciamento logístico de pequenas e médias empresas.</p>
+    </div>
+  </div>
+</div><!-- End slide item -->
 
-            <div class="swiper-slide">
-              <div class="team-member">
-                <div class="member-image">
-                  <img src="assets/img/person/person-m-12.webp" class="img-fluid" alt="" loading="lazy">
-                  <div class="member-social">
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                  </div>
-                </div>
-                <div class="member-content">
-                  <h3>Jason Parker</h3>
-                  <span>UI/UX Designer</span>
-                  <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia.</p>
-                </div>
-              </div>
-            </div><!-- End slide item -->
+<div class="swiper-slide">
+  <div class="team-member">
+    <div class="member-image">
+      <img src="assets/img/person/person-f-7.webp" class="img-fluid" alt="" loading="lazy">
+      <div class="member-social">
+        <a href="#"><i class="bi bi-twitter-x"></i></a>
+        <a href="#"><i class="bi bi-facebook"></i></a>
+        <a href="#"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+    <div class="member-content">
+      <h3>Rafael Oliveira</h3>
+      <span>Desenvolvedor Líder</span>
+      <p>Responsável pela arquitetura do sistema, integração com o banco de dados e implementação das principais funcionalidades de estoque e finanças.</p>
+    </div>
+  </div>
+</div><!-- End slide item -->
 
-            <div class="swiper-slide">
-              <div class="team-member">
-                <div class="member-image">
-                  <img src="assets/img/person/person-f-7.webp" class="img-fluid" alt="" loading="lazy">
-                  <div class="member-social">
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-facebook"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                  </div>
-                </div>
-                <div class="member-content">
-                  <h3>Emily Rodriguez</h3>
-                  <span>Project Manager</span>
-                  <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.</p>
-                </div>
-              </div>
-            </div><!-- End slide item -->
 
           </div>
         </div>
