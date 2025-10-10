@@ -125,6 +125,24 @@ if ($entradas > 0) {
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
+
+    <style>
+        .voltar-btn {
+        margin-top: 20px;
+        padding: 10px 15px;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        }
+
+        .voltar-btn:hover {
+            background: #555;
+        }
+    </style>
+    
 <body>
 
 <aside class="sidebar">
@@ -186,6 +204,8 @@ if ($entradas > 0) {
         <div id="grafico"></div>
         
         <button id="toggleView" class="toggle-btn">Ver Tabela</button>
+        <button id="btnVoltar" class="voltar-btn">← Voltar</button>
+        
         <div id="tabela-container" style="display:none;">
             <table>
                 <thead>
@@ -346,7 +366,7 @@ filtroSelect.addEventListener('change', function() {
     const btnVoltar = document.getElementById('btnVoltar');
     btnVoltar.addEventListener('click', () => {
     history.back(); 
-    
+
 });
 
 </script>
