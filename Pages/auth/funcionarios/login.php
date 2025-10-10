@@ -17,7 +17,7 @@
   <div class="right-side">
     <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
     <div class="form-container">
-      <h1>Olá Funcionario!</h1>
+      <h1>Olá Funcionário!</h1>
 
       <!-- Mostra erro, se existir -->
       <?php

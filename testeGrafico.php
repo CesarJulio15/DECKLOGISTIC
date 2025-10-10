@@ -94,3 +94,6 @@
   </script>
 </body>
 </html>
+
+ALTER TABLE movimentacoes_estoque
+ADD COLUMN custo_unitario DECIMAL(10,2) NOT NULL DEFAULT 0;

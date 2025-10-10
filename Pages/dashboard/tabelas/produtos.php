@@ -545,8 +545,6 @@ document.getElementById('close-import').addEventListener('click', function(e) {
             <option value="preco-desc">Preço (Maior→Menor)</option>
             <option value="quantidade-asc">Quantidade (Menor→Maior)</option>
             <option value="quantidade-desc">Quantidade (Maior→Menor)</option>
-            <option value="lote-asc">Lote (A-Z)</option>
-            <option value="lote-desc">Lote (Z-A)</option>
         </select>
     </div>
 
@@ -570,7 +568,6 @@ document.getElementById('close-import').addEventListener('click', function(e) {
     <th>Nome</th>
     <th>Preço Unitário</th>
     <th>Quantidade</th>
-    <th>Lote</th>
 </tr>
 </thead>
 <tbody id="tabela-produtos">
@@ -601,7 +598,6 @@ document.getElementById('close-import').addEventListener('click', function(e) {
     </td>
     <td>R$ <?= number_format($produto['preco_unitario'], 2, ',', '.') ?></td>
     <td><?= intval($produto['quantidade_estoque']) ?></td>
-    <td><?= htmlspecialchars($produto['lote']) ?></td>
 </tr>
 <?php endwhile; ?>
 </tbody>
@@ -736,16 +732,6 @@ if (ordenarSelect) {
                     const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
                     const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
                     return bNum - aNum;
-                }
-                case 'lote-asc': {
-                    const aText = normalizeStr(a.querySelector('td:nth-child(5)')?.textContent || '');
-                    const bText = normalizeStr(b.querySelector('td:nth-child(5)')?.textContent || '');
-                    return aText.localeCompare(bText, 'pt', { sensitivity: 'base' });
-                }
-                case 'lote-desc': {
-                    const aText = normalizeStr(a.querySelector('td:nth-child(5)')?.textContent || '');
-                    const bText = normalizeStr(b.querySelector('td:nth-child(5)')?.textContent || '');
-                    return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
                 }
                 default:
                     return 0;

@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Já é uma loja registrada? <a href="loginLoja.php">Login</a>
           </div>
                     <div class="login-link">
-            Já é um funcionario registrado? <a href="../funcionarios/login.php">Login</a>
+            Já é um funcionário registrado? <a href="../funcionarios/login.php">Login</a>
           </div>
 
           <button type="submit" class="btn">Continuar</button>

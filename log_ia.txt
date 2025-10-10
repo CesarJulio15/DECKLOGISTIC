@@ -1,5 +1,5 @@
-Argumentos recebidos: ['C:\\xampp\\htdocs\\DECKLOGISTIC\\api/../ml/detectar_anomalias_vendas.py', '21']
-Loja ID detectado: 21
+Argumentos recebidos: ['C:\\xampp\\htdocs\\DECKLOGISTIC\\api/../ml/detectar_anomalias_vendas.py', '23']
+Loja ID detectado: 23
 Nenhuma anomalia encontrada.
 Empty DataFrame
 Columns: [data_venda, valor_dia, media, desvio, zscore, anomalia]
