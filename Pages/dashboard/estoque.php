@@ -295,35 +295,26 @@ const lojaId = <?= $lojaId ?>;
 // ===================
 async function loadHistoricoEstoque() {
   try {
-    // Realiza a requisição para obter os dados do histórico de estoque
-    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+    // Altere para buscar do endpoint correto
+    const data = await fetch(`../../api/historico_estoque_6meses.php?loja_id=${lojaId}`).then(r => r.json());
 
-    // Verifica se a resposta contém dados
     if (!Array.isArray(data.series) || data.series.length === 0) {
       document.querySelector("#chartHistorico").innerHTML = "<p>Nenhum dado disponível</p>";
       return;
     }
 
-    // Prepara os dados para o gráfico
+    // Use o campo 'estoque' do endpoint
     const dataPoints = data.series.map(d => ({
-      label: d.mes, 
-      y: parseInt(d.total || 0)
+      label: d.mes,
+      y: parseInt(d.estoque || 0)
     }));
 
-    // Cria o gráfico de barras no modal com os dados
     new CanvasJS.Chart("chartHistorico", {
       animationEnabled: true,
       theme: "light2",
-      title: {
-        text: "Histórico de Estoque (últimos 6 meses)"
-      },
-      axisY: {
-        title: "Quantidade Total de Produtos"
-      },
-      data: [{
-        type: "column", 
-        dataPoints: dataPoints
-      }]
+      title: { text: "Histórico de Estoque (últimos 6 meses)" },
+      axisY: { title: "Quantidade Total de Produtos" },
+      data: [{ type: "column", dataPoints }]
     }).render();
   } catch (e) {
     console.error(e);
@@ -335,11 +326,25 @@ async function loadHistoricoEstoque() {
 // Funções de dados principais
 // ===================
 async function loadEstoqueTotal() {
-  try {
-    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
-    const estoqueEl = document.querySelector("#estoque");
-    if (estoqueEl) estoqueEl.textContent = parseFloat(data.total || 0).toFixed();
-  } catch(e) { console.error(e); }
+    if (!lojaId) {
+        document.querySelector("#estoque").textContent = "";
+        return;
+    }
+    try {
+        const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+        const estoqueEl = document.querySelector("#estoque");
+        // Exibe vazio se não houver estoque, senão exibe o valor
+        if (estoqueEl) {
+            if (data.total !== undefined && data.total !== null && data.total > 0) {
+                estoqueEl.textContent = parseFloat(data.total).toFixed(2);
+            } else {
+                estoqueEl.textContent = "";
+            }
+        }
+    } catch (e) { 
+        document.querySelector("#estoque").textContent = "";
+        console.error(e); 
+    }
 }
 
 async function loadProdutosFalta() {
@@ -470,8 +475,6 @@ btnFecharModal.addEventListener("click", () => { modalHistorico.style.display = 
 
 
 <script>
-const lojaId = <?= $lojaId ?>;
-
 // ===================
 // Funções de dados
 // ===================
@@ -482,13 +485,24 @@ const lojaId = <?= $lojaId ?>;
 // Total de estoque
 async function loadEstoqueTotal() {
     if (!lojaId) {
-        document.querySelector("#estoque").textContent = "0.00";
+        document.querySelector("#estoque").textContent = "";
         return;
     }
     try {
         const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
-        document.querySelector("#estoque").textContent = parseFloat(data.total || 0).toFixed(2);
-    } catch (e) { console.error(e); }
+        const estoqueEl = document.querySelector("#estoque");
+        // Exibe vazio se não houver estoque, senão exibe o valor
+        if (estoqueEl) {
+            if (data.total !== undefined && data.total !== null && data.total > 0) {
+                estoqueEl.textContent = parseFloat(data.total).toFixed(2);
+            } else {
+                estoqueEl.textContent = "";
+            }
+        }
+    } catch (e) { 
+        document.querySelector("#estoque").textContent = "";
+        console.error(e); 
+    }
 }
 
 // Produtos em falta
@@ -610,19 +624,20 @@ async function loadProdutosReabastecidos() {
 
 
 // Modal histórico
-const btnHistorico = document.getElementById("btnHistorico");
-const modalHistorico = document.getElementById("modalHistorico");
-const btnFecharModal = document.getElementById("btnFecharModal");
+var btnHistorico = document.getElementById("btnHistorico");
+var modalHistorico = document.getElementById("modalHistorico");
+var btnFecharModal = document.getElementById("btnFecharModal");
+
 
 btnHistorico.addEventListener("click", async () => {
   modalHistorico.style.display = "flex";
   try {
     const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
-    if (!Array.isArray(data) || data.series.length === 0) { 
+    if (!Array.isArray(data.series) || data.series.length === 0) { 
         document.querySelector("#chartHistorico").innerHTML = "<p>Nenhum dado disponível</p>"; 
         return; 
     }
-    const dataPoints = data.series.map(d => ({ label: d.mes, y: parseInt(d.total || 0) }));
+    const dataPoints = data.series.map(d => ({ label: d.mes, y: parseInt(d.estoque || 0) }));
     new CanvasJS.Chart("chartHistorico", { 
       animationEnabled: true, 
       theme: "light2", 
@@ -635,6 +650,7 @@ btnHistorico.addEventListener("click", async () => {
     document.querySelector("#chartHistorico").innerHTML = "<p>Erro ao carregar gráfico</p>"; 
   }
 });
+
 
 btnFecharModal.addEventListener("click", () => { 
   modalHistorico.style.display = "none"; 
@@ -652,5 +668,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+</body>
+</html>
+</body>
+</html>
+});
+</script>
+
+
+
+</body>
+</html>
 </body>
 </html>
