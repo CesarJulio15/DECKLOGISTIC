@@ -1,7 +1,6 @@
-Argumentos recebidos: ['C:\\xampp\\htdocs\\DECKLOGISTIC\\api/../ml/detectar_anomalias_vendas.py', '21']
-Loja ID detectado: 21
-0 anomalias novas salvas.
-  data_venda     valor_dia         media        desvio    zscore  anomalia
-0 2025-10-10  4.960000e+00           NaN  0.000000e+00       NaN     False
-1 2025-10-12  2.480000e+01           NaN  1.402900e+01       NaN     False
-2 2025-11-01  4.960498e+08  1.653499e+08  2.863945e+08  1.154701      True
+Argumentos recebidos: ['C:\\xampp\\htdocs\\DECKLOGISTIC\\api/../ml/detectar_anomalias_vendas.py', '23']
+Loja ID detectado: 23
+Nenhuma anomalia encontrada.
+Empty DataFrame
+Columns: [data_venda, valor_dia, media, desvio, zscore, anomalia]
+Index: []
