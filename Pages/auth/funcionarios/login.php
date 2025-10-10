@@ -17,7 +17,7 @@
   <div class="right-side">
     <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
     <div class="form-container">
-      <h1>Olá Funcionario!</h1>
+      <h1>Olá Funcionário!</h1>
 
       <!-- Mostra erro, se existir -->
       <?php
@@ -36,7 +36,7 @@
           <a href="../lojas/cadastro.php">Cadastrar</a>
         </div>
         <button type="submit" class="btn">Continuar</button>
-        <button type="button" class="btn" onclick="window.history.back()">Fechar</button>
+        <button type="button" class="btn" onclick="window.history.back()">Voltar</button>
       </form>
     </div>
   </div>

@@ -191,16 +191,26 @@
         padding-bottom: 6px;
     }
 
-    .tag-item {
-        display: flex;
-        align-items: center;
-        font-size: 16px;
-        margin-bottom: 10px;
-        padding: 6px 10px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
+   .tag-item {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    gap: 8px; /* ← ADICIONE ESTA LINHA para distância entre ícone e nome */
+}
+
+/* Ou se preferir usar margin individualmente: */
+.tag-icon {
+    margin-right: 8px; /* ← Distância apenas à direita do ícone */
+}
+
+.tag-name {
+    margin-left: 8px; /* ← Distância apenas à esquerda do texto */
+}
     .tag-item:hover {
         background: rgba(255,153,0,0.15); /* hover laranja suave */
     }
@@ -242,4 +252,31 @@
         pointer-events: none; /* não atrapalha digitar */
         font-size: 13px;
     }
-        
+/* DISTÂNCIA ENTRE ÍCONE E NOME DA TAG */
+.tags-sidebar .tag-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important; /* Aumentei para 12px para ficar mais visível */
+    padding: 8px 12px !important;
+}
+
+.tags-sidebar .tag-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 20px !important; /* Garante que o ícone tenha espaço */
+}
+
+.tags-sidebar .tag-name {
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* SOLUÇÃO ALTERNATIVA - MARGIN DIRETA */
+.tag-item span.tag-icon {
+    margin-right: 12px !important;
+}
+
+.tag-item span.tag-name {
+    margin-left: 0 !important;
+}

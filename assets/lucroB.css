@@ -167,3 +167,18 @@ body {
     #grafico { padding: 15px; }
     #tabela-container table, #tabela-container th, #tabela-container td { font-size: 14px; padding: 10px; }
 }
+
+.voltar-btn {
+    padding: 8px 16px;
+    margin-bottom: 20px;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.voltar-btn:hover {
+    background-color: #333;
+}

@@ -123,8 +123,26 @@ if ($entradas > 0) {
 <link rel="stylesheet" href="../../assets/sidebar.css">
 <link rel="stylesheet" href="../../assets/giroEstoque.css">
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
+
+    <style>
+        .voltar-btn {
+        margin-top: 20px;
+        padding: 10px 15px;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        }
+
+        .voltar-btn:hover {
+            background: #555;
+        }
+    </style>
+    
 <body>
 
 <aside class="sidebar">
@@ -186,6 +204,8 @@ if ($entradas > 0) {
         <div id="grafico"></div>
         
         <button id="toggleView" class="toggle-btn">Ver Tabela</button>
+        <button id="btnVoltar" class="voltar-btn">← Voltar</button>
+        
         <div id="tabela-container" style="display:none;">
             <table>
                 <thead>
@@ -215,59 +235,140 @@ if ($entradas > 0) {
         </div>
 
 <script>
-    // Alternar gráfico <-> tabela
-    document.getElementById('toggleView').addEventListener('click', () => {
-        const grafico = document.getElementById('grafico');
-        const tabela = document.getElementById('tabela-container');
-        const btn = document.getElementById('toggleView');
-
-        if (tabela.style.display === 'none') {
-            grafico.style.display = 'none';
-            tabela.style.display = 'block';
-            btn.innerText = 'Ver Gráfico';
-        } else {
-            grafico.style.display = 'block';
-            tabela.style.display = 'none';
-            btn.innerText = 'Ver Tabela';
-        }
-    });
-
-    // Salvar estado ao mudar filtro
     const filtroSelect = document.getElementById('filtro');
-    filtroSelect.addEventListener('change', function() {
-        localStorage.setItem('viewState', document.getElementById('tabela-container').style.display);
-        this.form.submit();
-    });
+filtroSelect.addEventListener('change', function() {
+    // Salva estado da view (gráfico ou tabela)
+    localStorage.setItem('viewState', document.getElementById('tabela-container').style.display);
+    // Submete o formulário para atualizar o filtro
+    this.form.submit();
+});
 
-    // Restaurar estado ao carregar
+    // Alternar gráfico <-> tabela
     document.addEventListener("DOMContentLoaded", () => {
-        const tabela = document.getElementById('tabela-container');
-        const grafico = document.getElementById('grafico');
-        const btn = document.getElementById('toggleView');
+    const grafico = document.getElementById('grafico');
+    const tabela = document.getElementById('tabela-container');
+    const btn = document.getElementById('toggleView');
 
-        const estado = localStorage.getItem('viewState');
-        if(estado === 'block') {
-            tabela.style.display = 'block';
+    // Garantir tamanho do gráfico
+    grafico.style.width = "100%";
+    grafico.style.height = "400px";
+
+    // Restaurar estado do toggle
+    const estado = localStorage.getItem('viewState');
+    if(estado === 'block') {
+        tabela.style.display = 'block';
+        grafico.style.display = 'none';
+        btn.innerText = 'Ver Gráfico';
+    } else {
+        tabela.style.display = 'none';
+        grafico.style.display = 'block';
+        btn.innerText = 'Ver Tabela';
+    }
+
+    btn.addEventListener('click', () => {
+        if(tabela.style.display === 'none') {
             grafico.style.display = 'none';
+            tabela.style.display = 'block';
             btn.innerText = 'Ver Gráfico';
         } else {
-            tabela.style.display = 'none';
             grafico.style.display = 'block';
+            tabela.style.display = 'none';
             btn.innerText = 'Ver Tabela';
+            initChart(); // inicializa gráfico ao tornar visível
         }
+        localStorage.setItem('viewState', tabela.style.display);
     });
 
-    // ApexCharts
-    var options = {
-        chart: { type: 'line', height: 350 },
-        series: [
-            { name: 'Entradas', data: <?php echo json_encode($dadosEntradas); ?> },
-            { name: 'Saídas', data: <?php echo json_encode($dadosSaidas); ?> }
-        ],
-        xaxis: { categories: <?php echo json_encode($labels); ?> }
-    };
-    var chart = new ApexCharts(document.querySelector("#grafico"), options);
-    chart.render();
+    function initChart() {
+        if (!grafico.echartsInstance) {
+            const myChart = echarts.init(grafico);
+
+            const option = {
+                title: {
+                    text: 'Entradas x Saídas x Saldo',
+                    left: 'center',
+                    textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e0e0e0' }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    textStyle: { color: '#fff' }
+                },
+                legend: {
+                    bottom: 0,
+                    textStyle: { color: '#e0e0e0' },
+                    data: ['Entradas', 'Saídas', 'Saldo']
+                },
+                grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: <?php echo json_encode($labels); ?>,
+                    axisLine: { lineStyle: { color: '#aaa' } },
+                    axisLabel: { color: '#e0e0e0' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#e0e0e0' }
+                },
+                series: [
+                    {
+                        name: 'Entradas',
+                        type: 'line',
+                        smooth: true,
+                        data: <?php echo json_encode($dadosEntradas); ?>,
+                        lineStyle: { color: '#4caf50', width: 3 },
+                        areaStyle: { color: 'rgba(76,175,80,0.3)' },
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        itemStyle: { color: '#bbf1bdff' }
+                    },
+                    {
+                        name: 'Saídas',
+                        type: 'line',
+                        smooth: true,
+                        data: <?php echo json_encode($dadosSaidas); ?>,
+                        lineStyle: { color: '#f44336', width: 3 },
+                        areaStyle: { color: 'rgba(244,67,54,0.3)' },
+                        symbol: 'square',
+                        symbolSize: 6,
+                        itemStyle: { color: '#f8a59fff' }
+                    },
+                    {
+                        name: 'Saldo',
+                        type: 'line',
+                        smooth: true,
+                        data: <?php echo json_encode(array_map(function($e, $s){ return $e - $s; }, $dadosEntradas, $dadosSaidas)); ?>,
+                        lineStyle: { color: '#2196f3', width: 3 },
+                        areaStyle: { color: 'rgba(33,150,243,0.3)' },
+                        symbol: 'diamond',
+                        symbolSize: 6,
+                        itemStyle: { color: '#a5d4faff' }
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+            grafico.echartsInstance = myChart;
+
+            window.addEventListener('resize', () => myChart.resize());
+        } else {
+            grafico.echartsInstance.resize();
+        }
+    }
+
+    if(grafico.style.display !== 'none') {
+        initChart();
+    }
+});
+    const btnVoltar = document.getElementById('btnVoltar');
+    btnVoltar.addEventListener('click', () => {
+    history.back(); 
+
+});
+
 </script>
     </div>
 </main>

@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Verifique a chave correta da sessão
-if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
+if (!isset($_SESSION['loja_id']) || !in_array($_SESSION['tipo_login'] ?? '', ['empresa', 'funcionario'])) {
     echo json_encode(["error" => "Loja não autenticada"]);
     exit; 
 }
