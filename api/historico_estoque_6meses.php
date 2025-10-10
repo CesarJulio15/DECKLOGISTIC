@@ -1,59 +1,76 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-require_once '../conexao.php';
+include '../conexao.php';
 
-$usuarioId = (int)($_GET['usuario_id'] ?? 0);
-if (!$usuarioId) {
-    echo json_encode([]);
+$loja_id = intval($_GET['loja_id'] ?? 0);
+if (!$loja_id) {
+    echo json_encode(['series' => []]);
     exit;
 }
 
-// Pega todos os produtos que o usuário pode movimentar
-$produtos = [];
-$res = $conn->query("
-    SELECT id, quantidade_inicial 
-    FROM produtos 
-");
-while ($row = $res->fetch_assoc()) {
-    $produtos[$row['id']] = (int)$row['quantidade_inicial'];
-}
-
-// Define os últimos 6 meses
+// 1. Define últimos 6 meses
 $meses = [];
 for ($i = 5; $i >= 0; $i--) {
     $mes = date('Y-m', strtotime("-$i month"));
-    $meses[$mes] = ['entrada' => 0, 'saida' => 0, 'estoque' => 0];
+    $meses[$mes] = ['entrada' => 0, 'saida' => 0];
 }
 
-// Pega todas as movimentações do usuário nos últimos 6 meses
+// 2. Busca movimentações dos produtos da loja nos últimos 6 meses
 $inicio = date('Y-m-01', strtotime('-5 month'));
-$hoje = date('Y-m-t'); // último dia do mês atual
-
+$hoje = date('Y-m-t');
 $sql = "
-    SELECT produto_id, tipo, quantidade, DATE_FORMAT(data_movimentacao, '%Y-%m') AS mes
+    SELECT tipo, quantidade, DATE_FORMAT(data_movimentacao, '%Y-%m') AS mes
     FROM movimentacoes_estoque
-    WHERE usuario_id = $usuarioId
+    WHERE produto_id IN (SELECT id FROM produtos WHERE loja_id = $loja_id AND deletado_em IS NULL)
       AND data_movimentacao BETWEEN '$inicio' AND '$hoje'
 ";
 $res = $conn->query($sql);
 
+// 3. Soma entradas e saídas por mês
 while ($row = $res->fetch_assoc()) {
     $mes = $row['mes'];
     if (!isset($meses[$mes])) continue;
-
     if ($row['tipo'] === 'entrada') {
-        $meses[$mes]['entrada'] += (int)$row['quantidade'];
+        $meses[$mes]['entrada'] += intval($row['quantidade']);
     } else {
-        $meses[$mes]['saida'] += (int)$row['quantidade'];
+        $meses[$mes]['saida'] += intval($row['quantidade']);
     }
 }
 
-// Calcula estoque acumulado mês a mês
-$acumulado = array_sum($produtos); // soma estoque inicial de todos produtos
-foreach ($meses as $mes => &$dados) {
-    $acumulado += $dados['entrada'] - $dados['saida'];
-    $dados['estoque'] = $acumulado;
-}
-unset($dados);
+// 4. Busca o estoque inicial ANTES do primeiro mês
+$stmt = $conn->prepare("SELECT SUM(quantidade_estoque) AS total FROM produtos WHERE loja_id = ? AND deletado_em IS NULL");
+$stmt->bind_param("i", $loja_id);
+$stmt->execute();
+$row = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+$estoque_atual = intval($row['total'] ?? 0);
 
-echo json_encode($meses, JSON_PRETTY_PRINT);
+// 5. Calcula estoque mês a mês (do passado para o presente)
+$series = [];
+$meses_chaves = array_keys($meses);
+$acumulado = $estoque_atual;
+
+// Para cada mês, do mais recente para o mais antigo, desfaz as movimentações
+for ($i = count($meses_chaves) - 1; $i >= 0; $i--) {
+    $mes = $meses_chaves[$i];
+    $entrada = $meses[$mes]['entrada'];
+    $saida = $meses[$mes]['saida'];
+
+    // Para o mês atual, mostra o estoque atual
+    // Para meses anteriores, desfaz movimentações para mostrar o saldo correto
+    $series[$i] = [
+        'mes' => date('M/Y', strtotime($mes . '-01')),
+        'entrada' => $entrada,
+        'saida' => $saida,
+        'estoque' => $acumulado
+    ];
+
+    // Para o mês anterior, desfaz as movimentações deste mês
+    $acumulado = $acumulado - $entrada + $saida;
+}
+
+// Inverte para ordem cronológica
+$series = array_reverse($series);
+
+echo json_encode(['series' => $series, 'total' => $estoque_atual], JSON_PRETTY_PRINT);
+?>

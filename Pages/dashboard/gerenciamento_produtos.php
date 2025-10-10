@@ -674,52 +674,51 @@ if ($stmt) {
   <!-- conteúdo principal -->
   <main>
 
-    <!-- formulário de adicionar -->
-    <div class="card">
-      <h2>➕ Adicionar Produto</h2>
-      <form id="formAdd" method="POST">
-        <input type="hidden" name="acao" value="adicionar_produto">
-        <div class="form-row">
-          <input type="text" name="nome" placeholder="Nome do produto" required>
-          <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required>
-          <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required>
-          <input type="number" name="estoque" placeholder="Estoque inicial" required>
-        </div>
-        <div class="actions">
-            <button class="btn primary" type="submit">Salvar</button>
-          <button class="btn ghost" type="reset">Limpar</button>
-        </div>
-      </form>
+  <!-- formulário de adicionar -->
+<div class="card">
+  <h2>➕ Adicionar Produto</h2>
+  <form id="formAdd" method="POST">
+    <input type="hidden" name="acao" value="adicionar_produto">
+    <div class="form-row">
+      <input type="text" name="nome" placeholder="Nome do produto" required>
+      <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required>
+      <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required>
+      <input type="number" name="estoque" placeholder="Estoque inicial" min="0" max="9999" required>
     </div>
+    <div class="actions">
+        <button class="btn primary" type="submit">Salvar</button>
+      <button class="btn ghost" type="reset">Limpar</button>
+    </div>
+  </form>
+</div>
 
     <!-- tabela produtos -->
-    <div class="table-wrap" style="margin-top:18px">
-      <table>
-        <thead>
-          <tr><th>ID</th><th>Produto</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr>
-        </thead>
-        <tbody>
-          <?php if (count($produtos) === 0): ?>
-            <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
-          <?php else: ?>
-            <?php foreach($produtos as $p): ?>
-              <tr data-id="<?= $p['id'] ?>" data-nome="<?= htmlspecialchars($p['nome']) ?>" data-preco="<?= $p['preco_unitario'] ?>" data-quantidade="<?= $p['quantidade_estoque'] ?>">
-                <td><?= $p['id'] ?></td>
-                <td><?= htmlspecialchars($p['nome']) ?></td>
-                <td>R$ <?= number_format($p['preco_unitario'],2,',','.') ?></td>
-                <td><?= $p['quantidade_estoque'] ?></td>
-                    <td class="actions-cell">
-                    <button class="btn icon editBtn" type="button" title="Editar">Editar</button>
-                    <button class="btn icon buyBtn" type="button" title="Comprar">Entrada</button>
-                    <button class="btn icon sellBtn" type="button" title="Vender">Saída</button>
-                    <button class="btn icon deleteBtn" type="button" title="Apagar">Excluir</button>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          <?php endif; ?>
-        </tbody>
-      </table>
-    </div>
+<div class="table-wrap" style="margin-top:18px">
+  <table>
+    <thead>
+      <tr><th>Produto</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr>
+    </thead>
+    <tbody>
+      <?php if (count($produtos) === 0): ?>
+        <tr><td colspan="4">Nenhum produto cadastrado.</td></tr>
+      <?php else: ?>
+        <?php foreach($produtos as $p): ?>
+          <tr data-id="<?= $p['id'] ?>" data-nome="<?= htmlspecialchars($p['nome']) ?>" data-preco="<?= $p['preco_unitario'] ?>" data-quantidade="<?= $p['quantidade_estoque'] ?>">
+            <td><?= htmlspecialchars($p['nome']) ?></td>
+            <td>R$ <?= number_format($p['preco_unitario'],2,',','.') ?></td>
+            <td><?= $p['quantidade_estoque'] ?></td>
+            <td class="actions-cell">
+              <button class="btn icon editBtn" type="button" title="Editar">Editar</button>
+              <button class="btn icon buyBtn" type="button" title="Comprar">Entrada</button>
+              <button class="btn icon sellBtn" type="button" title="Vender">Saída</button>
+              <button class="btn icon deleteBtn" type="button" title="Apagar">Excluir</button>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </tbody>
+  </table>
+</div>
 
   </main>
 </div>
@@ -742,7 +741,7 @@ if ($stmt) {
       </div>
 
       <div class="row" id="rowQtd">
-        <input type="number" name="quantidade" id="modalQuantidade" placeholder="Quantidade" min="1">
+        <input type="number" name="quantidade" id="modalQuantidade" placeholder="Quantidade" min="1" max="9999">
         <input type="date" name="data_movimentacao" id="modalData" value="<?= date('Y-m-d') ?>">
       </div>
 
@@ -861,11 +860,40 @@ document.querySelectorAll('.deleteBtn').forEach(btn => {
   });
 });
 
+// Novo: Submit do modal com AJAX para vendas
+modalForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    // Se for venda, usa AJAX para validação
+    if (modalAcao.value === 'vender_produto') {
+        fetch('', { // URL vazia = mesma página
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                closeModal();
+                location.reload(); // Recarrega a página para atualizar os dados
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('❌ Erro ao processar venda. Número maior que a quantidade do estoque.');
+        });
+    } else {
+        // Para outras ações (editar, comprar), submete normalmente
+        this.submit();
+    }
+});
+
 closeModalBtn.addEventListener('click', closeModal);
 backdrop.addEventListener('click', (ev) => { if (ev.target === backdrop) closeModal(); });
-
-// Ao submeter modalForm, apenas submit normalmente (POST) — servidor processa
-
 </script>
 
 </body>

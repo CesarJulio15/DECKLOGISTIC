@@ -74,7 +74,7 @@ $senha_hash = $_SESSION['cadastro']['senha'];
 
         if($stmt->execute()){
             unset($_SESSION['cadastro']); // Limpa sessão
-            echo "<script>alert('Cadastro concluído com sucesso!'); window.location.href='../../../index.php';</script>";
+            echo "<script>alert('Cadastro concluído com sucesso!'); window.location.href='loginLoja.php';</script>";
         } else {
             echo "<script>alert('Erro ao cadastrar: {$stmt->error}'); window.location.href='cadastroEmpresaCompleto.php';</script>";
         }

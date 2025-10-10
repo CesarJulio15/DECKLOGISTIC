@@ -74,8 +74,26 @@ $mediaMargem = count($margens) > 0 ? array_sum($margens) / count($margens) : 0;
 <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="../../../assets/sidebar.css">
 <link rel="stylesheet" href="../../../assets/lucroB.css">
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
+
+    <style>
+        .voltar-btn {
+        margin-top: 20px;
+        padding: 10px 15px;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        }
+
+        .voltar-btn:hover {
+            background: #555;
+        }
+    </style>
+    
 <body>
 
 <div class="content">
@@ -129,6 +147,7 @@ $mediaMargem = count($margens) > 0 ? array_sum($margens) / count($margens) : 0;
     <div id="grafico"></div>
 
     <button id="toggleView" class="toggle-btn">Ver Tabela</button>
+    <button id="btnVoltar" class="voltar-btn">← Voltar</button>
     <div id="tabela-container" style="display:none;">
         <table>
             <thead>
@@ -157,34 +176,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const grafico = document.getElementById('grafico');
     const tabela = document.getElementById('tabela-container');
 
+    // Toggle gráfico/tabela
     btn.addEventListener('click', () => {
         const mostrandoTabela = tabela.style.display === 'block';
         tabela.style.display = mostrandoTabela ? 'none' : 'block';
         grafico.style.display = mostrandoTabela ? 'block' : 'none';
         btn.innerText = mostrandoTabela ? 'Ver Tabela' : 'Ver Gráfico';
+
+        if (!mostrandoTabela) initChart(); // Renderiza gráfico ao mostrar
     });
 
-    const options = {
-        chart: {
-            type: 'line',
-            height: 350,
-            animations: { enabled: false },
-            toolbar: { show: false }
-        },
-        series: [{
-            name: 'Margem de Lucro (%)',
-            data: <?php echo json_encode($margens); ?>
-        }],
-        xaxis: { categories: <?php echo json_encode($labels); ?> },
-        colors: ['#36A2EB'],
-        stroke: { width: 2, curve: 'smooth' },
-        markers: { size: 4 }
-    };
+    function initChart() {
+        if (!grafico.echartsInstance) {
+            const myChart = echarts.init(grafico);
 
-    requestAnimationFrame(() => {
-        const chart = new ApexCharts(grafico, options);
-        chart.render();
-    });
+            const option = {
+                title: {
+                    text: 'Margem de Lucro (%)',
+                    left: 'center',
+                    textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e0e0e0' }
+                },
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.7)', textStyle: { color: '#fff' } },
+                xAxis: {
+                    type: 'category',
+                    data: <?php echo json_encode($labels); ?>,
+                    axisLine: { lineStyle: { color: '#aaa' } },
+                    axisLabel: { color: '#e0e0e0' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { show: false },
+                    splitLine: { lineStyle: { color: '#333' } },
+                    axisLabel: { color: '#e0e0e0' },
+                    min: 0
+                },
+                series: [{
+                    name: 'Margem de Lucro (%)',
+                    type: 'line',
+                    data: <?php echo json_encode($margens); ?>,
+                    smooth: true,
+                    lineStyle: { color: '#36A2EB', width: 3 },
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(54,162,235,0.3)'},{offset:1,color:'rgba(54,162,235,0)'}])
+                    },
+                    symbol: 'circle',
+                    symbolSize: 6
+                }]
+            };
+
+            myChart.setOption(option);
+            grafico.echartsInstance = myChart;
+            window.addEventListener('resize', () => myChart.resize());
+        } else {
+            grafico.echartsInstance.resize();
+        }
+    }
+
+    // Inicializar gráfico se estiver visível
+    if(grafico.style.display !== 'none') initChart();
+});
+
+    const btnVoltar = document.getElementById('btnVoltar');
+btnVoltar.addEventListener('click', () => {
+    history.back(); // volta para a página anterior
 });
 </script>
 

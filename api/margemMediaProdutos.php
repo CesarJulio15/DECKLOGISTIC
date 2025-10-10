@@ -1,7 +1,8 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) session_start();
-
-if (!isset($_SESSION['loja_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['loja_id']) || !in_array($_SESSION['tipo_login'] ?? '', ['empresa', 'funcionario'])) {
     echo "Loja não autenticada";
     exit;
 }
