@@ -55,11 +55,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
     if ($idToDelete) {
         $stmt = $conn->prepare("
             UPDATE tags
-            SET deletado_em = NOW(),
-                usuario_exclusao_id = ?
+            SET deletado_em = NOW()
             WHERE id = ? AND loja_id = ?
         ");
-        $stmt->bind_param("iii", $usuario_id, $idToDelete, $loja_id);
+        if (!$stmt) {
+            die("Erro prepare delete tag: " . $conn->error);
+        }
+        $stmt->bind_param("ii", $idToDelete, $loja_id);
         $stmt->execute();
         $stmt->close();
         header("Location: tag.php");
@@ -358,7 +360,7 @@ $stmt->close();
 <div id="overlay-tag-1">
   <div class="welcome-card-tag">
     <h2>Tags</h2>
-    <p>Nessa página você consegue criar tags para os seus produtos, criando um estoque organizado e detalhado.</p>
+    <p>Nessa página você consegue criar tags para os seus produtos, tags são úteis para manter seu estoque organizado e detalhado.</p>
     <button id="btnProximoTag">Próximo</button>
   </div>
 </div>
