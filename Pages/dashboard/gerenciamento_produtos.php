@@ -178,39 +178,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
     $custo_compra = isset($_POST['custo']) ? floatval($_POST['custo']) : null;
 
-    // Busca custo atual do produto
-    $stmtCusto = $conn->prepare("SELECT custo_unitario FROM produtos WHERE id=? AND loja_id=?");
-    $stmtCusto->bind_param("ii", $id, $lojaId);
-    $stmtCusto->execute();
-    $rowCusto = $stmtCusto->get_result()->fetch_assoc();
-    $custo_atual = isset($rowCusto['custo_unitario']) ? floatval($rowCusto['custo_unitario']) : 0;
-    $stmtCusto->close();
+    // Busca estoque e custo atual do produto
+    $stmtProduto = $conn->prepare("SELECT quantidade_estoque, custo_unitario FROM produtos WHERE id=? AND loja_id=?");
+    $stmtProduto->bind_param("ii", $id, $lojaId);
+    $stmtProduto->execute();
+    $produto = $stmtProduto->get_result()->fetch_assoc();
+    $stmtProduto->close();
 
-    // Se for a primeira entrada (custo 0), atualiza o custo oficial
-    if ($custo_atual == 0 && $custo_compra !== null && $qtd > 0) {
-        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ?, custo_unitario = ? WHERE id=? AND loja_id=?");
-        $stmt->bind_param("idii", $qtd, $custo_compra, $id, $lojaId);
-        $stmt->execute();
-        $stmt->close();
-        $custo_mov = $custo_compra;
+    $estoque_atual = (float)$produto['quantidade_estoque'];
+    $custo_atual = (float)$produto['custo_unitario'];
+
+    // Calcula custo médio ponderado sempre que houver nova entrada
+    if ($qtd > 0 && $custo_compra !== null) {
+        $novo_custo = (($custo_atual * $estoque_atual) + ($custo_compra * $qtd)) / ($estoque_atual + $qtd);
     } else {
-        // Apenas atualiza o estoque, custo é só para a movimentação
-        $stmt = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ? WHERE id=? AND loja_id=?");
-        $stmt->bind_param("iii", $qtd, $id, $lojaId);
-        $stmt->execute();
-        $stmt->close();
-        $custo_mov = $custo_compra !== null ? $custo_compra : $custo_atual;
+        $novo_custo = $custo_atual;
     }
+
+    // Atualiza estoque e custo médio
+    $stmtUpdate = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ?, custo_unitario = ? WHERE id=? AND loja_id=?");
+    $stmtUpdate->bind_param("idii", $qtd, $novo_custo, $id, $lojaId);
+    $stmtUpdate->execute();
+    $stmtUpdate->close();
+
+    $custo_mov = $custo_compra !== null ? $custo_compra : $custo_atual;
+
 
     // 2. Registra movimentação de estoque
     $tipo = 'entrada';
-    $stmt2 = $conn->prepare("
-        INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario) 
-        VALUES (?, ?, ?, ?, ?, NOW(), ?)
-    ");
-    $stmt2->bind_param("isissi", $id, $tipo, $qtd, $data, $usuarioId, $custo_mov);
-    $stmt2->execute();
-    $stmt2->close();
+  $stmt2 = $conn->prepare("
+    INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario) 
+    VALUES (?, ?, ?, ?, ?, NOW(), ?)
+");
+if (!$stmt2) die("Erro prepare mov: " . $conn->error);
+
+// tipos: i = int, s = string, i = int, s = string, i = int, d = double (float)
+$stmt2->bind_param("isisid", $id, $tipo, $qtd, $data, $usuarioId, $custo_mov);
+$stmt2->execute();
+$stmt2->close();
+
 
     // 3. Registra histórico de compra
     $stmtHist = $conn->prepare("

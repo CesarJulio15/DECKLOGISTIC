@@ -165,6 +165,7 @@ $lojaId = $_SESSION['loja_id'];
   }
 
   async function loadCustoMedioProdutos() {
+    // Corrige para garantir que o parâmetro loja_id é enviado
     const data = await fetch(`/DECKLOGISTIC/api/custo_medio_produto.php?loja_id=${lojaId}`).then(r => r.json());
     const tbody = document.querySelector("#custoMedioProdutos tbody");
     tbody.innerHTML = '';
