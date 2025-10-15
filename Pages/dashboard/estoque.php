@@ -40,9 +40,8 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
         <hr>
         <ul class="nav-list middle-section">
           <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
           <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-          <li><a href="tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
+          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
         </ul>
       </div>
       <div class="bottom-links">
@@ -115,6 +114,14 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
         <input type="text" id="filtroReabastecidos" placeholder="Pesquisar por produto..." 
           style="padding:6px 10px; font-size:14px; border-radius:10px; width:200px;
                  background: rgba(30,30,30,0.85); color: #fff; border: 1px solid #fff;">
+        <select id="selectFiltro" style="padding:6px 10px; border-radius:8px; margin-left:5px;">
+          <option value="data_recente">Mais recente</option>
+          <option value="data_antiga">Mais antiga</option>
+          <option value="categoria_asc">Categoria A-Z</option>
+          <option value="categoria_desc">Categoria Z-A</option>
+          <option value="nome_asc">Produto A-Z</option>
+          <option value="nome_desc">Produto Z-A</option>
+        </select>
         <button id="btnFiltrar" 
           style="padding:6px 12px; font-size:14px; margin-left:5px; cursor:pointer;
                  background: linear-gradient(135deg, rgba(255,153,0,0.9), rgba(255,200,0,0.85));
@@ -223,18 +230,31 @@ async function loadHistoricoEstoque() {
 // ---------- Reabastecidos ----------
 async function loadProdutosReabastecidos() {
   const tabela = document.querySelector("#tabelaReabastecidos");
+  const pesquisa = document.getElementById("filtroReabastecidos").value.trim();
+  const filtro = document.getElementById("selectFiltro") ? document.getElementById("selectFiltro").value : "data_recente";
   try {
-    const data = await fetch(`/DECKLOGISTIC/api/produtos_reabastecidos.php?loja_id=${lojaId}`).then(r => r.json());
+    const url = `/DECKLOGISTIC/api/produtos_reabastecidos.php?loja_id=${lojaId}&pesquisa=${encodeURIComponent(pesquisa)}&filtro=${filtro}`;
+    const data = await fetch(url).then(r => r.json());
     if (!Array.isArray(data) || !data.length) {
       tabela.innerHTML = "<p>Nenhum produto reabastecido recentemente.</p>";
       return;
     }
     let html = `<table border="1" cellpadding="8" cellspacing="0" style="width:95%; margin-left:26px;">
-      <thead><tr><th>Lote</th><th>Produto</th><th>Data</th></tr></thead><tbody>`;
-    data.forEach(p => { html += `<tr><td>${p.lote}</td><td>${p.nome}</td><td>${p.data_reabastecimento}</td></tr>`; });
+      <thead><tr><th>Produto</th><th>Categoria</th><th>Data</th></tr></thead><tbody>`;
+    data.forEach(p => { html += `<tr><td>${p.nome}</td><td>${p.categoria}</td><td>${p.data_reabastecimento}</td></tr>`; });
     html += "</tbody></table>";
     tabela.innerHTML = html;
   } catch (e) { tabela.innerHTML = "<p>Erro ao carregar dados</p>"; }
+}
+
+document.getElementById("btnFiltrar").onclick = loadProdutosReabastecidos;
+if (document.getElementById("filtroReabastecidos")) {
+  document.getElementById("filtroReabastecidos").addEventListener("keyup", function(e) {
+    if (e.key === "Enter") loadProdutosReabastecidos();
+  });
+}
+if (document.getElementById("selectFiltro")) {
+  document.getElementById("selectFiltro").addEventListener("change", loadProdutosReabastecidos);
 }
 
 // ---------- Modal Histórico ----------
@@ -253,16 +273,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-</body>
-</html>
-</body>
-</html>
-});
-</script>
-
-
-
-</body>
-</html>
 </body>
 </html>

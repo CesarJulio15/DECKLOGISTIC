@@ -218,6 +218,28 @@ if ($tagVincResult) {
     filter: blur(2px);
     pointer-events: none;
 }
+
+/* Remover sombreamento do botão ordenar */
+#ordenar {
+    box-shadow: none !important;
+}
+
+/* Botão Criar Tag */
+#criar-tag-btn {
+    margin-left: 8px;
+    background: #1b1b1b;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: border 0.2s, background 0.2s;
+    box-shadow: none;
+    display: inline-block;
+    height: 42px;
+}
 </style>
 </head>
 <body>
@@ -237,9 +259,8 @@ if ($tagVincResult) {
         <hr>
         <ul class="nav-list middle-section">
           <li><a href="../visaoGeral.php"><span><img src="../../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="../../dashboard/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Operações"></span> Histórico</a></li>
           <li class="active"><a href="../../dashboard/tabelas/produtos.php"><span><img src="../../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-          <li><a href="../tag.php"><span><img src="../../../img/tag.svg" alt="Tags"></span> Tags</a></li>
+          <li><a href="../../dashboard/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
         </ul>
       </div>
       <div class="bottom-links">
@@ -433,7 +454,23 @@ document.getElementById('close-acoes').addEventListener('click', function() {
 
     
     <!-- Botão Importar -->
-<button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
+    <button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
+    <!-- Botão Criar Tag -->
+    <button id="criar-tag-btn" style="
+        margin-left: 4px;
+        background: #1b1b1b;
+        color: #fff;
+        border: 1px solid #fff;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: border 0.2s, background 0.2s;
+        box-shadow: none;
+        display: inline-block;
+        height: 42px;
+    " onclick="window.location.href='../tag.php'">Criar Tag</button>
 
 
 
@@ -1195,8 +1232,60 @@ window._suppressDica = window._suppressDica || false;
 })();
 </script>
 
-</body>
-</html>
+<script>
+// Torna o botão "+" (add-tag-square) clicável para abrir o dropdown de tags
+document.querySelectorAll('.add-tag-square').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // Fecha todos os dropdowns antes de abrir o atual
+        document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+        const produtoId = btn.getAttribute('data-produto-id');
+        const dropdown = document.getElementById('tag-dropdown-' + produtoId);
+        if (dropdown) {
+            dropdown.style.display = 'block';
+        }
+    });
+});
+
+// Fecha dropdowns ao clicar fora
+document.addEventListener('click', function(e) {
+    document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+});
+
+// Impede fechamento ao clicar dentro do dropdown
+document.querySelectorAll('.tag-dropdown').forEach(dd => {
+    dd.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});
+
+// Vincula/desvincula tag ao produto via AJAX ao clicar na opção do dropdown
+document.querySelectorAll('.tag-dropdown .tag-option').forEach(option => {
+    option.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const tagId = this.getAttribute('data-tag-id');
+        const dropdown = this.closest('.tag-dropdown');
+        const produtoId = dropdown.id.replace('tag-dropdown-', '');
+
+        // AJAX para vincular/desvincular tag
+        fetch('vincular_tag_produto.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `produto_id=${encodeURIComponent(produtoId)}&tag_id=${encodeURIComponent(tagId)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Atualiza os ícones de tags vinculadas (simples: recarrega a página)
+                location.reload();
+            } else {
+                alert('Erro ao vincular/desvincular tag: ' + (data.message || ''));
+            }
+        })
+        .catch(() => alert('Erro de comunicação com o servidor.'));
+        dropdown.style.display = 'none';
+    });
+});
 </script>
 </body>
 </html>

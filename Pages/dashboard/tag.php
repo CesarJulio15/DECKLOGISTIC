@@ -266,9 +266,8 @@ $stmt->close();
             <hr>
             <ul class="nav-list middle-section">
                 <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg"></span> Visão Geral</a></li>
-                <li><a href="operacoes.php"><span><img src="../../img/icon-operacoes.svg"></span> Operações</a></li>
                 <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg"></span> Produtos</a></li>
-                <li class="<?= $currentPage=='tag.php' ? 'active' : '' ?>"><a href="tag.php"><span><img src="../../img/tag.svg"></span> Tags</a></li>
+                <li><a href="operacoes.php"><span><img src="../../img/icon-operacoes.svg"></span> Histórico</a></li>
             </ul>
         </div>
         <div class="bottom-links">
