@@ -183,23 +183,36 @@ async function loadEstoqueProdutos() {
 async function loadEntradaSaidaProdutos() {
   const container = document.querySelector("#chartEntradaSaida");
   try {
-    const data = await fetch(`/DECKLOGISTIC/api/entrada_saida.php?loja_id=${lojaId}`).then(r => r.json());
+    const response = await fetch(`/DECKLOGISTIC/api/entrada_saida.php?loja_id=${lojaId}`);
+    const json = await response.json();
+    
+    const data = json.data; // <-- acessa o array correto
     if (!Array.isArray(data) || !data.length) {
       container.innerHTML = "<p>Nenhuma movimentação registrada.</p>";
       return;
     }
-    const entrada = data.map(d => ({ label:d.data_movimentacao, y:d.entrada }));
-    const saida = data.map(d => ({ label:d.data_movimentacao, y:d.saida }));
+
+    const entrada = data.map(d => ({ label: d.data, y: d.entrada }));
+    const saida = data.map(d => ({ label: d.data, y: d.saida }));
+
     new CanvasJS.Chart(container, {
-      animationEnabled:true, theme:"light2", title:{text:"Entrada x Saída"},
-      axisY:{title:"Quantidade"},
-      data:[
-        {type:"line", name:"Entrada", showInLegend:true, dataPoints:entrada},
-        {type:"line", name:"Saída", showInLegend:true, dataPoints:saida}
+      animationEnabled: true,
+      theme: "light2",
+      title: { text: "Entrada x Saída" },
+      axisY: { title: "Quantidade" },
+      legend: { cursor: "pointer" },
+      data: [
+        { type: "line", name: "Entrada", showInLegend: true, dataPoints: entrada },
+        { type: "line", name: "Saída", showInLegend: true, dataPoints: saida }
       ]
     }).render();
-  } catch (e) { console.error(e); }
+
+  } catch (e) {
+    console.error(e);
+    container.innerHTML = "<p>Erro ao carregar dados.</p>";
+  }
 }
+
 
 // ---------- Histórico Estoque ----------
 async function loadHistoricoEstoque() {
