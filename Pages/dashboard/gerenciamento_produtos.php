@@ -135,6 +135,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
         }
 
+        // Remove recomendações vinculadas
+$stmt = $conn->prepare("DELETE FROM recomendacoes_reabastecimento WHERE produto_id=?");
+if ($stmt) {
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+}
+
+
         // Remove movimentações de estoque
         $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
         if ($stmt) {
