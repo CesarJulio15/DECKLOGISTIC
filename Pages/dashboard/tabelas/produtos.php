@@ -810,15 +810,32 @@ document.getElementById('close-import').addEventListener('click', function(e) {
 </div>
 <h4 style="color: #ffffff;">Adicionar novo produto</h4>
 
-    <form method="POST" style="margin-bottom:18px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <input type="hidden" name="acao" value="adicionar_produto">
-            <input type="text" name="nome" placeholder="Nome do produto" required style="padding:8px; border-radius:6px; border:1px solid #ccc;">
-            <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
-            <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
-            <input type="number" name="estoque" placeholder="Estoque inicial" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
-            <button type="submit" style="padding:8px 16px; border-radius:6px; background: linear-gradient(135deg, #ff9900 80%, #ffc800 100%); color:#fff; border:none; font-weight:600;">Salvar</button>
-            <button type="reset" style="padding:8px 16px; border-radius:6px; background:#222; color:#ff9900; border:1px solid #444;">Limpar</button>
-        </form>
+<form method="POST" style="margin-bottom:18px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+  <input type="hidden" name="acao" value="adicionar_produto">
+
+  <input type="text" name="nome" placeholder="Nome do produto" required 
+         style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff;">
+
+  <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required 
+         style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:120px;">
+
+  <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required 
+         style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:120px;">
+
+  <input type="number" name="estoque" placeholder="Estoque inicial" required 
+         style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:120px;">
+
+  <button type="submit" 
+          style="padding:8px 16px; border-radius:6px; border:1px solid #444; background:linear-gradient(135deg, #ff9900 80%, #ffc800 100%); color:#fff; font-weight:600; ">
+    Salvar
+  </button>
+
+  <button type="reset" 
+          style="padding:8px 16px; border-radius:6px; border:1px solid #ffffffff; background:#222; color:#fff;">
+    Limpar
+  </button>
+</form>
+
     <div class="tags-area" style="display:flex; align-items:center; gap:10px;">
         <?php foreach ($tags as $tag): ?>
             <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>" data-tag-id="<?= $tag['id'] ?>" style="cursor:pointer;">
