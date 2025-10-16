@@ -28,51 +28,6 @@ if (!$lojaId) {
     die("Acesso negado. Loja não encontrada.");
 }
 
-// === BACKEND adicionar produto ===
-$msg = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'adicionar_produto') {
-    $nome = trim($_POST['nome'] ?? '');
-    $preco = floatval($_POST['preco'] ?? 0);
-    $custo = floatval($_POST['custo'] ?? 0);
-    $estoque = intval($_POST['estoque'] ?? 0);
-    $lote = '';
-
-    // Se for empresa e não houver funcionário, usuario_id = NULL
-    $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
-
-    $stmt = $conn->prepare("
-        INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-    if ($stmt) {
-        $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
-        if ($stmt->execute()) {
-            $idNovoProduto = $stmt->insert_id;
-            $stmt->close();
-
-            // Histórico
-            $stmtHist = $conn->prepare("
-                INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
-                VALUES (?, ?, ?, 'adicionado', ?, NOW())
-            ");
-            if ($stmtHist) {
-                $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_produto);
-                $stmtHist->execute();
-                $stmtHist->close();
-            }
-            $msg = "✅ Produto cadastrado com sucesso!";
-            // Redireciona para evitar reenvio do formulário
-            header("Location: " . $_SERVER['REQUEST_URI']);
-            exit;
-        } else {
-            $msg = "❌ Erro ao cadastrar produto: " . $stmt->error;
-            $stmt->close();
-        }
-    } else {
-        $msg = "❌ Erro prepare produto: " . $conn->error;
-    }
-}
-
 // ---- PAGINAÇÃO ----
 $linhasPorPagina = 14;
 $paginaAtual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
@@ -120,6 +75,229 @@ if ($tagVincResult) {
             'icone' => $row['icone'],
             'cor' => $row['cor']
         ];
+    }
+}
+
+// Backend para adicionar produto
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'adicionar_produto') {
+    $nome = trim($_POST['nome'] ?? '');
+    $preco = floatval($_POST['preco'] ?? 0);
+    $custo = floatval($_POST['custo'] ?? 0);
+    $estoque = intval($_POST['estoque'] ?? 0);
+    $lote = '';
+
+    // Se for empresa e não houver funcionário, usuario_id = NULL
+    if ($tipo_login === 'empresa') {
+        $usuario_id_produto = null;
+    } else {
+        $usuario_id_produto = $usuarioId;
+    }
+
+    $stmt = $conn->prepare("
+        INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    if ($stmt) {
+        $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
+        $stmt->execute();
+        $idNovoProduto = $stmt->insert_id;
+        $stmt->close();
+
+        // Histórico
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            VALUES (?, ?, ?, 'adicionado', ?, NOW())
+        ");
+        if ($stmtHist) {
+            $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_produto);
+            $stmtHist->execute();
+            $stmtHist->close();
+        }
+        // Redireciona para evitar reenvio do formulário
+        header("Location: produtos.php");
+        exit;
+    }
+}
+
+// ====== BACKEND GERENCIAMENTO PRODUTOS (EDITAR, ENTRADA, SAÍDA, EXCLUIR) ======
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $acao = $_POST['acao'] ?? '';
+
+    // EDITAR PRODUTO
+    if ($acao === 'editar_produto') {
+        $id = intval($_POST['produto_id'] ?? 0);
+        $nome = trim($_POST['nome'] ?? '');
+        $preco = floatval($_POST['preco'] ?? 0);
+        $estoque = intval($_POST['estoque'] ?? 0);
+
+        $stmt = $conn->prepare("UPDATE produtos SET nome=?, preco_unitario=?, quantidade_estoque=? WHERE id=? AND loja_id=?");
+        if ($stmt) {
+            $stmt->bind_param("sdiii", $nome, $preco, $estoque, $id, $lojaId);
+            $stmt->execute();
+            $stmt->close();
+        }
+        // Histórico
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            VALUES (?, ?, ?, 'editado', ?, NOW())
+        ");
+        if ($stmtHist) {
+            $stmtHist->bind_param("isii", $id, $nome, $estoque, $usuarioId);
+            $stmtHist->execute();
+            $stmtHist->close();
+        }
+        header("Location: produtos.php");
+        exit;
+    }
+
+    // APAGAR PRODUTO
+    if ($acao === 'apagar_produto') {
+        $id = intval($_POST['produto_id'] ?? 0);
+
+        $conn->query("DELETE FROM produto_tag WHERE produto_id=$id");
+        $conn->query("DELETE FROM movimentacoes_estoque WHERE produto_id=$id");
+        $conn->query("DELETE FROM itens_venda WHERE produto_id=$id");
+        $conn->query("DELETE FROM historico_produtos WHERE produto_id=$id");
+        $conn->query("DELETE FROM produtos WHERE id=$id AND loja_id=$lojaId");
+
+        header("Location: produtos.php");
+        exit;
+    }
+
+    // ENTRADA (COMPRAR PRODUTO)
+    if ($acao === 'comprar_produto') {
+        $id = intval($_POST['produto_id'] ?? 0);
+        $qtd = intval($_POST['quantidade'] ?? 0);
+        $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
+        $custo_compra = isset($_POST['custo']) ? floatval($_POST['custo']) : null;
+
+        $stmtProduto = $conn->prepare("SELECT quantidade_estoque, custo_unitario FROM produtos WHERE id=? AND loja_id=?");
+        $stmtProduto->bind_param("ii", $id, $lojaId);
+        $stmtProduto->execute();
+        $produto = $stmtProduto->get_result()->fetch_assoc();
+        $stmtProduto->close();
+
+        $estoque_atual = (float)$produto['quantidade_estoque'];
+        $custo_atual = (float)$produto['custo_unitario'];
+
+        if ($qtd > 0 && $custo_compra !== null) {
+            $novo_custo = (($custo_atual * $estoque_atual) + ($custo_compra * $qtd)) / ($estoque_atual + $qtd);
+        } else {
+            $novo_custo = $custo_atual;
+        }
+
+        $stmtUpdate = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque + ?, custo_unitario = ? WHERE id=? AND loja_id=?");
+        $stmtUpdate->bind_param("idii", $qtd, $novo_custo, $id, $lojaId);
+        $stmtUpdate->execute();
+        $stmtUpdate->close();
+
+        $custo_mov = $custo_compra !== null ? $custo_compra : $custo_atual;
+
+        $tipo = 'entrada';
+        $stmt2 = $conn->prepare("
+            INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario) 
+            VALUES (?, ?, ?, ?, ?, NOW(), ?)
+        ");
+        $stmt2->bind_param("isisid", $id, $tipo, $qtd, $data, $usuarioId, $custo_mov);
+        $stmt2->execute();
+        $stmt2->close();
+
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            SELECT id, nome, quantidade_estoque, 'comprado', ?, NOW()
+            FROM produtos WHERE id=? AND loja_id=?
+        ");
+        $stmtHist->bind_param("iii", $usuarioId, $id, $lojaId);
+        $stmtHist->execute();
+        $stmtHist->close();
+
+        $resProduto = $conn->prepare("SELECT nome, custo_unitario FROM produtos WHERE id=? AND loja_id=?");
+        $resProduto->bind_param("ii", $id, $lojaId);
+        $resProduto->execute();
+        $produto = $resProduto->get_result()->fetch_assoc();
+        $resProduto->close();
+
+        $custo_total = $produto['custo_unitario'] * $qtd;
+        $nome = $produto['nome'];
+
+        $stmtDesp = $conn->prepare("
+            INSERT INTO transacoes_financeiras (loja_id, tipo, valor, descricao, data_transacao)
+            VALUES (?, 'saida', ?, ?, ?)
+        ");
+        $descricao = "Compra do produto $nome (x$qtd)";
+        $stmtDesp->bind_param("idss", $lojaId, $custo_total, $descricao, $data);
+        $stmtDesp->execute();
+        $stmtDesp->close();
+
+        header("Location: produtos.php");
+        exit;
+    }
+
+    // SAÍDA (VENDER PRODUTO)
+    if ($acao === 'vender_produto') {
+        header('Content-Type: application/json');
+        $produto_id = intval($_POST['produto_id'] ?? 0);
+        $quantidade = intval($_POST['quantidade'] ?? 0);
+        $data_movimentacao = $_POST['data_movimentacao'] ?? date('Y-m-d');
+
+        if ($produto_id <= 0 || $quantidade <= 0) {
+            echo json_encode(['success' => false, 'message' => '❌ Dados inválidos para venda.']);
+            exit;
+        }
+
+        $stmtEstoque = $conn->prepare("SELECT quantidade_estoque, preco_unitario, custo_unitario FROM produtos WHERE id=? AND loja_id=? AND deletado_em IS NULL");
+        $stmtEstoque->bind_param("ii", $produto_id, $lojaId);
+        $stmtEstoque->execute();
+        $result = $stmtEstoque->get_result();
+        $prod = $result->fetch_assoc();
+        $stmtEstoque->close();
+
+        if (!$prod || $prod['quantidade_estoque'] < $quantidade) {
+            echo json_encode(['success' => false, 'message' => '❌ Estoque insuficiente para venda.']);
+            exit;
+        }
+
+        $stmtUpdate = $conn->prepare("UPDATE produtos SET quantidade_estoque = quantidade_estoque - ? WHERE id=? AND loja_id=? AND quantidade_estoque >= ?");
+        $stmtUpdate->bind_param("iiii", $quantidade, $produto_id, $lojaId, $quantidade);
+        if (!$stmtUpdate->execute() || $stmtUpdate->affected_rows === 0) {
+            $stmtUpdate->close();
+            echo json_encode(['success' => false, 'message' => '❌ Falha ao decrementar estoque ou estoque insuficiente.']);
+            exit;
+        }
+        $stmtUpdate->close();
+
+        $stmtMov = $conn->prepare("INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em) VALUES (?, 'saida', ?, ?, ?, NOW())");
+        $stmtMov->bind_param("iisi", $produto_id, $quantidade, $data_movimentacao, $usuarioId);
+        $stmtMov->execute();
+        $stmtMov->close();
+
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            SELECT id, nome, quantidade_estoque, 'vendido', ?, NOW()
+            FROM produtos WHERE id=? AND loja_id=?
+        ");
+        $stmtHist->bind_param("iii", $usuarioId, $produto_id, $lojaId);
+        $stmtHist->execute();
+        $stmtHist->close();
+
+        $valor_total = $prod['preco_unitario'] * $quantidade;
+        $custo_total = $prod['custo_unitario'] * $quantidade;
+        $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total, usuario_id) VALUES (?, ?, ?, ?, ?)");
+        $stmtVenda->bind_param("isddi", $lojaId, $data_movimentacao, $valor_total, $custo_total, $usuarioId);
+        $stmtVenda->execute();
+        $venda_id = $stmtVenda->insert_id;
+        $stmtVenda->close();
+
+        $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $prod['preco_unitario'], $prod['custo_unitario'], $data_movimentacao);
+        $stmtItem->execute();
+        $stmtItem->close();
+
+        echo json_encode([
+            'success' => true,
+            'message' => "📤 Venda registrada com sucesso! (-$quantidade unidade(s))"
+        ]);
+        exit;
     }
 }
 ?>
@@ -401,19 +579,7 @@ document.getElementById('close-welcome').addEventListener('click', function() {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-        <!-- Formulário de adicionar produto -->
-        <form method="POST" style="margin-bottom:18px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <input type="hidden" name="acao" value="adicionar_produto">
-            <input type="text" name="nome" placeholder="Nome do produto" required style="padding:8px; border-radius:6px; border:1px solid #ccc;">
-            <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
-            <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
-            <input type="number" name="estoque" placeholder="Estoque inicial" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
-            <button type="submit" style="padding:8px 16px; border-radius:6px; background: linear-gradient(135deg, #ff9900 80%, #ffc800 100%); color:#fff; border:none; font-weight:600;">Salvar</button>
-            <button type="reset" style="padding:8px 16px; border-radius:6px; background:#222; color:#ff9900; border:1px solid #444;">Limpar</button>
-        </form>
-        <?php if (!empty($msg)): ?>
-            <div style="margin-bottom:10px; background:#d1ffd6; padding:8px 12px; border-radius:6px; color:#064e3b; font-weight:600"><?= htmlspecialchars($msg) ?></div>
-        <?php endif; ?>
+        <!-- Formulário para adicionar produto -->
         <button class="btn-novo" id="acoes-itens-btn" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
 
 <!-- Segundo overlay -->
@@ -641,8 +807,18 @@ document.getElementById('close-import').addEventListener('click', function(e) {
             <option value="quantidade-asc">Quantidade (Menor→Maior)</option>
             <option value="quantidade-desc">Quantidade (Maior→Menor)</option>
         </select>
-    </div>
+</div>
+<h4 style="color: #ffffff;">Adicionar novo produto</h4>
 
+    <form method="POST" style="margin-bottom:18px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input type="hidden" name="acao" value="adicionar_produto">
+            <input type="text" name="nome" placeholder="Nome do produto" required style="padding:8px; border-radius:6px; border:1px solid #ccc;">
+            <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
+            <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
+            <input type="number" name="estoque" placeholder="Estoque inicial" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
+            <button type="submit" style="padding:8px 16px; border-radius:6px; background: linear-gradient(135deg, #ff9900 80%, #ffc800 100%); color:#fff; border:none; font-weight:600;">Salvar</button>
+            <button type="reset" style="padding:8px 16px; border-radius:6px; background:#222; color:#ff9900; border:1px solid #444;">Limpar</button>
+        </form>
     <div class="tags-area" style="display:flex; align-items:center; gap:10px;">
         <?php foreach ($tags as $tag): ?>
             <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>" data-tag-id="<?= $tag['id'] ?>" style="cursor:pointer;">
@@ -663,6 +839,7 @@ document.getElementById('close-import').addEventListener('click', function(e) {
     <th>Nome</th>
     <th>Preço Unitário</th>
     <th>Quantidade</th>
+    <th>Ações</th> <!-- ✅ Nova coluna -->
 </tr>
 </thead>
 <tbody id="tabela-produtos">
@@ -693,10 +870,30 @@ document.getElementById('close-import').addEventListener('click', function(e) {
     </td>
     <td>R$ <?= number_format($produto['preco_unitario'], 2, ',', '.') ?></td>
     <td><?= intval($produto['quantidade_estoque']) ?></td>
+   <td>
+  <button class="btn icon editBtn" type="button" title="Editar" 
+    style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+    Editar
+  </button>
+  <button class="btn icon buyBtn" type="button" title="Comprar"
+    style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+    Entrada
+  </button>
+  <button class="btn icon sellBtn" type="button" title="Vender"
+    style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+    Saída
+  </button>
+  <button class="btn icon deleteBtn" type="button" title="Apagar"
+    style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+    Excluir
+  </button>
+</td>
+
 </tr>
 <?php endwhile; ?>
 </tbody>
 </table>
+
 <?php if ($totalPaginas > 1): ?>
 <div style="margin-top:10px; display:flex; justify-content:center; gap:5px;">
     <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
@@ -1010,12 +1207,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
-</html>
-
-<!-- Botão de dica flutuante -->
-<button id="dica-btn-flutuante" title="Dica rápida">
- ?
-</button>
+<!-- Botão de dica flutuante deve estar dentro do body -->
+<button id="dica-btn-flutuante" title="Dica rápida">?</button>
 
 <!-- Overlay 1: Dica inicial -->
 <div id="dica-overlay-1" style="display:none;">
@@ -1183,10 +1376,91 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 </head>
-
+<body>
+<div class="content">
+  <!-- Sidebar -->
+<div class="sidebar">
+    <link rel="stylesheet" href="../../../assets/sidebar.css">
+    <div class="logo-area">
+      <img src="../../../img/logo2.svg" alt="Logo">
+    </div>
+    <nav class="nav-section">
+      <div class="nav-menus">
+       <ul class="nav-list top-section">
+    <li><a href="../financas.php"><span><img src="../../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+    <li><a href="../estoque.php"><span><img src="../../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+</ul>
+        <hr>
+        <ul class="nav-list middle-section">
+          <li><a href="../visaoGeral.php"><span><img src="../../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+          <li class="active"><a href="../../dashboard/tabelas/produtos.php"><span><img src="../../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+          <li><a href="../../dashboard/operacoes.php"><span><img src="../../../img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
+        </ul>
+      </div>
+      <div class="bottom-links">
+        <a href="../../auth/config.php"><span><img src="../../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+        <a href="../../../Pages/auth/dicas.php"><span><img src="../../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+      </div>
+    </nav>
+  </div>
   
+<!-- Primeiro overlay -->
+<div id="welcome-overlay">
+    <div class="welcome-card">
+        <h2>Seja bem-vindo!</h2>
+        <p>Essa é a página de produtos. Aqui você pode gerenciar seus itens e tags.</p>
+        <button id="close-welcome">Entendi</button>
+    </div>
+</div>
 
+<style>
+/* Primeiro overlay ocupa toda a tela */
+#welcome-overlay {
+     display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 1000;
+    padding: 30px;
+    padding-top: 700px; /* ajusta altura se quiser */
+}
 
+/* Card do overlay */
+#welcome-overlay .welcome-card {
+    background: #000;
+    padding: 20px 30px;
+    border-radius: 10px;
+    max-width: 300px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    text-align: left;
+    color: #fff;
+}
+
+#welcome-overlay .welcome-card h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+#welcome-overlay .welcome-card p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Botão */
+#welcome-overlay .welcome-card button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #ff6600;
+    color: #fff;
+    cursor: pointer;
+}
+</style>
 
 <script>
 document.getElementById('close-welcome').addEventListener('click', function() {
@@ -1206,8 +1480,73 @@ document.getElementById('close-welcome').addEventListener('click', function() {
 });
 </script>
 
+<!-- Segundo overlay -->
+<div id="acoes-overlay" style="display:none;">
+    <div class="blur-bg"></div>
+    <div class="welcome-card">
+        <h2>Ações Itens</h2>
+        <p>Você pode gerenciar os produtos clicando nos botões abaixo.</p>
+        <button id="close-acoes">Fechar</button>
+    </div>
+</div>
 
+<style>
+/* Overlay */
+#acoes-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
 
+/* Blur cobrindo a tela */
+#acoes-overlay .blur-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.3);
+    z-index: 1;
+}
+
+/* Card acima do blur */
+#acoes-overlay .welcome-card {
+    position: absolute;
+    z-index: 2;
+    background: #000;
+    padding: 20px 30px;
+    border-radius: 10px;
+    max-width: 300px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    color: #fff;
+}
+
+/* Botão dentro do card */
+#acoes-overlay .welcome-card button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #ff6600;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Botão Ações Itens normal (não afeta primeiro overlay) */
+#acoes-itens-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9));
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    position: static; /* normal */
+    z-index: auto;
+}
+</style>
 
 <script>
 document.getElementById('close-acoes').addEventListener('click', function() {
@@ -1357,164 +1696,55 @@ document.getElementById('close-import').addEventListener('click', function(e) {
 
 </script>
 
-    <div class="tags-area" style="display:flex; align-items:center; gap:10px;">
-        <?php foreach ($tags as $tag): ?>
-            <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>" data-tag-id="<?= $tag['id'] ?>" style="cursor:pointer;">
-                <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i> <?= htmlspecialchars($tag['nome']) ?>
-            </div>
-        <?php endforeach; ?>
-        <button class="btn-reset-filtro" onclick="resetFiltro()">
-            <i class="fa-solid fa-xmark" style="color: #ffffffff;"></i>
-        </button>
-        
-    </div>
-</div>
 
 
-<?php if ($totalPaginas > 1): ?>
-<div style="margin-top:10px; display:flex; justify-content:center; gap:5px;">
-    <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
-        <a href="?pagina=<?= $i ?>" 
-           class="<?= ($i == $paginaAtual) ? 'active' : '' ?>"
-           style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; 
-                  border:1px solid #555; border-radius:4px; text-decoration:none; color:#fff;">
-            <?= $i ?>
-        </a>
-    <?php endfor; ?>
-</div>
 
-<style>
-a.active {
-    border: 2px solid #ff6600 !important; /* só a borda laranja */
-    color: #fff !important;               /* mantém o texto branco */
-    font-weight: normal;                   /* opcional, sem negrito */
-    background-color: transparent;         /* mantém fundo transparente */
-}
-</style>
-<?php endif; ?>
+
 
 <script>
-// ------------- UTILIDADES -------------
-function normalizeStr(s) {
-    if (!s && s !== 0) return '';
-    // trim, lowercase, remove acentos (normalização NFD)
-    try {
-        return String(s).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    } catch (e) {
-        // fallback simples se normalize não existir
-        return String(s).trim().toLowerCase().replace(/[\u0300-\u036f]/g, '');
-    }
-}
-
-function textoNomeDoRow(tr) {
-    // pega a célula da "coluna nome" (2ª coluna lógica, considerando que a coluna de checkbox existe)
-    const td = tr.querySelector('td:nth-child(2)');
-    if (!td) return '';
-
-    // 1) tenta achar o <span> que NÃO é .tags-vinculadas (esse é o nome)
-    let nameSpan = td.querySelector('span:not(.tags-vinculadas)');
-    if (nameSpan && nameSpan.textContent.trim() !== '') {
-        return normalizeStr(nameSpan.textContent);
+// Mova este bloco para o final do arquivo, após o botão existir
+document.addEventListener('DOMContentLoaded', function() {
+    const dicaBtn = document.getElementById('dica-btn-flutuante');
+    const dicaOverlay1 = document.getElementById('dica-overlay-1');
+    if (dicaBtn && dicaOverlay1) {
+        dicaBtn.addEventListener('click', function(e) {
+            if (window._suppressDica) return;
+            dicaOverlay1.style.display = 'flex';
+        });
     }
 
-    // 2) fallback: monta o texto a partir de nós de texto diretos na td (caso a estrutura mude)
-    let textParts = [];
-    td.childNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const t = node.textContent.trim();
-            if (t) textParts.push(t);
-        } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'span' && !node.classList.contains('tags-vinculadas')) {
-            const t = node.textContent.trim();
-            if (t) textParts.push(t);
-        }
-    });
-    return normalizeStr(textParts.join(' ').trim());
-}
+    // Evento para o botão "Avançar" da primeira overlay
+    const dicaAvancar1 = document.getElementById('dica-avancar-1');
+    const dicaOverlay2 = document.getElementById('dica-overlay-2');
+    const dicaCard2 = document.getElementById('dica-card-2');
+    const btnAcoes = document.getElementById('acoes-itens-btn');
+    const btnImport = document.getElementById('import-btn');
 
-function parsePrecoText(text) {
-    // Recebe algo como "R$ 1.234,56" ou "R$ 12,34" e retorna número
-    if (!text) return 0;
-    let s = String(text).replace(/\s/g, '').replace('R$', '').trim();
-    s = s.replace(/\./g, ''); // remove pontos de milhar
-    s = s.replace(',', '.'); // vírgula decimal -> ponto
-    const n = parseFloat(s);
-    return isNaN(n) ? 0 : n;
-}
+    if (dicaAvancar1 && dicaOverlay1 && dicaOverlay2 && dicaCard2 && btnAcoes && btnImport) {
+        dicaAvancar1.addEventListener('click', function() {
+            dicaOverlay1.style.display = 'none';
 
-// ------------- PESQUISA -------------
-const pesquisaInput = document.getElementById('pesquisa');
-if (pesquisaInput) {
-    pesquisaInput.addEventListener('input', function() {
-        const termo = normalizeStr(this.value);
-        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-            const nome = textoNomeDoRow(tr);
+            // Calcula posição dos botões reais
+            const rectAcoes = btnAcoes.getBoundingClientRect();
+            const rectImport = btnImport.getBoundingClientRect();
 
-            const loteTd = tr.querySelector('td:nth-child(5)');
-            const lote = loteTd ? normalizeStr(loteTd.textContent) : '';
+            // Posiciona o card ao lado direito e acima dos botões, sem cobrir
+            const top = Math.min(rectAcoes.top, rectImport.top) + window.scrollY - 70;
+            const left = rectImport.right + window.scrollX + 30;
 
-            const precoTd = tr.querySelector('td:nth-child(3)');
-            const preco = precoTd ? normalizeStr(precoTd.textContent) : '';
+            dicaCard2.style.top = top + 'px';
+            dicaCard2.style.left = left + 'px';
 
-            const matches = nome.includes(termo) || lote.includes(termo) || preco.includes(termo);
-            tr.style.display = matches ? '' : 'none';
+            dicaOverlay2.style.display = 'flex';
+            dicaOverlay2.classList.add('active');
+
+            btnAcoes.style.zIndex = 2500;
+            btnAcoes.style.pointerEvents = 'auto';
+            btnImport.style.zIndex = 2500;
+            btnImport.style.pointerEvents = 'auto';
         });
-    });
-}
-
-// ------------- ORDENAÇÃO -------------
-const ordenarSelect = document.getElementById('ordenar');
-if (ordenarSelect) {
-    ordenarSelect.addEventListener('change', function() {
-        const tbody = document.getElementById('tabela-produtos');
-        if (!tbody) return;
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        const val = this.value;
-
-        rows.sort((a, b) => {
-            switch (val) {
-                case 'nome-asc': {
-                    const aText = textoNomeDoRow(a);
-                    const bText = textoNomeDoRow(b);
-                    return aText.localeCompare(bText, 'pt', { sensitivity: 'base' });
-                }
-                case 'nome-desc': {
-                    const aText = textoNomeDoRow(a);
-                    const bText = textoNomeDoRow(b);
-                    return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
-                }
-                case 'preco-asc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
-                    return aNum - bNum;
-                }
-                case 'preco-desc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
-                    return bNum - aNum;
-                }
-                case 'quantidade-asc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    return aNum - bNum;
-                }
-                case 'quantidade-desc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    return bNum - aNum;
-                }
-                default:
-                    return 0;
-            }
-        });
-
-        rows.forEach(r => tbody.appendChild(r));
-    });
-}
+    }
+});
 </script>
 
-
-</div>
-</div>
-</main>
-
-                           
+</body>
