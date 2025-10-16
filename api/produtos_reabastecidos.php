@@ -43,7 +43,12 @@ $sql = "
     FROM produtos p
     LEFT JOIN produto_tag pt ON pt.produto_id = p.id
     LEFT JOIN tags t ON pt.tag_id = t.id AND t.deletado_em IS NULL
-    INNER JOIN movimentacoes_estoque m ON m.produto_id = p.id AND m.tipo = 'entrada'
+    INNER JOIN (
+        SELECT produto_id, MAX(data_movimentacao) AS data_movimentacao
+        FROM movimentacoes_estoque
+        WHERE tipo = 'entrada'
+        GROUP BY produto_id
+    ) m ON m.produto_id = p.id
     WHERE p.loja_id = ? AND p.deletado_em IS NULL
     $wherePesquisa
     $orderBy

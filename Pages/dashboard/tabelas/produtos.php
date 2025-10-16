@@ -28,6 +28,51 @@ if (!$lojaId) {
     die("Acesso negado. Loja não encontrada.");
 }
 
+// === BACKEND adicionar produto ===
+$msg = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'adicionar_produto') {
+    $nome = trim($_POST['nome'] ?? '');
+    $preco = floatval($_POST['preco'] ?? 0);
+    $custo = floatval($_POST['custo'] ?? 0);
+    $estoque = intval($_POST['estoque'] ?? 0);
+    $lote = '';
+
+    // Se for empresa e não houver funcionário, usuario_id = NULL
+    $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
+
+    $stmt = $conn->prepare("
+        INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    if ($stmt) {
+        $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
+        if ($stmt->execute()) {
+            $idNovoProduto = $stmt->insert_id;
+            $stmt->close();
+
+            // Histórico
+            $stmtHist = $conn->prepare("
+                INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+                VALUES (?, ?, ?, 'adicionado', ?, NOW())
+            ");
+            if ($stmtHist) {
+                $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_produto);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
+            $msg = "✅ Produto cadastrado com sucesso!";
+            // Redireciona para evitar reenvio do formulário
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
+        } else {
+            $msg = "❌ Erro ao cadastrar produto: " . $stmt->error;
+            $stmt->close();
+        }
+    } else {
+        $msg = "❌ Erro prepare produto: " . $conn->error;
+    }
+}
+
 // ---- PAGINAÇÃO ----
 $linhasPorPagina = 14;
 $paginaAtual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
@@ -356,7 +401,20 @@ document.getElementById('close-welcome').addEventListener('click', function() {
         <div class="pesquisa-produtos" style="margin-bottom:15px;">
             <input type="text" id="pesquisa" placeholder="Pesquisar produto..." style="padding:8px 12px; width:350px; height: 45px; border-radius:36px; border:1px solid #ccc; font-size:14px; outline:none; transition:all 0.2s ease;">
         </div>
-   <button class="btn-novo" id="acoes-itens-btn" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
+        <!-- Formulário de adicionar produto -->
+        <form method="POST" style="margin-bottom:18px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input type="hidden" name="acao" value="adicionar_produto">
+            <input type="text" name="nome" placeholder="Nome do produto" required style="padding:8px; border-radius:6px; border:1px solid #ccc;">
+            <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
+            <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
+            <input type="number" name="estoque" placeholder="Estoque inicial" required style="padding:8px; border-radius:6px; border:1px solid #ccc; max-width:120px;">
+            <button type="submit" style="padding:8px 16px; border-radius:6px; background: linear-gradient(135deg, #ff9900 80%, #ffc800 100%); color:#fff; border:none; font-weight:600;">Salvar</button>
+            <button type="reset" style="padding:8px 16px; border-radius:6px; background:#222; color:#ff9900; border:1px solid #444;">Limpar</button>
+        </form>
+        <?php if (!empty($msg)): ?>
+            <div style="margin-bottom:10px; background:#d1ffd6; padding:8px 12px; border-radius:6px; color:#064e3b; font-weight:600"><?= htmlspecialchars($msg) ?></div>
+        <?php endif; ?>
+        <button class="btn-novo" id="acoes-itens-btn" onclick="window.location.href='../gerenciamento_produtos.php'">Ações Itens</button>
 
 <!-- Segundo overlay -->
 <div id="acoes-overlay" style="display:none;">
@@ -1101,191 +1159,362 @@ document.addEventListener('DOMContentLoaded', function() {
     filter: blur(2px);
     pointer-events: none;
 }
+
+/* Remover sombreamento do botão ordenar */
+#ordenar {
+    box-shadow: none !important;
+}
+
+/* Botão Criar Tag */
+#criar-tag-btn {
+    margin-left: 8px;
+    background: #1b1b1b;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: border 0.2s, background 0.2s;
+    box-shadow: none;
+    display: inline-block;
+    height: 42px;
+}
+</style>
+</head>
+
+  
+
+
+
+<script>
+document.getElementById('close-welcome').addEventListener('click', function() {
+    document.getElementById('welcome-overlay').style.display = 'none';
+
+    const overlay = document.getElementById('acoes-overlay');
+    const card = overlay.querySelector('.welcome-card');
+    const btn = document.getElementById('acoes-itens-btn');
+    const rect = btn.getBoundingClientRect();
+
+    card.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+    card.style.left = (rect.left + window.scrollX) + 'px';
+
+    overlay.style.display = 'block';
+    btn.style.position = 'relative';
+    btn.style.zIndex = 2000;
+});
+</script>
+
+
+
+
+<script>
+document.getElementById('close-acoes').addEventListener('click', function() {
+    document.getElementById('acoes-overlay').style.display = 'none';
+
+    // Restaura o botão Ações Itens
+    const btnAcoes = document.getElementById('acoes-itens-btn');
+    btnAcoes.style.position = 'static';
+    btnAcoes.style.zIndex = 'auto';
+
+    // Abre o terceiro overlay automaticamente
+    const overlayImport = document.getElementById('import-overlay');
+    const cardImport = overlayImport.querySelector('.welcome-card');
+    const btnImport = document.getElementById('import-btn');
+    const rectImport = btnImport.getBoundingClientRect();
+
+    cardImport.style.top = (rectImport.bottom + window.scrollY + 10) + 'px';
+    cardImport.style.left = (rectImport.left + window.scrollX) + 'px';
+
+    overlayImport.style.display = 'block';
+    btnImport.style.position = 'relative';
+    btnImport.style.zIndex = 2000;
+});
+
+</script>
+
+
+    
+    <!-- Botão Importar -->
+    <button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
+    <!-- Botão Criar Tag -->
+    <button id="criar-tag-btn" style="
+        margin-left: 4px;
+        background: #1b1b1b;
+        color: #fff;
+        border: 1px solid #fff;
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: border 0.2s, background 0.2s;
+        box-shadow: none;
+        display: inline-block;
+        height: 42px;
+    " onclick="window.location.href='../tag.php'">Criar Tag</button>
+
+
+
+<style>
+/* Overlay terceiro */
+#import-overlay {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:1000;
+    display:flex;
+    justify-content:flex-start;
+    align-items:flex-start;
+}
+
+/* Blur cobrindo toda a tela */
+#import-overlay .blur-bg {
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.3);
+    z-index:1;
+}
+
+/* Card acima do blur */
+#import-overlay .welcome-card {
+    position: absolute;
+    z-index:2;
+    background:#000;
+    padding:20px 30px;
+    border-radius:10px;
+    max-width:300px;
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
+    color:#fff;
+}
+
+/* Botões dentro do card */
+#import-overlay .welcome-card button {
+    padding:6px 12px;
+    border:none;
+    border-radius:6px;
+    background:#ff6600;
+    color:#fff;
+    cursor:pointer;
+}
+
+/* Botão Importar fora do blur */
+#import-btn {
+    position: static; /* será alterado quando o overlay abrir */
+    z-index: auto;
+    padding: 8px 16px;
+    border-radius:6px;
+       background: linear-gradient(135deg, rgba(255, 153, 0, 0.9), rgba(255, 200, 0, 0.9));
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
 </style>
 
 <script>
-// Dica flutuante
-const dicaBtn = document.getElementById('dica-btn-flutuante');
-const dicaOverlay1 = document.getElementById('dica-overlay-1');
-const dicaAvancar1 = document.getElementById('dica-avancar-1');
-const dicaOverlay2 = document.getElementById('dica-overlay-2');
-const dicaCard2 = document.getElementById('dica-card-2');
-const dicaFechar2 = document.getElementById('dica-fechar-2');
-const btnAcoes = document.getElementById('acoes-itens-btn');
-const btnImport = document.getElementById('import-btn');
+document.getElementById('import-btn').addEventListener('click', function(e) {
+    // evita que o clique dispare handlers globais/propagação
+    e.preventDefault();
+    e.stopPropagation();
 
-dicaBtn.addEventListener('click', function(e) {
-    // se estivermos com supressão ativa (ex: abrimos import), não abrir a dica
-    if (window._suppressDica) {
-        // opcional: debug no console
-        // console.log('Dica suprimida porque import foi acionado.');
-        return;
-    }
-    dicaOverlay1.style.display = 'flex';
+    // marca que abrimos o import diretamente (suprime dicas)
+    window._suppressDica = true;
+
+    const overlay = document.getElementById('import-overlay');
+    const card = overlay.querySelector('.welcome-card');
+    const btn = document.getElementById('import-btn');
+    const rect = btn.getBoundingClientRect();
+
+    // Posiciona o card abaixo do botão
+    card.style.top = (rect.bottom + window.scrollY + 10) + 'px';
+    card.style.left = (rect.left + window.scrollX) + 'px';
+
+    overlay.style.display = 'block';
+
+    // Botão fora do blur
+    btn.style.position = 'relative';
+    btn.style.zIndex = 2000;
 });
 
-dicaAvancar1.addEventListener('click', function() {
-    dicaOverlay1.style.display = 'none';
 
-    // Calcula posição dos botões reais
-    const rectAcoes = btnAcoes.getBoundingClientRect();
-    const rectImport = btnImport.getBoundingClientRect();
+document.getElementById('close-import').addEventListener('click', function(e) {
+    e.stopPropagation();
+    const overlay = document.getElementById('import-overlay');
+    overlay.style.display = 'none';
 
-    // Posiciona o card ao lado direito e acima dos botões, sem cobrir
-    const top = Math.min(rectAcoes.top, rectImport.top) + window.scrollY - 70;
-    const left = rectImport.right + window.scrollX + 30;
+    // Restaura botão
+    const btn = document.getElementById('import-btn');
+    btn.style.position = 'static';
+    btn.style.zIndex = 'auto';
 
-    dicaCard2.style.top = top + 'px';
-    dicaCard2.style.left = left + 'px';
-
-    dicaOverlay2.style.display = 'flex';
-    dicaOverlay2.classList.add('active');
-
-    btnAcoes.style.zIndex = 2500;
-    btnAcoes.style.pointerEvents = 'auto';
-    btnImport.style.zIndex = 2500;
-    btnImport.style.pointerEvents = 'auto';
+    // Permite que as dicas voltem a abrir normalmente
+    window._suppressDica = false;
 });
 
-dicaFechar2.addEventListener('click', function() {
-    dicaOverlay2.style.display = 'none';
-    dicaOverlay2.classList.remove('active');
-    btnAcoes.style.zIndex = '';
-    btnAcoes.style.pointerEvents = '';
-    btnImport.style.zIndex = '';
-    btnImport.style.pointerEvents = '';
-});
-
-// Fecha overlays ao clicar fora do card
-document.addEventListener('click', function(e) {
-    if (dicaOverlay1.style.display === 'flex' && !e.target.closest('#dica-card-1') && !e.target.closest('#dica-btn-flutuante')) {
-        dicaOverlay1.style.display = 'none';
-    }
-    if (dicaOverlay2.style.display === 'flex' && !e.target.closest('#dica-card-2')) {
-        dicaOverlay2.style.display = 'none';
-        dicaOverlay2.classList.remove('active');
-        btnAcoes.style.zIndex = '';
-        btnImport.style.zIndex = '';
-    }
-});
-
-// Impede propagação do clique dentro dos cards
-document.querySelectorAll('.dica-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-});
 </script>
 
-<script>
-// garante flag padrão
-window._suppressDica = window._suppressDica || false;
+    <div class="tags-area" style="display:flex; align-items:center; gap:10px;">
+        <?php foreach ($tags as $tag): ?>
+            <div class="tag-item" title="<?= htmlspecialchars($tag['nome']) ?>" data-tag-id="<?= $tag['id'] ?>" style="cursor:pointer;">
+                <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i> <?= htmlspecialchars($tag['nome']) ?>
+            </div>
+        <?php endforeach; ?>
+        <button class="btn-reset-filtro" onclick="resetFiltro()">
+            <i class="fa-solid fa-xmark" style="color: #ffffffff;"></i>
+        </button>
+        
+    </div>
+</div>
 
-(function(){
-  const dicaBtn = document.getElementById('dica-btn-flutuante');
-  const dicaOverlay1 = document.getElementById('dica-overlay-1');
-  const dicaAvancar1 = document.getElementById('dica-avancar-1');
-  const dicaOverlay2 = document.getElementById('dica-overlay-2');
 
-  const importBtn = document.getElementById('import-btn');
-  const importModalEl = document.getElementById('importModal');
+<?php if ($totalPaginas > 1): ?>
+<div style="margin-top:10px; display:flex; justify-content:center; gap:5px;">
+    <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+        <a href="?pagina=<?= $i ?>" 
+           class="<?= ($i == $paginaAtual) ? 'active' : '' ?>"
+           style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; 
+                  border:1px solid #555; border-radius:4px; text-decoration:none; color:#fff;">
+            <?= $i ?>
+        </a>
+    <?php endfor; ?>
+</div>
 
-  // Se o Bootstrap estiver presente, escuta os eventos do modal para suprimir dicas
-  if (importModalEl && typeof bootstrap !== 'undefined') {
-    importModalEl.addEventListener('show.bs.modal', function() {
-      window._suppressDica = true;
-      // Fecha imediatamente qualquer dica visível
-      if (dicaOverlay1) dicaOverlay1.style.display = 'none';
-      if (dicaOverlay2) {
-        dicaOverlay2.style.display = 'none';
-        dicaOverlay2.classList.remove('active');
-      }
-    });
-
-    importModalEl.addEventListener('hidden.bs.modal', function() {
-      // reativa dicas quando o modal for fechado
-      window._suppressDica = false;
-    });
-  }
-
-  // Protege abertura via botão de dica
-  if (dicaBtn) {
-    dicaBtn.addEventListener('click', function(e) {
-      if (window._suppressDica) return;
-      // já existente: abre a dica 1
-      dicaOverlay1.style.display = 'flex';
-    });
-  }
-
-  // Protege botão avançar (se alguém tentar avançar programaticamente)
-  if (dicaAvancar1) {
-    dicaAvancar1.addEventListener('click', function() {
-      if (window._suppressDica) return;
-      // restante da lógica já existente para posicionar e abrir overlay2
-      // (se você já tem esse código, ele continuará rodando; essa checagem evita abertura)
-      // ... seu código de posicionamento permanece
-    });
-  }
-
-  // Em caso de outros handlers que abram dicas programaticamente, você pode usar:
-  // if (window._suppressDica) return;  antes de qualquer dicaOverlayX.style.display = '...';
-})();
-</script>
+<style>
+a.active {
+    border: 2px solid #ff6600 !important; /* só a borda laranja */
+    color: #fff !important;               /* mantém o texto branco */
+    font-weight: normal;                   /* opcional, sem negrito */
+    background-color: transparent;         /* mantém fundo transparente */
+}
+</style>
+<?php endif; ?>
 
 <script>
-// Torna o botão "+" (add-tag-square) clicável para abrir o dropdown de tags
-document.querySelectorAll('.add-tag-square').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        // Fecha todos os dropdowns antes de abrir o atual
-        document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
-        const produtoId = btn.getAttribute('data-produto-id');
-        const dropdown = document.getElementById('tag-dropdown-' + produtoId);
-        if (dropdown) {
-            dropdown.style.display = 'block';
+// ------------- UTILIDADES -------------
+function normalizeStr(s) {
+    if (!s && s !== 0) return '';
+    // trim, lowercase, remove acentos (normalização NFD)
+    try {
+        return String(s).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    } catch (e) {
+        // fallback simples se normalize não existir
+        return String(s).trim().toLowerCase().replace(/[\u0300-\u036f]/g, '');
+    }
+}
+
+function textoNomeDoRow(tr) {
+    // pega a célula da "coluna nome" (2ª coluna lógica, considerando que a coluna de checkbox existe)
+    const td = tr.querySelector('td:nth-child(2)');
+    if (!td) return '';
+
+    // 1) tenta achar o <span> que NÃO é .tags-vinculadas (esse é o nome)
+    let nameSpan = td.querySelector('span:not(.tags-vinculadas)');
+    if (nameSpan && nameSpan.textContent.trim() !== '') {
+        return normalizeStr(nameSpan.textContent);
+    }
+
+    // 2) fallback: monta o texto a partir de nós de texto diretos na td (caso a estrutura mude)
+    let textParts = [];
+    td.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const t = node.textContent.trim();
+            if (t) textParts.push(t);
+        } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'span' && !node.classList.contains('tags-vinculadas')) {
+            const t = node.textContent.trim();
+            if (t) textParts.push(t);
         }
     });
-});
+    return normalizeStr(textParts.join(' ').trim());
+}
 
-// Fecha dropdowns ao clicar fora
-document.addEventListener('click', function(e) {
-    document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
-});
+function parsePrecoText(text) {
+    // Recebe algo como "R$ 1.234,56" ou "R$ 12,34" e retorna número
+    if (!text) return 0;
+    let s = String(text).replace(/\s/g, '').replace('R$', '').trim();
+    s = s.replace(/\./g, ''); // remove pontos de milhar
+    s = s.replace(',', '.'); // vírgula decimal -> ponto
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+}
 
-// Impede fechamento ao clicar dentro do dropdown
-document.querySelectorAll('.tag-dropdown').forEach(dd => {
-    dd.addEventListener('click', function(e) {
-        e.stopPropagation();
+// ------------- PESQUISA -------------
+const pesquisaInput = document.getElementById('pesquisa');
+if (pesquisaInput) {
+    pesquisaInput.addEventListener('input', function() {
+        const termo = normalizeStr(this.value);
+        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+            const nome = textoNomeDoRow(tr);
+
+            const loteTd = tr.querySelector('td:nth-child(5)');
+            const lote = loteTd ? normalizeStr(loteTd.textContent) : '';
+
+            const precoTd = tr.querySelector('td:nth-child(3)');
+            const preco = precoTd ? normalizeStr(precoTd.textContent) : '';
+
+            const matches = nome.includes(termo) || lote.includes(termo) || preco.includes(termo);
+            tr.style.display = matches ? '' : 'none';
+        });
     });
-});
+}
 
-// Vincula/desvincula tag ao produto via AJAX ao clicar na opção do dropdown
-document.querySelectorAll('.tag-dropdown .tag-option').forEach(option => {
-    option.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const tagId = this.getAttribute('data-tag-id');
-        const dropdown = this.closest('.tag-dropdown');
-        const produtoId = dropdown.id.replace('tag-dropdown-', '');
+// ------------- ORDENAÇÃO -------------
+const ordenarSelect = document.getElementById('ordenar');
+if (ordenarSelect) {
+    ordenarSelect.addEventListener('change', function() {
+        const tbody = document.getElementById('tabela-produtos');
+        if (!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const val = this.value;
 
-        // AJAX para vincular/desvincular tag
-        fetch('vincular_tag_produto.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `produto_id=${encodeURIComponent(produtoId)}&tag_id=${encodeURIComponent(tagId)}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                // Atualiza os ícones de tags vinculadas (simples: recarrega a página)
-                location.reload();
-            } else {
-                alert('Erro ao vincular/desvincular tag: ' + (data.message || ''));
+        rows.sort((a, b) => {
+            switch (val) {
+                case 'nome-asc': {
+                    const aText = textoNomeDoRow(a);
+                    const bText = textoNomeDoRow(b);
+                    return aText.localeCompare(bText, 'pt', { sensitivity: 'base' });
+                }
+                case 'nome-desc': {
+                    const aText = textoNomeDoRow(a);
+                    const bText = textoNomeDoRow(b);
+                    return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
+                }
+                case 'preco-asc': {
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    return aNum - bNum;
+                }
+                case 'preco-desc': {
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    return bNum - aNum;
+                }
+                case 'quantidade-asc': {
+                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    return aNum - bNum;
+                }
+                case 'quantidade-desc': {
+                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    return bNum - aNum;
+                }
+                default:
+                    return 0;
             }
-        })
-        .catch(() => alert('Erro de comunicação com o servidor.'));
-        dropdown.style.display = 'none';
+        });
+
+        rows.forEach(r => tbody.appendChild(r));
     });
-});
+}
 </script>
-</body>
-</html>
+
+
+</div>
+</div>
+</main>
+
+                           

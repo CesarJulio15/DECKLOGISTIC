@@ -106,20 +106,7 @@ WHERE (p.loja_id = $lojaId OR u.loja_id = $lojaId)
 
 UNION ALL
 
-SELECT 
-    CASE WHEN m.tipo='entrada' THEN 'Compra (Entrada)' ELSE 'Venda (Saída)' END AS tipo,
-    p.nome AS item,
-    '' AS icone,
-    '' AS cor,
-    CONCAT('Qtd: ', m.quantidade) AS detalhe,
-    m.data_movimentacao AS data,
-    COALESCE(u.nome, 'Sistema') AS usuario
-FROM movimentacoes_estoque m
-INNER JOIN produtos p ON m.produto_id = p.id
-LEFT JOIN usuarios u ON u.id = m.usuario_id
-WHERE p.loja_id = $lojaId
 
-UNION ALL
 
 SELECT 'Tag Criada' AS tipo, t.nome AS item, t.icone AS icone, t.cor AS cor, 
        CONCAT('Cor: ', t.cor, ' | Ícone: ', t.icone) AS detalhe, t.criado_em AS data,
