@@ -1,6 +1,6 @@
 Argumentos recebidos: ['C:\\xampp\\htdocs\\DECKLOGISTIC\\api/../ml/detectar_anomalias_vendas.py', '23']
 Loja ID detectado: 23
 Nenhuma anomalia encontrada.
-  data_venda  valor_dia  media       desvio  zscore  anomalia
-0 2025-10-16        2.0    NaN     0.000000     NaN     False
-1 2025-10-17     1500.0    NaN  1059.245958     NaN     False
+  data_venda  valor_dia  media      desvio  zscore  anomalia
+0 2025-10-16      152.0    NaN    0.000000     NaN     False
+1 2025-10-17     1500.0    NaN  953.179941     NaN     False

@@ -203,7 +203,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $custo_mov = $custo_compra !== null ? $custo_compra : $custo_atual;
 
-
     // 2. Registra movimentação de estoque
     $tipo = 'entrada';
   $stmt2 = $conn->prepare("
