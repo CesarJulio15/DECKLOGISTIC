@@ -19,28 +19,36 @@ if (!isset($conn) || !($conn instanceof mysqli)) {
 }
 
 // exige usuário logado
-if (!isset($_SESSION['usuario_id']) || empty($_SESSION['usuario_id'])) {
+if (!isset($_SESSION['loja_id']) || empty($_SESSION['loja_id'])) {
     die("Acesso negado: usuário não autenticado. Faça login.");
 }
-$usuarioId = (int) $_SESSION['usuario_id'];
+// Detecta tipo de login (empresa ou funcionário)
+$tipoLogin = $_SESSION['tipo_login'] ?? 'funcionario';
 
-// busca loja_id do usuário (consulta segura)
-$stmt = $conn->prepare("SELECT loja_id FROM usuarios WHERE id = ?");
-if ($stmt === false) {
-    die("Erro ao preparar consulta de usuário: " . $conn->error);
+if ($tipoLogin === 'empresa') {
+    // Se for login da loja, o próprio ID da loja é o loja_id
+    $lojaId = (int)$_SESSION['loja_id'];
+} else {
+    // Se for funcionário, buscamos o loja_id na tabela usuarios
+    $usuarioId = (int)($_SESSION['usuario_id'] ?? 0);
+    if (!$usuarioId) {
+        die("Acesso negado: usuário não autenticado.");
+    }
+
+    $stmt = $conn->prepare("SELECT loja_id FROM usuarios WHERE id = ?");
+    if (!$stmt) {
+        die("Erro ao preparar consulta: " . $conn->error);
+    }
+    $stmt->bind_param("i", $usuarioId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $row = $res->fetch_assoc();
+    if (!$row || empty($row['loja_id'])) {
+        die("Loja do usuário não encontrada. Verifique se o funcionário está vinculado a uma loja.");
+    }
+    $lojaId = (int)$row['loja_id'];
+    $stmt->close();
 }
-$stmt->bind_param("i", $usuarioId);
-$stmt->execute();
-$resUser = $stmt->get_result();
-if ($resUser === false) {
-    die("Erro ao executar consulta de usuário: " . $conn->error);
-}
-$userRow = $resUser->fetch_assoc();
-if (!$userRow || !isset($userRow['loja_id'])) {
-    die("Loja do usuário não encontrada. Verifique se o usuário possui loja_id cadastrado.");
-}
-$lojaId = (int)$userRow['loja_id'];
-$stmt->close();
 
 // Charset da página / conexão
 header('Content-Type: text/html; charset=utf-8');
@@ -192,6 +200,8 @@ while ($row = mysqli_fetch_assoc($res)) {
     $dadosSaidas[] = (int)($row['saidas'] ?? 0);
 }
 
+
+
 // monta condição de período para totais (sem WHERE de loja ainda)
 switch ($filtro) {
     case 'bimestre':
@@ -246,52 +256,251 @@ if ($resS === false) {
 $saidasRow = mysqli_fetch_assoc($resS);
 $saidas = (int)($saidasRow['total_saidas'] ?? 0);
 
+// ✅ Cálculo da variação percentual entre entradas e saídas
+$variacao = $entradas - $saidas;
+$percentual = 0;
+$seta = "↑";
+$classe = "positivo";
+
+if ($entradas > 0) {
+    $percentual = ($variacao / $entradas) * 100;
+    if ($percentual < 0) {
+        $seta = "↓";
+        $classe = "negativo";
+    }
+}
+
+
 // Saída mínima para o navegador
 ?>
-<!doctype html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <title>Giro de Estoque - <?=htmlspecialchars($tituloFiltro ?? 'Geral')?></title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    body{font-family:Arial,Helvetica,sans-serif;margin:20px}
-    .card{display:inline-block;border:1px solid #ddd;padding:12px;margin:6px;border-radius:6px}
-    table{border-collapse:collapse;width:100%;margin-top:1rem}
-    th,td{border:1px solid #ddd;padding:8px;text-align:left}
-    code{background:#f5f5f5;padding:4px;border-radius:4px;display:inline-block}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giro de Estoque - Decklogistic</title>
+    <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
+    <link rel="stylesheet" href="../../assets/sidebar.css">
+    <link rel="stylesheet" href="../../assets/lucroB.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body>
-  <h1>Giro de Estoque — <?=htmlspecialchars($tituloFiltro ?? 'Geral')?></h1>
+<div class="content">
+  <aside class="sidebar">
+    <div class="logo-area">
+      <img src="../../img/logo2.svg" alt="Logo">
+    </div>
 
-  <div class="card"><strong>Total Entradas (no <?=htmlspecialchars($tituloFiltro ?? 'período')?> atual):</strong><br><?=number_format($entradas,0,',','.')?></div>
-  <div class="card"><strong>Total Saídas (no <?=htmlspecialchars($tituloFiltro ?? 'período')?> atual):</strong><br><?=number_format($saidas,0,',','.')?></div>
+    <nav class="nav-section">
+      <div class="nav-menus">
+        <ul class="nav-list top-section">
+          <li><a href="../dashboard/financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span>Financeiro</a></li>
+          <li><a href="../dashboard/estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span>Estoque</a></li>
+        </ul>
 
-  <h2>Dados agregados (períodos)</h2>
-  <?php if (empty($labels)): ?>
-    <p>Nenhum registro encontrado para o filtro selecionado.</p>
-  <?php else: ?>
-    <table>
-      <thead><tr><th>Período</th><th>Entradas</th><th>Saídas</th></tr></thead>
-      <tbody>
-        <?php foreach ($labels as $i => $label): ?>
-          <tr>
-            <td><?=htmlspecialchars($label)?></td>
-            <td><?=number_format($dadosEntradas[$i] ?? 0,0,',','.')?></td>
-            <td><?=number_format($dadosSaidas[$i] ?? 0,0,',','.')?></td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  <?php endif; ?>
+        <hr>
 
-  <?php if ($debug): ?>
-    <h3>Debug</h3>
-    <p>Estratégia: <?= $hasLojaCol ? 'filtrar por movimentacoes_estoque.loja_id' : 'filtrar via join produtos (movimentacoes_estoque.produto_id → produtos.id)' ?></p>
-    <p>Query executada (agregada): <code><?=htmlspecialchars($sql)?></code></p>
-    <p>SQL Totais Entradas: <code><?=htmlspecialchars($sqlEntradas)?></code></p>
-    <p>SQL Totais Saídas: <code><?=htmlspecialchars($sqlSaidas)?></code></p>
-  <?php endif; ?>
+        <ul class="nav-list middle-section">
+          <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span>Visão Geral</a></li>
+          <li><a  class="active" href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span>Produtos</a></li>
+          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Histórico"></span>Histórico</a></li>
+        </ul>
+      </div>
+
+      <div class="bottom-links">
+        <a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span>Conta</a>
+        <a href="../auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span>Dicas</a>
+      </div>
+    </nav>
+  </aside>
+
+    <main class="dashboard">
+        <h1>Giro de Estoque</h1>
+
+        <div class="cards-container">
+            <div class="card receita">
+                <h2>Entradas (<?php echo $tituloFiltro; ?>)</h2>
+                <p><?php echo number_format($entradas, 0, ',', '.'); ?></p>
+            </div>
+            <div class="card custo">
+                <h2>Saídas (<?php echo $tituloFiltro; ?>)</h2>
+                <p><?php echo number_format($saidas, 0, ',', '.'); ?></p>
+            </div>
+            <div class="card variacao <?php echo $classe; ?>">
+                <h2>Variação (<?php echo $tituloFiltro; ?>)</h2>
+                <p><?php echo $seta . " " . number_format($percentual, 2, ',', '.'); ?>%</p>
+            </div>
+        </div>
+
+        <form method="GET" class="filtros-container">
+            <label for="filtro">Filtrar por:</label>
+            <select name="filtro" id="filtro">
+                <option value="dia" <?php if($filtro==='dia') echo 'selected'; ?>>Dia</option>
+                <option value="mes" <?php if($filtro==='mes') echo 'selected'; ?>>Mês</option>
+                <option value="bimestre" <?php if($filtro==='bimestre') echo 'selected'; ?>>Bimestre</option>
+                <option value="trimestre" <?php if($filtro==='trimestre') echo 'selected'; ?>>Trimestre</option>
+                <option value="semestre" <?php if($filtro==='semestre') echo 'selected'; ?>>Semestre</option>
+                <option value="ano" <?php if($filtro==='ano') echo 'selected'; ?>>Ano</option>
+            </select>
+        </form>
+
+        <div id="grafico"></div>
+        <button id="toggleView" class="toggle-btn">Ver Tabela</button>
+        <button id="btnVoltar" class="voltar-btn">← Voltar</button>
+
+        <div id="tabela-container" style="display:none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Entradas</th>
+                        <th>Saídas</th>
+                        <th>Variação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    foreach ($labels as $i => $periodo) {
+                        $e = $dadosEntradas[$i] ?? 0;
+                        $s = $dadosSaidas[$i] ?? 0;
+                        $v = $e - $s;
+                        echo "<tr>
+                                <td>".htmlspecialchars($periodo)."</td>
+                                <td>".number_format($e,0,',','.')."</td>
+                                <td>".number_format($s,0,',','.')."</td>
+                                <td>".number_format($v,0,',','.')."</td>
+                            </tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const grafico = document.getElementById('grafico');
+            const tabela = document.getElementById('tabela-container');
+            const btn = document.getElementById('toggleView');
+            const filtroSelect = document.getElementById('filtro');
+
+            grafico.style.width = "100%";
+            grafico.style.height = "400px";
+            grafico.style.minHeight = "400px";
+
+            // Restaurar estado toggle
+            const estado = localStorage.getItem('viewState');
+            if(estado === 'block') {
+                tabela.style.display = 'block';
+                grafico.style.display = 'none';
+                btn.innerText = 'Ver Gráfico';
+            } else {
+                tabela.style.display = 'none';
+                grafico.style.display = 'block';
+                btn.innerText = 'Ver Tabela';
+            }
+
+            btn.addEventListener('click', () => {
+                if(tabela.style.display === 'none') {
+                    grafico.style.display = 'none';
+                    tabela.style.display = 'block';
+                    btn.innerText = 'Ver Gráfico';
+                } else {
+                    grafico.style.display = 'block';
+                    tabela.style.display = 'none';
+                    btn.innerText = 'Ver Tabela';
+                    initChart();
+                }
+                localStorage.setItem('viewState', tabela.style.display);
+            });
+
+            filtroSelect.addEventListener('change', function() {
+                localStorage.setItem('viewState', tabela.style.display);
+                this.form.submit();
+            });
+
+            function initChart() {
+                if (!grafico.echartsInstance) {
+                    const myChart = echarts.init(grafico);
+
+                    // Calcular variação por ponto
+                    const dadosVaria = <?php echo json_encode(array_map(function($e, $s){ return $e - $s; }, $dadosEntradas, $dadosSaidas)); ?>;
+
+                    const option = {
+                        title: {
+                            text: 'Entradas x Saídas x Variação',
+                            left: 'center',
+                            textStyle: { fontSize: 18, fontWeight: 'bold', color: '#e0e0e0' }
+                        },
+                        tooltip: { trigger: 'axis', backgroundColor: 'rgba(0,0,0,0.7)', textStyle: { color: '#fff' } },
+                        legend: {
+                            bottom: 0,
+                            textStyle: { color: '#e0e0e0' },
+                            data: ['Entradas', 'Saídas', 'Variação']
+                        },
+                        grid: { left: '3%', right: '4%', bottom: '12%', containLabel: true },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: <?php echo json_encode($labels); ?>,
+                            axisLine: { lineStyle: { color: '#aaa' } },
+                            axisLabel: { color: '#e0e0e0' }
+                        },
+                        yAxis: {
+                            type: 'value',
+                            axisLine: { show: false },
+                            splitLine: { lineStyle: { color: '#333' } },
+                            axisLabel: { color: '#e0e0e0' }
+                        },
+                        series: [
+                            {
+                                name: 'Entradas',
+                                type: 'line',
+                                smooth: true,
+                                data: <?php echo json_encode($dadosEntradas); ?>,
+                                lineStyle: { color: '#4caf50', width: 3 },
+                                areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(76,175,80,0.4)'},{offset:1,color:'rgba(76,175,80,0)'}]) },
+                                symbol: 'circle', symbolSize: 6, itemStyle: { color: '#aaffadff' }
+                            },
+                            {
+                                name: 'Saídas',
+                                type: 'line',
+                                smooth: true,
+                                data: <?php echo json_encode($dadosSaidas); ?>,
+                                lineStyle: { color: '#f44336', width: 3 },
+                                areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(244,67,54,0.3)'},{offset:1,color:'rgba(244,67,54,0)'}]) },
+                                symbol: 'square', symbolSize: 6, itemStyle: { color: '#f79c96ff' }
+                            },
+                            {
+                                name: 'Variação',
+                                type: 'line',
+                                smooth: true,
+                                data: dadosVaria,
+                                lineStyle: { color: '#2196f3', width: 3 },
+                                areaStyle: { color: 'rgba(33,150,243,0.3)' },
+                                symbol: 'diamond', symbolSize: 6, itemStyle: { color: '#a5d4faff' }
+                            }
+                        ]
+                    };
+
+                    myChart.setOption(option);
+                    grafico.echartsInstance = myChart;
+                    window.addEventListener('resize', () => myChart.resize());
+                } else {
+                    grafico.echartsInstance.resize();
+                }
+            }
+
+            if(grafico.style.display !== 'none') {
+                initChart();
+            }
+        });
+
+        const btnVoltar = document.getElementById('btnVoltar');
+        btnVoltar.addEventListener('click', () => {
+            history.back();
+        });
+        </script>
+    </main>
+</div>
 </body>
 </html>
