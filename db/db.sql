@@ -180,3 +180,7 @@ CREATE TABLE historico_produtos (
 -- AP DIA 25 DE SETMEOBV 202365
 
 ALTER TABLE tags ADD COLUMN tipo_usuario ENUM('empresa','funcionario') DEFAULT 'funcionario';
+
+-- AP DIA 16 DE Outubro 2025
+ALTER TABLE movimentacoes_estoque
+ADD COLUMN custo_unitario DECIMAL(10,2) AFTER usuario_id;
