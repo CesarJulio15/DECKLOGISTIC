@@ -383,9 +383,39 @@ if ($tagVincResult) {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-.add-tag-square { width:24px; height:24px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; border-radius:6px; margin-left:5px; }
-.tag-dropdown { display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:4px; z-index:10; }
-.tag-option { padding:2px 5px; cursor:pointer; }
+.add-tag-square { 
+    width:24px; 
+    height:24px; 
+    background:#000; 
+    color:#fff; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    cursor:pointer; 
+    font-weight:bold; 
+    border-radius:6px; 
+    flex-shrink: 0;
+}
+.tag-dropdown { 
+    display:none; 
+    position:fixed; 
+    background:#fff; 
+    border:1px solid #ccc; 
+    padding:8px; 
+    border-radius:6px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index:10000;
+    min-width: 160px;
+}
+.tag-option { 
+    padding:6px 8px; 
+    cursor:pointer;
+    border-radius:4px;
+    transition: background 0.2s;
+}
+.tag-option:hover {
+    background: #f0f0f0;
+}
 
 /* Toast notifications */
 .toast-container {
@@ -506,6 +536,20 @@ if ($tagVincResult) {
 <?php while ($produto = mysqli_fetch_assoc($result)): ?>
 <tr data-id="<?= $produto['id'] ?>" data-nome="<?= htmlspecialchars($produto['nome']) ?>" data-preco="<?= $produto['preco_unitario'] ?>" data-quantidade="<?= $produto['quantidade_estoque'] ?>">
     <td style="display:flex; align-items:center; gap:10px; position:relative;">
+        <!-- Botão de adicionar tag -->
+        <div class="add-tag-square" data-produto-id="<?= $produto['id'] ?>" tabindex="0" title="Adicionar tag">+</div>
+        <!-- Dropdown de tags (inicialmente oculto) -->
+        <div class="tag-dropdown" id="tag-dropdown-<?= $produto['id'] ?>">
+            <?php foreach ($tags as $tag): ?>
+                <div class="tag-option" 
+                     data-tag-id="<?= $tag['id'] ?>" 
+                     data-produto-id="<?= $produto['id'] ?>"
+                     style="display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i>
+                    <?= htmlspecialchars($tag['nome']) ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
         <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
             <?php if (isset($produtoTags[$produto['id']])): ?>
                 <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
@@ -763,7 +807,7 @@ function updateTableRow(produtoId) {
     // Recarrega apenas a linha afetada via AJAX
     fetch(`get_produto.php?id=${produtoId}`)
         .then(res => res.json())
-        .then(data => {
+        .then (data => {
             if (data.success) {
                 const row = document.querySelector(`tr[data-id="${produtoId}"]`);
                 if (row) {
@@ -774,6 +818,16 @@ function updateTableRow(produtoId) {
                 }
             }
         });
+}
+
+// Função utilitária para normalizar string (usada na pesquisa)
+function normalizeStr(str) {
+    return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+// Função para pegar o nome do produto na linha (usada na pesquisa/ordenação)
+function textoNomeDoRow(tr) {
+    const span = tr.querySelector('span:last-of-type');
+    return normalizeStr(span ? span.textContent : '');
 }
 
 // ========== EDITAR PRODUTO ==========
@@ -834,7 +888,7 @@ document.addEventListener('click', function(e) {
 function submitBuy() {
     const formData = new FormData(document.getElementById('buyForm'));
     formData.append('acao', 'comprar_produto');
-    
+
     fetch('', {
         method: 'POST',
         body: formData
@@ -1012,6 +1066,79 @@ function resetFiltro() {
         tr.style.display = '';
     });
 }
+
+// ========== BIND DROPDOWN DE TAGS ==========
+function bindTagDropdownEvents() {
+    // Botão de adicionar tag
+    document.querySelectorAll('.add-tag-square').forEach(btn => {
+        btn.onclick = function(e) {
+            e.stopPropagation();
+            // Fecha outros dropdowns
+            document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+            // Abre o dropdown deste produto
+            const produtoId = this.dataset.produtoId;
+            const dropdown = document.getElementById('tag-dropdown-' + produtoId);
+            if (dropdown) {
+                // Usa position fixed e calcula posição em relação à viewport
+                const btnRect = this.getBoundingClientRect();
+                dropdown.style.display = 'block';
+                dropdown.style.position = 'fixed';
+                dropdown.style.left = (btnRect.right + 8) + 'px'; // 8px à direita do botão
+                dropdown.style.top = btnRect.top + 'px';
+            }
+        };
+    });
+
+    // Ao clicar em uma tag do dropdown, faz o vínculo via AJAX
+    document.querySelectorAll('.tag-dropdown .tag-option').forEach(opt => {
+        opt.onclick = function(e) {
+            e.stopPropagation();
+            const produtoId = this.dataset.produtoId;
+            const tagId = this.dataset.tagId;
+            fetch('vincular_tag.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `produto_id=${produtoId}&tag_id=${tagId}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Atualiza os ícones de tags na linha
+                    const tagsSpan = document.getElementById('tags-produto-' + produtoId);
+                    if (tagsSpan) {
+                        // Adiciona o ícone da tag se não existir
+                        if (!tagsSpan.querySelector('[data-tag-id="' + tagId + '"]')) {
+                            const icon = document.createElement('i');
+                            icon.className = 'fa-solid ' + data.icone;
+                            icon.style.color = data.cor;
+                            icon.setAttribute('data-tag-id', tagId);
+                            tagsSpan.appendChild(icon);
+                        }
+                    }
+                    showToast('Tag vinculada ao produto!', 'success');
+                } else {
+                    showToast('Erro ao vincular tag', 'danger');
+                }
+                // Fecha dropdown
+                document.getElementById('tag-dropdown-' + produtoId).style.display = 'none';
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Erro ao vincular tag', 'danger');
+            });
+        };
+    });
+}
+
+// Chama o bind ao carregar a página
+bindTagDropdownEvents();
+
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.tag-dropdown') && !e.target.closest('.add-tag-square')) {
+        document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+    }
+});
 </script>
 
 </body>
