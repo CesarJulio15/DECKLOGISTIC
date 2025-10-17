@@ -507,7 +507,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
             <div class="col-lg-7">
               <div class="visual-content">
                 <div class="main-image">
-                  <img src="assets/img/features/features-2.webp" alt="" class="img-fluid">
+                  <img src="img/seguranca.webp" alt="" class="img-fluid">
                   <div class="floating-card">
                     <i class="bi bi-shield-check"></i>
                     <div class="card-content">
@@ -575,7 +575,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
             <div class="col-lg-7">
               <div class="visual-content">
                 <div class="main-image">
-                  <img src="assets/img/features/features-6.webp" alt="" class="img-fluid">
+                  <img src="img/performance.webp" alt="" class="img-fluid">
                   <div class="floating-card">
                     <i class="bi bi-speedometer2"></i>
                     <div class="card-content">
@@ -643,7 +643,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
             <div class="col-lg-7">
               <div class="visual-content">
                 <div class="main-image">
-                  <img src="assets/img/features/features-1.webp" alt="" class="img-fluid">
+                  <img src="img/suporte.webp" alt="" class="img-fluid">
                   <div class="floating-card">
                     <i class="bi bi-headset"></i>
                     <div class="card-content">
