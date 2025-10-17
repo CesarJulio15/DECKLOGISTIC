@@ -425,6 +425,140 @@ if ($tagVincResult) {
     right: 20px;
     z-index: 9999;
 }
+
+/* Blur que cobre toda a tela */
+#overlay-blur {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+/* Overlay de produtos */
+#overlay-produtos {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 10000;
+    padding: 30px;
+    padding-top: 700px;
+    background: transparent;
+}
+
+#overlay-produtos .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-produtos .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-produtos .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-produtos .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Overlay de ações */
+#overlay-acoes {
+    display: none;
+    position: absolute;
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+#overlay-acoes .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-acoes .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-acoes .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-acoes .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Botão de ajuda flutuante */
+#help-btn-produtos {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Classe para seção ficar acima do blur */
+.fora-do-blur {
+    position: relative;
+    z-index: 10002 !important;
+}
 </style>
 </head>
 <body>
@@ -789,6 +923,166 @@ a.active {
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Overlay Blur de Fundo -->
+<div id="overlay-blur" class="full-screen-blur" style="display:none;"></div>
+
+<!-- Overlay 1: Produtos - canto inferior direito -->
+<div id="overlay-produtos" style="display:none;">
+  <div class="welcome-card">
+    <h2>Produtos</h2>
+    <p>Esta é a área de gerenciamento de produtos da sua empresa. Aqui você pode adicionar, editar, visualizar e controlar o estoque de todos os seus produtos.</p>
+    <button id="closeOverlayProdutos1">Próximo</button>
+  </div>
+</div>
+
+<!-- Overlay 2: Ações - próximo à seção de ações -->
+<div id="overlay-acoes" class="welcome-overlay" style="display:none;">
+  <div class="welcome-card">
+    <h2>Ações Rápidas</h2>
+    <p>Nesta seção você pode pesquisar produtos, importar planilhas, criar tags personalizadas e ordenar sua lista de produtos.</p>
+    <button id="closeOverlayProdutos2">Entendi</button>
+  </div>
+</div>
+
+<!-- Botão de Ajuda Flutuante -->
+<button id="help-btn-produtos">?</button>
+
+<style>
+/* Blur que cobre toda a tela */
+#overlay-blur {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+/* Overlay de produtos */
+#overlay-produtos {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 10000;
+    padding: 30px;
+    padding-top: 700px;
+    background: transparent;
+}
+
+#overlay-produtos .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-produtos .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-produtos .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-produtos .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Overlay de ações */
+#overlay-acoes {
+    display: none;
+    position: absolute;
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+#overlay-acoes .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-acoes .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-acoes .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-acoes .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Botão de ajuda flutuante */
+#help-btn-produtos {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Classe para seção ficar acima do blur */
+.fora-do-blur {
+    position: relative;
+    z-index: 10002 !important;
+}
+</style>
+
 <script>
 // ========== FUNÇÕES UTILITÁRIAS ==========
 function showToast(message, type = 'success') {
@@ -963,7 +1257,7 @@ document.addEventListener('click', function(e) {
             body: formData
         })
         .then(res => res.json())
-        .then(data => {
+        .then (data => {
             if (data.success) {
                 showToast(data.message, 'success');
                 row.remove();
@@ -1139,6 +1433,58 @@ document.addEventListener('click', function(e) {
     if (!e.target.closest('.tag-dropdown') && !e.target.closest('.add-tag-square')) {
         document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
     }
+});
+
+// ========== OVERLAYS DE AJUDA ==========
+const helpBtnProdutos = document.getElementById('help-btn-produtos');
+const overlayProdutos1 = document.getElementById('overlay-produtos');
+const overlayAcoes = document.getElementById('overlay-acoes');
+const blurProdutos = document.getElementById('overlay-blur');
+const btnCloseProdutos1 = document.getElementById('closeOverlayProdutos1');
+const btnCloseProdutos2 = document.getElementById('closeOverlayProdutos2');
+
+helpBtnProdutos.addEventListener('click', () => {
+    overlayProdutos1.style.display = 'flex';
+    blurProdutos.style.display = 'block';
+});
+
+btnCloseProdutos1.addEventListener('click', () => {
+    overlayProdutos1.style.display = 'none';
+    
+    // Mantém blur ativo
+    blurProdutos.style.display = 'block';
+    
+    // Pega a seção de ações e adiciona classe para ficar acima do blur
+    const acoesSection = document.querySelector('.acoes');
+    acoesSection.classList.add('fora-do-blur');
+    
+    // Posiciona overlay2 próximo da seção de ações
+    const rect = acoesSection.getBoundingClientRect();
+    
+    overlayAcoes.style.position = 'absolute';
+    overlayAcoes.style.top = `${rect.bottom + window.scrollY + 10}px`;
+    overlayAcoes.style.left = `${rect.left + window.scrollX}px`;
+    overlayAcoes.style.display = 'flex';
+    overlayAcoes.style.zIndex = '10001';
+});
+
+btnCloseProdutos2.addEventListener('click', () => {
+    overlayAcoes.style.display = 'none';
+    blurProdutos.style.display = 'none';
+    
+    // Remove classe da seção de ações
+    const acoesSection = document.querySelector('.acoes');
+    acoesSection.classList.remove('fora-do-blur');
+});
+
+// Fecha overlays ao clicar no blur
+blurProdutos.addEventListener('click', () => {
+    overlayProdutos1.style.display = 'none';
+    overlayAcoes.style.display = 'none';
+    blurProdutos.style.display = 'none';
+    
+    const acoesSection = document.querySelector('.acoes');
+    acoesSection.classList.remove('fora-do-blur');
 });
 </script>
 
