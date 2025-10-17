@@ -1137,8 +1137,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-f-5.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/THUCOxz"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/arthur-filipe-5a4726325/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">
@@ -1154,8 +1154,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-m-8.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/GabrielPrudente10"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/gabriel-magalh%C3%A3es-220726325/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">
@@ -1188,7 +1188,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
       <img src="assets/img/person/person-m-12.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
         <a href="https://github.com/CesarJulio15"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://www.linkedin.com/in/juliocesardev25/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">
@@ -1204,8 +1204,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-f-7.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/RafaelOliveira5501"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/rafaoliversilva/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">
