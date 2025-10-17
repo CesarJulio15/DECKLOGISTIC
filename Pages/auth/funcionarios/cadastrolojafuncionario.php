@@ -1,7 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../../conexao.php';
-include __DIR__ . '../../../session_check.php';
+include __DIR__ . '/../../../session_check.php';
 
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login']) || $_SESSION['tipo_login'] !== 'empresa') {
     die("Acesso negado. Apenas empresas podem cadastrar funcionários.");

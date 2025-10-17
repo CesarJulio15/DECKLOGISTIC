@@ -671,8 +671,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>Services</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <h2>Serviços</h2>
+        <p>Soluções digitais que simplificam a gestão de processos logísticos.</p>
       </div><!-- End Section Title -->
 
       <div class="container" data-aos="fade-up" data-aos-delay="100">
@@ -682,12 +682,12 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
             <div class="intro-content" data-aos="fade-right" data-aos-delay="100">
               <div class="section-badge mb-3" data-aos="zoom-in" data-aos-delay="50">
                 <i class="bi bi-star-fill"></i>
-                <span>WHAT WE DO</span>
+                <span>O QUE FAZEMOS</span>
               </div>
-              <h2 class="section-heading mb-4">Transforming Ideas into Outstanding Results</h2>
-              <p class="section-description mb-4">We believe in crafting exceptional experiences that drive meaningful growth for your business. Our dedicated team combines creativity with technical excellence to deliver solutions that make a difference.</p>
+              <h2 class="section-heading mb-4">Transformando Ideias em Resultados Excepcionais</h2>
+              <p class="section-description mb-4">Acreditamos em criar experiências excepcionais que impulsionam o crescimento significativo para o seu negócio. Nossa equipe dedicada combina criatividade com excelência técnica para oferecer soluções que fazem a diferença.</p>
               <a href="#" class="cta-button" data-aos="fade-right" data-aos-delay="200">
-                Explore Our Work
+                Explore Nosso Trabalho
               </a>
             </div>
           </div>
@@ -707,9 +707,9 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                 </div>
                 <div class="card-content">
                   <h5 class="service-title">
-                    <a href="#">Custom Application Development</a>
+                    <a href="#">Desenvolvimento de Aplicações Personalizadas</a>
                   </h5>
-                  <p class="service-description">Building robust applications tailored to your specific needs using modern frameworks and cutting-edge technologies.</p>
+                  <p class="service-description">Construindo aplicações robustas adaptadas às suas necessidades específicas, utilizando frameworks modernos e tecnologias de ponta.</p>
                 </div>
               </div>
             </div><!-- End Service Card -->
@@ -721,9 +721,9 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                 </div>
                 <div class="card-content">
                   <h5 class="service-title">
-                    <a href="#">Strategic Planning</a>
+                    <a href="#">Planejamento Estratégico</a>
                   </h5>
-                  <p class="service-description">Comprehensive roadmaps that align technology solutions with your business objectives and market opportunities.</p>
+                  <p class="service-description">Mapas abrangentes que alinham soluções tecnológicas com seus objetivos de negócios e oportunidades de mercado.</p>
                 </div>
               </div>
             </div><!-- End Service Card -->
@@ -735,9 +735,9 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                 </div>
                 <div class="card-content">
                   <h5 class="service-title">
-                    <a href="#">Identity Design</a>
+                    <a href="#">Identidade Visual</a>
                   </h5>
-                  <p class="service-description">Creating compelling visual narratives that resonate with your audience and strengthen brand recognition across all touchpoints.</p>
+                  <p class="service-description">Criando narrativas visuais envolventes que ressoam com seu público e fortalecem o reconhecimento da marca em todos os pontos de contato.</p>
                 </div>
               </div>
             </div><!-- End Service Card -->
@@ -749,9 +749,9 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                 </div>
                 <div class="card-content">
                   <h5 class="service-title">
-                    <a href="#">Digital Marketing</a>
+                    <a href="#">Marketing Digital</a>
                   </h5>
-                  <p class="service-description">Maximizing your online presence through targeted campaigns that drive engagement and convert visitors into loyal customers.</p>
+                  <p class="service-description">Maximizando sua presença online por meio de campanhas direcionadas que impulsionam o engajamento e convertem visitantes em clientes fiéis.</p>
                 </div>
               </div>
             </div><!-- End Service Card -->
@@ -765,7 +765,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                   <h5 class="service-title">
                     <a href="#">User Experience Design</a>
                   </h5>
-                  <p class="service-description">Crafting intuitive interfaces that prioritize user needs while delivering seamless interactions across desktop and mobile platforms.</p>
+                  <p class="service-description">Criando interfaces intuitivas que priorizam as necessidades do usuário, enquanto oferecem interações perfeitas em plataformas desktop e móveis.</p>
                 </div>
               </div>
             </div><!-- End Service Card -->
@@ -777,9 +777,9 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                 </div>
                 <div class="card-content">
                   <h5 class="service-title">
-                    <a href="#">Data Intelligence</a>
+                    <a href="#">Inteligência de Dados</a>
                   </h5>
-                  <p class="service-description">Transforming raw data into actionable insights that inform strategic decisions and optimize business performance effectively.</p>
+                  <p class="service-description">Transformando dados brutos em insights acionáveis que informam decisões estratégicas e otimizam o desempenho dos negócios de forma eficaz.</p>
                 </div>
               </div>
             </div><!-- End Service Card -->
@@ -799,28 +799,28 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
         <div class="advertise-1 d-flex flex-column flex-lg-row gap-4 align-items-center position-relative">
 
           <div class="content-left flex-grow-1" data-aos="fade-right" data-aos-delay="200">
-            <span class="badge text-uppercase mb-2">Don't Miss!</span>
-            <h2>Revolutionize Your Digital Experience Today</h2>
-            <p class="my-4">Strategia accelerates your business growth through innovative solutions and cutting-edge technology. Join thousands of satisfied customers who have transformed their operations.</p>
+            <span class="badge text-uppercase mb-2">Não Perca!</span>
+            <h2>Revolucione Sua Experiência Digital Hoje</h2>
+            <p class="my-4">A Strategia acelera o crescimento do seu negócio por meio de soluções inovadoras e tecnologia de ponta. Junte-se a milhares de clientes satisfeitos que transformaram suas operações.</p>
 
             <div class="features d-flex flex-wrap gap-3 mb-4">
               <div class="feature-item">
                 <i class="bi bi-check-circle-fill"></i>
-                <span>Premium Support</span>
+                <span>Suporte Premium</span>
               </div>
               <div class="feature-item">
                 <i class="bi bi-check-circle-fill"></i>
-                <span>Cloud Integration</span>
+                <span>Integração em Nuvem</span>
               </div>
               <div class="feature-item">
                 <i class="bi bi-check-circle-fill"></i>
-                <span>Real-time Analytics</span>
+                <span>Analytics em Tempo Real</span>
               </div>
             </div>
 
             <div class="cta-buttons d-flex flex-wrap gap-3">
-              <a href="#" class="btn btn-primary">Start Free Trial</a>
-              <a href="#" class="btn btn-outline">Learn More</a>
+              <a href="#" class="btn btn-primary">Iniciar Teste Gratuito</a>
+              <a href="#" class="btn btn-outline">Saiba Mais</a>
             </div>
           </div>
 
@@ -832,7 +832,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
               </div>
               <div class="card-content">
                 <span class="stats-number">245%</span>
-                <span class="stats-text">Growth Rate</span>
+                <span class="stats-text">Taxa de Crescimento</span>
               </div>
             </div>
           </div>
@@ -1137,8 +1137,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-f-5.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/THUCOxz"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/arthur-filipe-5a4726325/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">
@@ -1154,8 +1154,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-m-8.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/GabrielPrudente10"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/gabriel-magalh%C3%A3es-220726325/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">
@@ -1171,8 +1171,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-f-9.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/GuilhermeoAparecido"><i class="bi bi-github"></i></a>
       </div>
     </div>
     <div class="member-content">
@@ -1188,8 +1187,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-m-12.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/CesarJulio15"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/juliocesardev25/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">
@@ -1205,8 +1204,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     <div class="member-image">
       <img src="assets/img/person/person-f-7.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
-        <a href="#"><i class="bi bi-github"></i></a>
-        <a href="#"><i class="bi bi-linkedin"></i></a>
+        <a href="https://github.com/RafaelOliveira5501"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/rafaoliversilva/"><i class="bi bi-linkedin"></i></a>
       </div>
     </div>
     <div class="member-content">

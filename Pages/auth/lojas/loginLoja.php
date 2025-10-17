@@ -40,14 +40,13 @@ if (session_status() === PHP_SESSION_NONE) {
         - campo oculto "fakeusernameremembered" ajuda a confundir alguns salvadores de senha que preenchem o primeiro campo visível.
       -->
       <form id="loginForm" action="processa_login_loja.php" method="POST" autocomplete="off">
-        <!-- campo falso para ajudar a evitar autofill -->
         <input type="text" name="fakeusernameremembered" id="fakeusernameremembered"
                style="display:none" autocomplete="off" value="">
 
-        <input type="email" name="email" placeholder="Endereço de e-mail" required
-               autocomplete="username" value="">
-        <input type="password" name="senha" placeholder="Insira sua Senha" required
-               autocomplete="new-password" value="">
+        <input type="email" name="email" maxlength="100" placeholder="Endereço de e-mail" required
+               autocomplete="username" value="" title="Digite um e-mail válido">
+        <input type="password" name="senha" minlength="6" maxlength="50" placeholder="Insira sua Senha" required
+               autocomplete="new-password" value="" title="Mínimo 6 caracteres">
 
         <div class="login-link">
           Ainda não tem uma conta para sua empresa?

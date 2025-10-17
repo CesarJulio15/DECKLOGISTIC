@@ -384,9 +384,39 @@ if ($tagVincResult) {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-.add-tag-square { width:24px; height:24px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; border-radius:6px; margin-left:5px; }
-.tag-dropdown { display:none; position:absolute; background:#fff; border:1px solid #ccc; padding:5px; border-radius:4px; z-index:10; }
-.tag-option { padding:2px 5px; cursor:pointer; }
+.add-tag-square { 
+    width:24px; 
+    height:24px; 
+    background:#000; 
+    color:#fff; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    cursor:pointer; 
+    font-weight:bold; 
+    border-radius:6px; 
+    flex-shrink: 0;
+}
+.tag-dropdown { 
+    display:none; 
+    position:fixed; 
+    background:#fff; 
+    border:1px solid #ccc; 
+    padding:8px; 
+    border-radius:6px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index:10000;
+    min-width: 160px;
+}
+.tag-option { 
+    padding:6px 8px; 
+    cursor:pointer;
+    border-radius:4px;
+    transition: background 0.2s;
+}
+.tag-option:hover {
+    background: #f0f0f0;
+}
 
 /* Toast notifications */
 .toast-container {
@@ -396,19 +426,8 @@ if ($tagVincResult) {
     z-index: 9999;
 }
 
-/* Classe para botões ficarem acima do blur */
-.fora-do-blur-produtos {
-  position: relative !important;
-  z-index: 10002 !important;
-}
-
-.fora-do-blur-produtos:hover {
-  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #ff6600 !important;
-  transform: none !important;
-}
-
 /* Blur que cobre toda a tela */
-#overlay-blur-produtos {
+#overlay-blur {
     display: none;
     position: fixed;
     top: 0; left: 0;
@@ -419,8 +438,8 @@ if ($tagVincResult) {
     z-index: 9999;
 }
 
-/* Overlay introdução aos produtos */
-#overlay-produtos-intro {
+/* Overlay de produtos */
+#overlay-produtos {
     display: none;
     position: fixed;
     top: 0; left: 0;
@@ -434,18 +453,7 @@ if ($tagVincResult) {
     background: transparent;
 }
 
-/* Overlay de ações */
-#overlay-produtos-acoes {
-    display: none;
-    position: absolute;
-    z-index: 10001;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Cards das overlays */
-#overlay-produtos-intro .welcome-card,
-#overlay-produtos-acoes .welcome-card {
+#overlay-produtos .welcome-card {
     background: #222;
     color: #fff;
     border-radius: 12px;
@@ -455,25 +463,66 @@ if ($tagVincResult) {
     font-size: 15px;
     pointer-events: auto;
     position: relative;
-    margin-bottom: 10px;
     z-index: 2;
     text-align: left;
 }
 
-#overlay-produtos-intro .welcome-card h2,
-#overlay-produtos-acoes .welcome-card h2 {
+#overlay-produtos .welcome-card h2 {
     font-size: 1.1rem;
     margin-bottom: 8px;
 }
 
-#overlay-produtos-intro .welcome-card p,
-#overlay-produtos-acoes .welcome-card p {
+#overlay-produtos .welcome-card p {
     font-size: 15px;
     margin-bottom: 18px;
 }
 
-#overlay-produtos-intro .welcome-card button,
-#overlay-produtos-acoes .welcome-card button {
+#overlay-produtos .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Overlay de ações */
+#overlay-acoes {
+    display: none;
+    position: absolute;
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+#overlay-acoes .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-acoes .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-acoes .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-acoes .welcome-card button {
     margin-top: 12px;
     background: #ff6600 !important;
     color: #fff;
@@ -487,30 +536,28 @@ if ($tagVincResult) {
 
 /* Botão de ajuda flutuante */
 #help-btn-produtos {
-    position: fixed !important;
-    bottom: 20px !important;
-    right: 20px !important;
-    width: 50px !important;
-    height: 50px !important;
-    border-radius: 50% !important;
-    background: #ff6600 !important;
-    color: #fff !important;
-    border: none !important;
-    font-size: 24px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    z-index: 99999 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 4px 16px rgba(255,102,0,0.5) !important;
-    transition: all 0.3s ease !important;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#help-btn-produtos:hover {
-    box-shadow: 0 6px 24px rgba(255,102,0,0.7) !important;
-    transform: scale(1.1) !important;
-    background: #ff7700 !important;
+/* Classe para seção ficar acima do blur */
+.fora-do-blur {
+    position: relative;
+    z-index: 10002 !important;
 }
 </style>
 </head>
@@ -624,6 +671,20 @@ if ($tagVincResult) {
 <?php while ($produto = mysqli_fetch_assoc($result)): ?>
 <tr data-id="<?= $produto['id'] ?>" data-nome="<?= htmlspecialchars($produto['nome']) ?>" data-preco="<?= $produto['preco_unitario'] ?>" data-quantidade="<?= $produto['quantidade_estoque'] ?>">
     <td style="display:flex; align-items:center; gap:10px; position:relative;">
+        <!-- Botão de adicionar tag -->
+        <div class="add-tag-square" data-produto-id="<?= $produto['id'] ?>" tabindex="0" title="Adicionar tag">+</div>
+        <!-- Dropdown de tags (inicialmente oculto) -->
+        <div class="tag-dropdown" id="tag-dropdown-<?= $produto['id'] ?>">
+            <?php foreach ($tags as $tag): ?>
+                <div class="tag-option" 
+                     data-tag-id="<?= $tag['id'] ?>" 
+                     data-produto-id="<?= $produto['id'] ?>"
+                     style="display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i>
+                    <?= htmlspecialchars($tag['nome']) ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
         <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
             <?php if (isset($produtoTags[$produto['id']])): ?>
                 <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
@@ -862,315 +923,33 @@ a.active {
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-// ========== FUNÇÕES UTILITÁRIAS ==========
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('actionToast');
-    const toastBody = document.getElementById('toastMessage');
-    
-    toast.classList.remove('bg-success', 'bg-danger', 'bg-warning');
-    toast.classList.add(type === 'success' ? 'bg-success' : 'bg-danger');
-    
-    toastBody.textContent = message;
-    
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-}
+<!-- Overlay Blur de Fundo -->
+<div id="overlay-blur" class="full-screen-blur" style="display:none;"></div>
 
-function updateTableRow(produtoId) {
-    // Recarrega apenas a linha afetada via AJAX
-    fetch(`get_produto.php?id=${produtoId}`)
-        .then(res => res.json())
-        .then data => {
-            if (data.success) {
-                const row = document.querySelector(`tr[data-id="${produtoId}"]`);
-                if (row) {
-                    row.dataset.preco = data.produto.preco_unitario;
-                    row.dataset.quantidade = data.produto.quantidade_estoque;
-                    row.querySelector('td:nth-child(2)').textContent = `R$ ${parseFloat(data.produto.preco_unitario).toFixed(2).replace('.', ',')}`;
-                    row.querySelector('td:nth-child(3)').textContent = data.produto.quantidade_estoque;
-                }
-            }
-        });
-}
-
-// ========== EDITAR PRODUTO ==========
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('editBtn') || e.target.closest('.editBtn')) {
-        const row = e.target.closest('tr');
-        const id = row.dataset.id;
-        const nome = row.dataset.nome;
-        const preco = row.dataset.preco;
-        const quantidade = row.dataset.quantidade;
-        
-        document.getElementById('edit_produto_id').value = id;
-        document.getElementById('edit_nome').value = nome;
-        document.getElementById('edit_preco').value = preco;
-        document.getElementById('edit_estoque').value = quantidade;
-        
-        new bootstrap.Modal(document.getElementById('editModal')).show();
-    }
-});
-
-function submitEdit() {
-    const formData = new FormData(document.getElementById('editForm'));
-    formData.append('acao', 'editar_produto');
-    
-    fetch('', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            showToast(data.message, 'success');
-            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showToast(data.message, 'danger');
-        }
-    })
-    .catch(err => showToast('Erro ao editar produto', 'danger'));
-}
-
-// ========== ENTRADA (COMPRA) ==========
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('buyBtn') || e.target.closest('.buyBtn')) {
-        const row = e.target.closest('tr');
-        const id = row.dataset.id;
-        const nome = row.dataset.nome;
-        
-        document.getElementById('buy_produto_id').value = id;
-        document.getElementById('buy_nome').value = nome;
-        document.getElementById('buy_quantidade').value = 1;
-        document.getElementById('buy_custo').value = '';
-        
-        new bootstrap.Modal(document.getElementById('buyModal')).show();
-    }
-});
-
-function submitBuy() {
-    const formData = new FormData(document.getElementById('buyForm'));
-    formData.append('acao', 'comprar_produto');
-    
-    fetch('', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            showToast(data.message, 'success');
-            bootstrap.Modal.getInstance(document.getElementById('buyModal')).hide();
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showToast(data.message, 'danger');
-        }
-    })
-    .catch(err => showToast('Erro ao registrar entrada', 'danger'));
-}
-
-// ========== SAÍDA (VENDA) ==========
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('sellBtn') || e.target.closest('.sellBtn')) {
-        const row = e.target.closest('tr');
-        const id = row.dataset.id;
-        const nome = row.dataset.nome;
-        
-        document.getElementById('sell_produto_id').value = id;
-        document.getElementById('sell_nome').value = nome;
-        document.getElementById('sell_quantidade').value = 1;
-        
-        new bootstrap.Modal(document.getElementById('sellModal')).show();
-    }
-});
-
-function submitSell() {
-    const formData = new FormData(document.getElementById('sellForm'));
-    formData.append('acao', 'vender_produto');
-    
-    fetch('', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            showToast(data.message, 'success');
-            bootstrap.Modal.getInstance(document.getElementById('sellModal')).hide();
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showToast(data.message, 'danger');
-        }
-    })
-    .catch(err => showToast('Erro ao registrar saída', 'danger'));
-}
-
-// ========== EXCLUIR PRODUTO ==========
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('deleteBtn') || e.target.closest('.deleteBtn')) {
-        const row = e.target.closest('tr');
-        const id = row.dataset.id;
-        const nome = row.dataset.nome;
-        
-        if (!confirm(`Deseja realmente excluir o produto "${nome}"?\n\nEsta ação é irreversível.`)) {
-            return;
-        }
-        
-        const formData = new FormData();
-        formData.append('acao', 'apagar_produto');
-        formData.append('produto_id', id);
-        
-        fetch('', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                showToast(data.message, 'success');
-                row.remove();
-            } else {
-                showToast(data.message, 'danger');
-            }
-        })
-        .catch(err => showToast('Erro ao excluir produto', 'danger'));
-    }
-});
-
-// ------------- PESQUISA -------------
-const pesquisaInput = document.getElementById('pesquisa');
-if (pesquisaInput) {
-    pesquisaInput.addEventListener('input', function() {
-        const termo = normalizeStr(this.value);
-        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-            const nome = textoNomeDoRow(tr);
-
-            const loteTd = tr.querySelector('td:nth-child(5)');
-            const lote = loteTd ? normalizeStr(loteTd.textContent) : '';
-
-            const precoTd = tr.querySelector('td:nth-child(3)');
-            const preco = precoTd ? normalizeStr(precoTd.textContent) : '';
-
-            const matches = nome.includes(termo) || lote.includes(termo) || preco.includes(termo);
-            tr.style.display = matches ? '' : 'none';
-        });
-    });
-}
-
-// ------------- ORDENAÇÃO -------------
-const ordenarSelect = document.getElementById('ordenar');
-if (ordenarSelect) {
-    ordenarSelect.addEventListener('change', function() {
-        const tbody = document.getElementById('tabela-produtos');
-        if (!tbody) return;
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        const val = this.value;
-
-        rows.sort((a, b) => {
-            switch (val) {
-                case 'nome-asc': {
-                    const aText = textoNomeDoRow(a);
-                    const bText = textoNomeDoRow(b);
-                    return aText.localeCompare(bText, 'pt', { sensitivity: 'base' });
-                }
-                case 'nome-desc': {
-                    const aText = textoNomeDoRow(a);
-                    const bText = textoNomeDoRow(b);
-                    return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
-                }
-                case 'preco-asc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
-                    return aNum - bNum;
-                }
-                case 'preco-desc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
-                    return bNum - aNum;
-                }
-                case 'quantidade-asc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    return aNum - bNum;
-                }
-                case 'quantidade-desc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    return bNum - aNum;
-                }
-                default:
-                    return 0;
-            }
-        });
-
-        rows.forEach(r => tbody.appendChild(r));
-    });
-}
-
-// Filtro por tag
-document.querySelectorAll('.tag-item').forEach(tag => {
-    tag.addEventListener('click', function() {
-        const tagId = this.dataset.tagId;
-        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-            const icones = tr.querySelectorAll('.tags-vinculadas i');
-            let possuiTag = false;
-            icones.forEach(icon => {
-                if (icon.dataset.tagId === tagId) {
-                    possuiTag = true;
-                }
-            });
-            tr.style.display = possuiTag ? '' : 'none';
-        });
-    });
-});
-
-function resetFiltro() {
-    document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
-        tr.style.display = '';
-    });
-}
-
-// =================== BOTÃO E OVERLAYS DE AJUDA ===================
-
-<!-- Blur atrás dos overlays -->
-<div id="overlay-blur-produtos" class="full-screen-blur" style="display:none;"></div>
-
-<!-- Overlay 1: Introdução à página de produtos -->
-<div id="overlay-produtos-intro" style="display:none;">
+<!-- Overlay 1: Produtos - canto inferior direito -->
+<div id="overlay-produtos" style="display:none;">
   <div class="welcome-card">
     <h2>Produtos</h2>
-    <p>Esta é a área de produtos da sua empresa. Aqui você gerencia seu catálogo, controla preços, estoque e realiza operações de entrada e saída.</p>
+    <p>Esta é a área de gerenciamento de produtos da sua empresa. Aqui você pode adicionar, editar, visualizar e controlar o estoque de todos os seus produtos.</p>
     <button id="closeOverlayProdutos1">Próximo</button>
   </div>
 </div>
 
-<!-- Overlay 2: Destaque para botões de ação -->
-<div id="overlay-produtos-acoes" class="welcome-overlay" style="display:none;">
+<!-- Overlay 2: Ações - próximo à seção de ações -->
+<div id="overlay-acoes" class="welcome-overlay" style="display:none;">
   <div class="welcome-card">
-    <h2>Ações de Produtos</h2>
-    <p>Use os botões <b>Entrada</b> para registrar compras e <b>Saída</b> para registrar vendas. Você também pode editar informações e excluir produtos.</p>
-    <button id="closeOverlayProdutos2">Fechar</button>
+    <h2>Ações Rápidas</h2>
+    <p>Nesta seção você pode pesquisar produtos, importar planilhas, criar tags personalizadas e ordenar sua lista de produtos.</p>
+    <button id="closeOverlayProdutos2">Entendi</button>
   </div>
 </div>
 
-<!-- Botão de ajuda flutuante -->
+<!-- Botão de Ajuda Flutuante -->
 <button id="help-btn-produtos">?</button>
 
 <style>
-/* Classe para botões ficarem acima do blur */
-.fora-do-blur-produtos {
-  position: relative !important;
-  z-index: 10002 !important;
-}
-
-.fora-do-blur-produtos:hover {
-  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #ff6600 !important;
-  transform: none !important;
-}
-
 /* Blur que cobre toda a tela */
-#overlay-blur-produtos {
+#overlay-blur {
     display: none;
     position: fixed;
     top: 0; left: 0;
@@ -1181,8 +960,8 @@ function resetFiltro() {
     z-index: 9999;
 }
 
-/* Overlay introdução aos produtos */
-#overlay-produtos-intro {
+/* Overlay de produtos */
+#overlay-produtos {
     display: none;
     position: fixed;
     top: 0; left: 0;
@@ -1196,18 +975,7 @@ function resetFiltro() {
     background: transparent;
 }
 
-/* Overlay de ações */
-#overlay-produtos-acoes {
-    display: none;
-    position: absolute;
-    z-index: 10001;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Cards das overlays */
-#overlay-produtos-intro .welcome-card,
-#overlay-produtos-acoes .welcome-card {
+#overlay-produtos .welcome-card {
     background: #222;
     color: #fff;
     border-radius: 12px;
@@ -1217,25 +985,66 @@ function resetFiltro() {
     font-size: 15px;
     pointer-events: auto;
     position: relative;
-    margin-bottom: 10px;
     z-index: 2;
     text-align: left;
 }
 
-#overlay-produtos-intro .welcome-card h2,
-#overlay-produtos-acoes .welcome-card h2 {
+#overlay-produtos .welcome-card h2 {
     font-size: 1.1rem;
     margin-bottom: 8px;
 }
 
-#overlay-produtos-intro .welcome-card p,
-#overlay-produtos-acoes .welcome-card p {
+#overlay-produtos .welcome-card p {
     font-size: 15px;
     margin-bottom: 18px;
 }
 
-#overlay-produtos-intro .welcome-card button,
-#overlay-produtos-acoes .welcome-card button {
+#overlay-produtos .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Overlay de ações */
+#overlay-acoes {
+    display: none;
+    position: absolute;
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+#overlay-acoes .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-acoes .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-acoes .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-acoes .welcome-card button {
     margin-top: 12px;
     background: #ff6600 !important;
     color: #fff;
@@ -1249,30 +1058,28 @@ function resetFiltro() {
 
 /* Botão de ajuda flutuante */
 #help-btn-produtos {
-    position: fixed !important;
-    bottom: 20px !important;
-    right: 20px !important;
-    width: 50px !important;
-    height: 50px !important;
-    border-radius: 50% !important;
-    background: #ff6600 !important;
-    color: #fff !important;
-    border: none !important;
-    font-size: 24px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    z-index: 99999 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 4px 16px rgba(255,102,0,0.5) !important;
-    transition: all 0.3s ease !important;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#help-btn-produtos:hover {
-    box-shadow: 0 6px 24px rgba(255,102,0,0.7) !important;
-    transform: scale(1.1) !important;
-    background: #ff7700 !important;
+/* Classe para seção ficar acima do blur */
+.fora-do-blur {
+    position: relative;
+    z-index: 10002 !important;
 }
 </style>
 
@@ -1295,7 +1102,7 @@ function updateTableRow(produtoId) {
     // Recarrega apenas a linha afetada via AJAX
     fetch(`get_produto.php?id=${produtoId}`)
         .then(res => res.json())
-        .then(data => {
+        .then (data => {
             if (data.success) {
                 const row = document.querySelector(`tr[data-id="${produtoId}"]`);
                 if (row) {
@@ -1306,6 +1113,16 @@ function updateTableRow(produtoId) {
                 }
             }
         });
+}
+
+// Função utilitária para normalizar string (usada na pesquisa)
+function normalizeStr(str) {
+    return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+// Função para pegar o nome do produto na linha (usada na pesquisa/ordenação)
+function textoNomeDoRow(tr) {
+    const span = tr.querySelector('span:last-of-type');
+    return normalizeStr(span ? span.textContent : '');
 }
 
 // ========== EDITAR PRODUTO ==========
@@ -1366,7 +1183,7 @@ document.addEventListener('click', function(e) {
 function submitBuy() {
     const formData = new FormData(document.getElementById('buyForm'));
     formData.append('acao', 'comprar_produto');
-    
+
     fetch('', {
         method: 'POST',
         body: formData
@@ -1440,7 +1257,7 @@ document.addEventListener('click', function(e) {
             body: formData
         })
         .then(res => res.json())
-        .then(data => {
+        .then (data => {
             if (data.success) {
                 showToast(data.message, 'success');
                 row.remove();
@@ -1545,65 +1362,130 @@ function resetFiltro() {
     });
 }
 
-// =================== SISTEMA DE OVERLAYS ===================
-const helpBtnProdutos = document.getElementById('help-btn-produtos');
-const overlayIntro = document.getElementById('overlay-produtos-intro');
-const overlayAcoes = document.getElementById('overlay-produtos-acoes');
-const blurProdutos = document.getElementById('overlay-blur-produtos');
-const btnCloseIntro = document.getElementById('closeOverlayProdutos1');
-const btnCloseAcoes = document.getElementById('closeOverlayProdutos2');
-
-// Abre primeira overlay
-if (helpBtnProdutos) {
-    helpBtnProdutos.addEventListener('click', () => {
-        overlayIntro.style.display = 'flex';
-        blurProdutos.style.display = 'block';
-    });
-}
-
-// Fecha primeira overlay e abre segunda
-if (btnCloseIntro) {
-    btnCloseIntro.addEventListener('click', () => {
-        overlayIntro.style.display = 'none';
-        
-        // Mantém blur ativo
-        blurProdutos.style.display = 'block';
-
-        // Pega a primeira linha da tabela para posicionar próximo aos botões de ação
-        const primeiraLinha = document.querySelector('#tabela-produtos tr');
-        if (primeiraLinha) {
-            const btnEntrada = primeiraLinha.querySelector('.buyBtn');
-            if (btnEntrada) {
-                const rect = btnEntrada.getBoundingClientRect();
-                
-                // Posiciona overlay2 próximo aos botões de ação
-                overlayAcoes.style.position = 'absolute';
-                overlayAcoes.style.top = `${rect.bottom + window.scrollY + 10}px`;
-                overlayAcoes.style.left = `${rect.left + window.scrollX}px`;
-                overlayAcoes.style.display = 'flex';
-                overlayAcoes.style.zIndex = '10001';
-
-                // Adiciona classe para todos os botões de ação ficarem acima do blur
-                document.querySelectorAll('.editBtn, .buyBtn, .sellBtn, .deleteBtn').forEach(btn => {
-                    btn.classList.add('fora-do-blur-produtos');
-                });
+// ========== BIND DROPDOWN DE TAGS ==========
+function bindTagDropdownEvents() {
+    // Botão de adicionar tag
+    document.querySelectorAll('.add-tag-square').forEach(btn => {
+        btn.onclick = function(e) {
+            e.stopPropagation();
+            // Fecha outros dropdowns
+            document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+            // Abre o dropdown deste produto
+            const produtoId = this.dataset.produtoId;
+            const dropdown = document.getElementById('tag-dropdown-' + produtoId);
+            if (dropdown) {
+                // Usa position fixed e calcula posição em relação à viewport
+                const btnRect = this.getBoundingClientRect();
+                dropdown.style.display = 'block';
+                dropdown.style.position = 'fixed';
+                dropdown.style.left = (btnRect.right + 8) + 'px'; // 8px à direita do botão
+                dropdown.style.top = btnRect.top + 'px';
             }
-        }
+        };
+    });
+
+    // Ao clicar em uma tag do dropdown, faz o vínculo via AJAX
+    document.querySelectorAll('.tag-dropdown .tag-option').forEach(opt => {
+        opt.onclick = function(e) {
+            e.stopPropagation();
+            const produtoId = this.dataset.produtoId;
+            const tagId = this.dataset.tagId;
+            fetch('vincular_tag.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `produto_id=${produtoId}&tag_id=${tagId}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Atualiza os ícones de tags na linha
+                    const tagsSpan = document.getElementById('tags-produto-' + produtoId);
+                    if (tagsSpan) {
+                        // Adiciona o ícone da tag se não existir
+                        if (!tagsSpan.querySelector('[data-tag-id="' + tagId + '"]')) {
+                            const icon = document.createElement('i');
+                            icon.className = 'fa-solid ' + data.icone;
+                            icon.style.color = data.cor;
+                            icon.setAttribute('data-tag-id', tagId);
+                            tagsSpan.appendChild(icon);
+                        }
+                    }
+                    showToast('Tag vinculada ao produto!', 'success');
+                } else {
+                    showToast('Erro ao vincular tag', 'danger');
+                }
+                // Fecha dropdown
+                document.getElementById('tag-dropdown-' + produtoId).style.display = 'none';
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Erro ao vincular tag', 'danger');
+            });
+        };
     });
 }
 
-// Fecha segunda overlay
-if (btnCloseAcoes) {
-    btnCloseAcoes.addEventListener('click', () => {
-        overlayAcoes.style.display = 'none';
-        blurProdutos.style.display = 'none';
+// Chama o bind ao carregar a página
+bindTagDropdownEvents();
 
-        // Remove classe dos botões
-        document.querySelectorAll('.editBtn, .buyBtn, .sellBtn, .deleteBtn').forEach(btn => {
-            btn.classList.remove('fora-do-blur-produtos');
-        });
-    });
-}
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.tag-dropdown') && !e.target.closest('.add-tag-square')) {
+        document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+    }
+});
+
+// ========== OVERLAYS DE AJUDA ==========
+const helpBtnProdutos = document.getElementById('help-btn-produtos');
+const overlayProdutos1 = document.getElementById('overlay-produtos');
+const overlayAcoes = document.getElementById('overlay-acoes');
+const blurProdutos = document.getElementById('overlay-blur');
+const btnCloseProdutos1 = document.getElementById('closeOverlayProdutos1');
+const btnCloseProdutos2 = document.getElementById('closeOverlayProdutos2');
+
+helpBtnProdutos.addEventListener('click', () => {
+    overlayProdutos1.style.display = 'flex';
+    blurProdutos.style.display = 'block';
+});
+
+btnCloseProdutos1.addEventListener('click', () => {
+    overlayProdutos1.style.display = 'none';
+    
+    // Mantém blur ativo
+    blurProdutos.style.display = 'block';
+    
+    // Pega a seção de ações e adiciona classe para ficar acima do blur
+    const acoesSection = document.querySelector('.acoes');
+    acoesSection.classList.add('fora-do-blur');
+    
+    // Posiciona overlay2 próximo da seção de ações
+    const rect = acoesSection.getBoundingClientRect();
+    
+    overlayAcoes.style.position = 'absolute';
+    overlayAcoes.style.top = `${rect.bottom + window.scrollY + 10}px`;
+    overlayAcoes.style.left = `${rect.left + window.scrollX}px`;
+    overlayAcoes.style.display = 'flex';
+    overlayAcoes.style.zIndex = '10001';
+});
+
+btnCloseProdutos2.addEventListener('click', () => {
+    overlayAcoes.style.display = 'none';
+    blurProdutos.style.display = 'none';
+    
+    // Remove classe da seção de ações
+    const acoesSection = document.querySelector('.acoes');
+    acoesSection.classList.remove('fora-do-blur');
+});
+
+// Fecha overlays ao clicar no blur
+blurProdutos.addEventListener('click', () => {
+    overlayProdutos1.style.display = 'none';
+    overlayAcoes.style.display = 'none';
+    blurProdutos.style.display = 'none';
+    
+    const acoesSection = document.querySelector('.acoes');
+    acoesSection.classList.remove('fora-do-blur');
+});
 </script>
 
 </body>

@@ -54,28 +54,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form action="" method="POST">
           <div class="form-group">
             <label for="nome">Nome da Empresa</label>
-            <input type="text" id="nome" name="nome" placeholder="Digite o nome da empresa" required>
+            <input type="text" id="nome" name="nome" maxlength="100" placeholder="Digite o nome da empresa" required
+                   pattern="[A-Za-zÀ-ú0-9\s\-\.]+" title="Apenas letras, números, espaços, hífen e ponto">
           </div>
 
           <div class="form-group">
             <label for="email">Endereço de e-mail</label>
-            <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required>
+            <input type="email" id="email" name="email" maxlength="100" placeholder="Digite seu e-mail" required
+                   title="Digite um e-mail válido">
           </div>
 
           <div class="form-group">
             <label for="senha">Senha</label>
-            <input type="password" id="senha" name="senha" placeholder="Insira sua senha" required>
+            <input type="password" id="senha" name="senha" minlength="6" maxlength="50" placeholder="Insira sua senha" required
+                   title="Mínimo 6 caracteres">
           </div>
 
           <div class="form-group">
             <label for="senha2">Repita a senha</label>
-            <input type="password" id="senha2" name="senha2" placeholder="Repita sua senha" required>
+            <input type="password" id="senha2" name="senha2" minlength="6" maxlength="50" placeholder="Repita sua senha" required
+                   title="Mínimo 6 caracteres">
           </div>
 
           <div class="login-link">
             Já é uma loja registrada? <a href="loginLoja.php">Login</a>
           </div>
-                    <div class="login-link">
+          <div class="login-link">
             Já é um funcionário registrado? <a href="../funcionarios/login.php">Login</a>
           </div>
 

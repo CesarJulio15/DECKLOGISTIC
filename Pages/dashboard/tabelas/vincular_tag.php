@@ -1,32 +1,74 @@
 <?php
-header('Content-Type: text/plain');
 include '../../../conexao.php';
+session_start();
 
-$produto_id = intval($_POST['produto_id'] ?? 0);
-$tag_id = intval($_POST['tag_id'] ?? 0);
+header('Content-Type: application/json');
 
-if (!$produto_id || !$tag_id) {
-    echo "Erro: Dados inválidos";
+// Verifica se está logado
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['loja_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Não autorizado']);
     exit;
 }
 
-// Remove tags anteriores (se quiser apenas uma por produto)
-$stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id = ?");
-$stmt->bind_param("i", $produto_id);
-$stmt->execute();
-$stmt->close();
+$lojaId = $_SESSION['loja_id'];
+$produtoId = intval($_POST['produto_id'] ?? 0);
+$tagId = intval($_POST['tag_id'] ?? 0);
 
-// Vincula nova tag
-$stmt = $conn->prepare("INSERT INTO produto_tag (produto_id, tag_id) VALUES (?, ?)");
-if (!$stmt) {
-    echo "Erro: " . $conn->error;
+if ($produtoId <= 0 || $tagId <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Dados inválidos']);
     exit;
 }
-$stmt->bind_param("ii", $produto_id, $tag_id);
-if ($stmt->execute()) {
-    echo "ok";
+
+// Verifica se o produto pertence à loja do usuário
+$stmtProduto = $conn->prepare("SELECT id FROM produtos WHERE id = ? AND loja_id = ?");
+$stmtProduto->bind_param("ii", $produtoId, $lojaId);
+$stmtProduto->execute();
+$produto = $stmtProduto->get_result()->fetch_assoc();
+$stmtProduto->close();
+
+if (!$produto) {
+    echo json_encode(['success' => false, 'message' => 'Produto não encontrado']);
+    exit;
+}
+
+// Verifica se a tag pertence à loja do usuário
+$stmtTag = $conn->prepare("SELECT icone, cor FROM tags WHERE id = ? AND loja_id = ? AND deletado_em IS NULL");
+$stmtTag->bind_param("ii", $tagId, $lojaId);
+$stmtTag->execute();
+$tag = $stmtTag->get_result()->fetch_assoc();
+$stmtTag->close();
+
+if (!$tag) {
+    echo json_encode(['success' => false, 'message' => 'Tag não encontrada']);
+    exit;
+}
+
+// Verifica se já existe vínculo
+$stmtCheck = $conn->prepare("SELECT id FROM produto_tag WHERE produto_id = ? AND tag_id = ?");
+$stmtCheck->bind_param("ii", $produtoId, $tagId);
+$stmtCheck->execute();
+$existe = $stmtCheck->get_result()->fetch_assoc();
+$stmtCheck->close();
+
+if ($existe) {
+    echo json_encode(['success' => false, 'message' => 'Tag já vinculada a este produto']);
+    exit;
+}
+
+// Insere o vínculo
+$stmtInsert = $conn->prepare("INSERT INTO produto_tag (produto_id, tag_id) VALUES (?, ?)");
+$stmtInsert->bind_param("ii", $produtoId, $tagId);
+
+if ($stmtInsert->execute()) {
+    $stmtInsert->close();
+    echo json_encode([
+        'success' => true,
+        'message' => 'Tag vinculada com sucesso',
+        'icone' => $tag['icone'],
+        'cor' => $tag['cor']
+    ]);
 } else {
-    echo "Erro: " . $stmt->error;
+    $stmtInsert->close();
+    echo json_encode(['success' => false, 'message' => 'Erro ao vincular tag']);
 }
-$stmt->close();
 ?>
