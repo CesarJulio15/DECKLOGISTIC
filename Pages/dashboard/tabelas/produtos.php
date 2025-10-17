@@ -396,7 +396,7 @@ if ($tagVincResult) {
         </div>
         
         <button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
-        <button id="criar-tag-btn" onclick="window.location.href='../tag.php'">Criar Tag</button>
+        <button class="btn-novo" id="criar-tag-btn" onclick="window.location.href='../tag.php'">Criar Tag</button>
         
         <select id="ordenar">
             <option value="">Ordenar...</option>
