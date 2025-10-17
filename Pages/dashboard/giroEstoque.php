@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-
+require_once __DIR__ . '/../../session_check.php';
 // include seguro (ajuste o caminho se necessário)
 $path = __DIR__ . '/../../conexao.php';
 if (!file_exists($path)) {

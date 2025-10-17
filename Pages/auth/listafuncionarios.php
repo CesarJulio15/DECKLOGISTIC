@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
+include __DIR__ . '../../../session_check.php';
 
 // Apenas loja pode acessar
 if (!isset($_SESSION['usuario_id']) || ($_SESSION['tipo_login'] ?? '') !== 'empresa') {

@@ -1,5 +1,6 @@
 <?php
 session_start();
+include __DIR__ . '/../../../session_check.php';
 include __DIR__ . '/../../../conexao.php';
 // Apenas empresas podem cadastrar funcionários
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login']) || $_SESSION['tipo_login'] !== 'empresa') {

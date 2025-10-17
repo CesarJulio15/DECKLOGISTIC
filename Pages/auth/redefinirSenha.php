@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
+include __DIR__ . '../../../session_check.php';
 
 // Se o usuário não estiver autorizado pelo 2FA, volta para login
 if (!isset($_SESSION['autorizado_alterar_senha']) || !$_SESSION['autorizado_alterar_senha']) {

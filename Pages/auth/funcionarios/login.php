@@ -1,5 +1,8 @@
-<?php session_start(); 
-
+<?php
+// Inicia sessão apenas se necessário
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -9,6 +12,10 @@
   <title>Login Funcionário | DeckLogistic</title>
   <link rel="stylesheet" href="../../../assets/login.css">
   <link rel="icon" href="../../../img/logoDecklogistic.webp" type="image/x-icon" />
+  <!-- Meta redundante para reforçar não-cache -->
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 </head>
 <body>
 <div class="container">
@@ -22,14 +29,17 @@
       <!-- Mostra erro, se existir -->
       <?php
       if (isset($_SESSION['erro_login'])) {
-          echo '<div class="erro-msg">' . $_SESSION['erro_login'] . '</div>';
+          echo '<div class="erro-msg">' . htmlspecialchars($_SESSION['erro_login']) . '</div>';
           unset($_SESSION['erro_login']);
       }
       ?>
 
-      <form action="processa_login.php" method="POST">
-        <input type="email" name="email" placeholder="Endereço de e-mail" required>
-        <input type="password" name="senha" placeholder="Insira sua Senha" required>
+      <!-- Form com autocomplete controlado e campo falso para reduzir autofill -->
+      <form id="loginForm" action="processa_login.php" method="POST" autocomplete="off">
+        <input type="text" name="fakeusernameremembered" id="fakeusernameremembered" style="display:none" autocomplete="off" value="">
+
+        <input type="email" name="email" placeholder="Endereço de e-mail" required autocomplete="username" value="">
+        <input type="password" name="senha" placeholder="Insira sua Senha" required autocomplete="new-password" value="">
 
         <div class="login-link">
           Ainda não tem uma conta para sua empresa?
@@ -41,5 +51,22 @@
     </div>
   </div>
 </div>
+
+<script>
+/* Limpa campos caso a página seja restaurada do bfcache (back-forward cache) */
+window.addEventListener("pageshow", function(event) {
+    const isNavBack = event.persisted || (performance.getEntriesByType && performance.getEntriesByType("navigation")[0] && performance.getEntriesByType("navigation")[0].type === "back_forward");
+    if (isNavBack) {
+        const form = document.getElementById('loginForm');
+        if (form) {
+            form.reset();
+            form.querySelectorAll('input').forEach(i => {
+                i.value = '';
+                try { i.setAttribute('autocomplete','off'); } catch(e) {}
+            });
+        }
+    }
+});
+</script>
 </body>
 </html>

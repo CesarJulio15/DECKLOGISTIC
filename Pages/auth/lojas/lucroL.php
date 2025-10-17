@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . "/../../../conexao.php";
+include __DIR__ . '/../../../session_check.php';
 
 $filtro = $_GET['filtro'] ?? 'dia';
 
