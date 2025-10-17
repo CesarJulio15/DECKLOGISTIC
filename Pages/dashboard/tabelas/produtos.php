@@ -31,38 +31,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
 
     // ADICIONAR PRODUTO
-    if ($acao === 'adicionar_produto') {
-        $nome = trim($_POST['nome'] ?? '');
-        $preco = floatval($_POST['preco'] ?? 0);
-        $custo = floatval($_POST['custo'] ?? 0);
-        $estoque = intval($_POST['estoque'] ?? 0);
-        $lote = '';
+if ($acao === 'adicionar_produto') {
+    $nome = trim($_POST['nome'] ?? '');
+    $preco = floatval($_POST['preco'] ?? 0);
+    $custo = floatval($_POST['custo'] ?? 0);
+    $estoque = intval($_POST['estoque'] ?? 0);
+    $lote = '';
 
-        $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
+    // Se usuário for empresa ($tipo_login === 'empresa'), deixamos null (ou 0) no campo usuario_id do produto
+    $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
 
-        $stmt = $conn->prepare("
-            INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+    $stmt = $conn->prepare("
+        INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    if ($stmt) {
+        // Ajuste de tipos: s = string, d = double, i = integer
+        // nome (s), preco (d), custo (d), estoque (i), lote (s), lojaId (i), usuario_id_produto (i)
+        // Para evitar problemas com NULL no bind, convertemos usuario_id_produto para 0 quando for null
+        $usuario_id_for_bind = $usuario_id_produto === null ? 0 : $usuario_id_produto;
+        $stmt->bind_param("sddisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_for_bind);
+        $stmt->execute();
+        $idNovoProduto = $stmt->insert_id;
+        $stmt->close();
+
+        // Inserir histórico de adição (já existente)
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            VALUES (?, ?, ?, 'adicionado', ?, NOW())
         ");
-        if ($stmt) {
-            $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
-            $stmt->execute();
-            $idNovoProduto = $stmt->insert_id;
-            $stmt->close();
-
-            $stmtHist = $conn->prepare("
-                INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
-                VALUES (?, ?, ?, 'adicionado', ?, NOW())
-            ");
-            if ($stmtHist) {
-                $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_produto);
-                $stmtHist->execute();
-                $stmtHist->close();
-            }
-            header("Location: produtos.php");
-            exit;
+        if ($stmtHist) {
+            $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_for_bind);
+            $stmtHist->execute();
+            $stmtHist->close();
         }
+
+        // --- NOVO: Registrar movimentação de ENTRADA para a quantidade inicial ---
+        if ($estoque > 0) {
+            $tipo = 'entrada';
+            $data_mov = date('Y-m-d');
+            // custo_mov usamos o custo informado; se custo for zero, registra 0
+            $custo_mov = $custo;
+
+            $stmtMov = $conn->prepare("
+                INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario)
+                VALUES (?, ?, ?, ?, ?, NOW(), ?)
+            ");
+            if ($stmtMov) {
+                // tipos: i (produto_id), s (tipo), i (quantidade), s (data), i (usuario_id), d (custo)
+                $stmtMov->bind_param("isisid", $idNovoProduto, $tipo, $estoque, $data_mov, $usuario_id_for_bind, $custo_mov);
+                $stmtMov->execute();
+                $stmtMov->close();
+            }
+        }
+
+        header("Location: produtos.php");
+        exit;
     }
+}
+
 
     // EDITAR PRODUTO (AJAX)
     if ($acao === 'editar_produto') {

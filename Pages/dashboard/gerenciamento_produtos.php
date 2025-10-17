@@ -41,27 +41,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
 
     // --- ADICIONAR PRODUTO ---
-    if ($acao === 'adicionar_produto') {
-        $nome = trim($_POST['nome'] ?? '');
-        $preco = floatval($_POST['preco'] ?? 0);
-        $custo = floatval($_POST['custo'] ?? 0);
-        $estoque = intval($_POST['estoque'] ?? 0);
-        $lote = '';
+  
+if ($acao === 'adicionar_produto') {
+    $nome = trim($_POST['nome'] ?? '');
+    $preco = floatval($_POST['preco'] ?? 0);
+    $custo = floatval($_POST['custo'] ?? 0);
+    $estoque = intval($_POST['estoque'] ?? 0);
+    $lote = '';
 
-        // Se for empresa e não houver funcionário, usuario_id = NULL
-        if ($tipo_login === 'empresa') {
-            $usuario_id_produto = null;
-        } else {
-            $usuario_id_produto = $usuarioId;
-        }
+    // Se for empresa, usuario do produto será NULL (aceito pelo bind)
+    $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
 
-        $stmt = $conn->prepare("
-            INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ");
-        if (!$stmt) {
-            die("Erro prepare produto: " . $conn->error);
-        }
+    // 1) Inserir produto
+    $stmt = $conn->prepare("
+        INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    if (!$stmt) {
+        die("Erro prepare produto: " . $conn->error);
+    }
+
+    // tipos: s (nome), d (preco), d (custo), i (estoque), s (lote), i (loja_id), i (usuario_id)
+    $stmt->bind_param("sddisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
+    if (!$stmt->execute()) {
+        die("Erro execute produto: " . $stmt->error);
+    }
+
+    $idNovoProduto = $stmt->insert_id;
+    $stmt->close();
+
+    // 2) Inserir movimentação de estoque tipo 'entrada' com a quantidade inicial
+    // usa data atual (YYYY-MM-DD); ajuste se preferir outro formato
+    $data_mov = date('Y-m-d');
+    $tipo_mov = 'entrada';
+
+    $stmtMov = $conn->prepare("
+        INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario)
+        VALUES (?, ?, ?, ?, ?, NOW(), ?)
+    ");
+    if (!$stmtMov) {
+        // não interrompe o fluxo totalmente se falhar, mas mostra erro para diagnosticar
+        die("Erro prepare movimentacao: " . $conn->error);
+    }
+    // parâmetros: produto_id (i), tipo (s), quantidade (i), data_mov (s), usuario_id (i|null), custo_unitario (d)
+    $stmtMov->bind_param("isisid", $idNovoProduto, $tipo_mov, $estoque, $data_mov, $usuario_id_produto, $custo);
+    if (!$stmtMov->execute()) {
+        // você pode optar por logar em vez de die; aqui mostramos erro pra facilitar debug
+        die("Erro execute movimentacao: " . $stmtMov->error);
+    }
+    $stmtMov->close();
+
+    // 3) Histórico (como já fazia)
+    $stmtHist = $conn->prepare("
+        INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+        VALUES (?, ?, ?, 'adicionado', ?, NOW())
+    ");
+    if (!$stmtHist) {
+        die("Erro prepare histórico: " . $conn->error);
+    }
+    $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_produto);
+    if (!$stmtHist->execute()) {
+        die("Erro execute histórico: " . $stmtHist->error);
+    }
+    $stmtHist->close();
+
+    $msg = "✅ Produto cadastrado com sucesso e entrada registrada (+{$estoque}).";
+}
+
 
         // Se usuario_id_produto for null, use "i" e passe null, senão passe o id normalmente
         if ($usuario_id_produto === null) {
@@ -334,7 +380,7 @@ if (($acao ?? '') === 'vender_produto') {
     exit;
 }
 
-  }
+  
 
 /* ======================================================
    BUSCA PRODUTOS (LISTAGEM)
