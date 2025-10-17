@@ -31,38 +31,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
 
     // ADICIONAR PRODUTO
-    if ($acao === 'adicionar_produto') {
-        $nome = trim($_POST['nome'] ?? '');
-        $preco = floatval($_POST['preco'] ?? 0);
-        $custo = floatval($_POST['custo'] ?? 0);
-        $estoque = intval($_POST['estoque'] ?? 0);
-        $lote = '';
+if ($acao === 'adicionar_produto') {
+    $nome = trim($_POST['nome'] ?? '');
+    $preco = floatval($_POST['preco'] ?? 0);
+    $custo = floatval($_POST['custo'] ?? 0);
+    $estoque = intval($_POST['estoque'] ?? 0);
+    $lote = '';
 
-        $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
+    // Se usuário for empresa ($tipo_login === 'empresa'), deixamos null (ou 0) no campo usuario_id do produto
+    $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
 
-        $stmt = $conn->prepare("
-            INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+    $stmt = $conn->prepare("
+        INSERT INTO produtos (nome, preco_unitario, custo_unitario, quantidade_estoque, lote, loja_id, usuario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    if ($stmt) {
+        // Ajuste de tipos: s = string, d = double, i = integer
+        // nome (s), preco (d), custo (d), estoque (i), lote (s), lojaId (i), usuario_id_produto (i)
+        // Para evitar problemas com NULL no bind, convertemos usuario_id_produto para 0 quando for null
+        $usuario_id_for_bind = $usuario_id_produto === null ? 0 : $usuario_id_produto;
+        $stmt->bind_param("sddisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_for_bind);
+        $stmt->execute();
+        $idNovoProduto = $stmt->insert_id;
+        $stmt->close();
+
+        // Inserir histórico de adição (já existente)
+        $stmtHist = $conn->prepare("
+            INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+            VALUES (?, ?, ?, 'adicionado', ?, NOW())
         ");
-        if ($stmt) {
-            $stmt->bind_param("sdiisii", $nome, $preco, $custo, $estoque, $lote, $lojaId, $usuario_id_produto);
-            $stmt->execute();
-            $idNovoProduto = $stmt->insert_id;
-            $stmt->close();
-
-            $stmtHist = $conn->prepare("
-                INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
-                VALUES (?, ?, ?, 'adicionado', ?, NOW())
-            ");
-            if ($stmtHist) {
-                $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_produto);
-                $stmtHist->execute();
-                $stmtHist->close();
-            }
-            header("Location: produtos.php");
-            exit;
+        if ($stmtHist) {
+            $stmtHist->bind_param("isii", $idNovoProduto, $nome, $estoque, $usuario_id_for_bind);
+            $stmtHist->execute();
+            $stmtHist->close();
         }
+
+        // --- NOVO: Registrar movimentação de ENTRADA para a quantidade inicial ---
+        if ($estoque > 0) {
+            $tipo = 'entrada';
+            $data_mov = date('Y-m-d');
+            // custo_mov usamos o custo informado; se custo for zero, registra 0
+            $custo_mov = $custo;
+
+            $stmtMov = $conn->prepare("
+                INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario)
+                VALUES (?, ?, ?, ?, ?, NOW(), ?)
+            ");
+            if ($stmtMov) {
+                // tipos: i (produto_id), s (tipo), i (quantidade), s (data), i (usuario_id), d (custo)
+                $stmtMov->bind_param("isisid", $idNovoProduto, $tipo, $estoque, $data_mov, $usuario_id_for_bind, $custo_mov);
+                $stmtMov->execute();
+                $stmtMov->close();
+            }
+        }
+
+        header("Location: produtos.php");
+        exit;
     }
+}
+
 
     // EDITAR PRODUTO (AJAX)
     if ($acao === 'editar_produto') {
@@ -99,15 +126,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Content-Type: application/json');
         $id = intval($_POST['produto_id'] ?? 0);
 
-        $conn->query("DELETE FROM produto_tag WHERE produto_id=$id");
-        $conn->query("DELETE FROM recomendacoes_reabastecimento WHERE produto_id=$id");
-        $conn->query("DELETE FROM movimentacoes_estoque WHERE produto_id=$id");
-        $conn->query("DELETE FROM itens_venda WHERE produto_id=$id");
-        $conn->query("DELETE FROM historico_produtos WHERE produto_id=$id");
-        $conn->query("DELETE FROM produtos WHERE id=$id AND loja_id=$lojaId");
+        try {
+            // Remove tags associadas
+            $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
 
-        echo json_encode(['success' => true, 'message' => '🗑️ Produto excluído com sucesso!']);
-        exit;
+
+            // Remove movimentações de estoque
+            $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Remove itens de venda
+            $stmt = $conn->prepare("DELETE FROM itens_venda WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Remove histórico do produto
+            $stmt = $conn->prepare("DELETE FROM historico_produtos WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Apaga produto do banco
+            $stmt = $conn->prepare("DELETE FROM produtos WHERE id = ? AND loja_id = ?");
+            if ($stmt) {
+                $stmt->bind_param("ii", $id, $lojaId);
+                if ($stmt->execute()) {
+                    if ($stmt->affected_rows > 0) {
+                        $stmt->close();
+                        echo json_encode(['success' => true, 'message' => '🗑️ Produto excluído com sucesso!']);
+                        exit;
+                    } else {
+                        $stmt->close();
+                        echo json_encode(['success' => false, 'message' => '❌ Produto não encontrado ou já foi excluído.']);
+                        exit;
+                    }
+                }
+                $stmt->close();
+            }
+
+            echo json_encode(['success' => false, 'message' => '❌ Erro ao preparar consulta de exclusão.']);
+            exit;
+
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => '❌ Erro ao excluir produto: ' . $e->getMessage()]);
+            exit;
+        }
     }
 
     // ENTRADA (COMPRAR PRODUTO) - AJAX
@@ -317,6 +394,123 @@ if ($tagVincResult) {
     right: 20px;
     z-index: 9999;
 }
+
+/* Classe para botões ficarem acima do blur */
+.fora-do-blur-produtos {
+  position: relative !important;
+  z-index: 10002 !important;
+}
+
+.fora-do-blur-produtos:hover {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #ff6600 !important;
+  transform: none !important;
+}
+
+/* Blur que cobre toda a tela */
+#overlay-blur-produtos {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+/* Overlay introdução aos produtos */
+#overlay-produtos-intro {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 10000;
+    padding: 30px;
+    padding-top: 700px;
+    background: transparent;
+}
+
+/* Overlay de ações */
+#overlay-produtos-acoes {
+    display: none;
+    position: absolute;
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cards das overlays */
+#overlay-produtos-intro .welcome-card,
+#overlay-produtos-acoes .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-produtos-intro .welcome-card h2,
+#overlay-produtos-acoes .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-produtos-intro .welcome-card p,
+#overlay-produtos-acoes .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-produtos-intro .welcome-card button,
+#overlay-produtos-acoes .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Botão de ajuda flutuante */
+#help-btn-produtos {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    background: #ff6600 !important;
+    color: #fff !important;
+    border: none !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 16px rgba(255,102,0,0.5) !important;
+    transition: all 0.3s ease !important;
+}
+
+#help-btn-produtos:hover {
+    box-shadow: 0 6px 24px rgba(255,102,0,0.7) !important;
+    transform: scale(1.1) !important;
+    background: #ff7700 !important;
+}
 </style>
 </head>
 <body>
@@ -369,7 +563,7 @@ if ($tagVincResult) {
         </div>
         
         <button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
-        <button id="criar-tag-btn" onclick="window.location.href='../tag.php'">Criar Tag</button>
+        <button class="btn-novo" id="criar-tag-btn" onclick="window.location.href='../tag.php'">Criar Tag</button>
         
         <select id="ordenar">
             <option value="">Ordenar...</option>
@@ -686,6 +880,420 @@ function updateTableRow(produtoId) {
     // Recarrega apenas a linha afetada via AJAX
     fetch(`get_produto.php?id=${produtoId}`)
         .then(res => res.json())
+        .then data => {
+            if (data.success) {
+                const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+                if (row) {
+                    row.dataset.preco = data.produto.preco_unitario;
+                    row.dataset.quantidade = data.produto.quantidade_estoque;
+                    row.querySelector('td:nth-child(2)').textContent = `R$ ${parseFloat(data.produto.preco_unitario).toFixed(2).replace('.', ',')}`;
+                    row.querySelector('td:nth-child(3)').textContent = data.produto.quantidade_estoque;
+                }
+            }
+        });
+}
+
+// ========== EDITAR PRODUTO ==========
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('editBtn') || e.target.closest('.editBtn')) {
+        const row = e.target.closest('tr');
+        const id = row.dataset.id;
+        const nome = row.dataset.nome;
+        const preco = row.dataset.preco;
+        const quantidade = row.dataset.quantidade;
+        
+        document.getElementById('edit_produto_id').value = id;
+        document.getElementById('edit_nome').value = nome;
+        document.getElementById('edit_preco').value = preco;
+        document.getElementById('edit_estoque').value = quantidade;
+        
+        new bootstrap.Modal(document.getElementById('editModal')).show();
+    }
+});
+
+function submitEdit() {
+    const formData = new FormData(document.getElementById('editForm'));
+    formData.append('acao', 'editar_produto');
+    
+    fetch('', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(data.message, 'danger');
+        }
+    })
+    .catch(err => showToast('Erro ao editar produto', 'danger'));
+}
+
+// ========== ENTRADA (COMPRA) ==========
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('buyBtn') || e.target.closest('.buyBtn')) {
+        const row = e.target.closest('tr');
+        const id = row.dataset.id;
+        const nome = row.dataset.nome;
+        
+        document.getElementById('buy_produto_id').value = id;
+        document.getElementById('buy_nome').value = nome;
+        document.getElementById('buy_quantidade').value = 1;
+        document.getElementById('buy_custo').value = '';
+        
+        new bootstrap.Modal(document.getElementById('buyModal')).show();
+    }
+});
+
+function submitBuy() {
+    const formData = new FormData(document.getElementById('buyForm'));
+    formData.append('acao', 'comprar_produto');
+    
+    fetch('', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('buyModal')).hide();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(data.message, 'danger');
+        }
+    })
+    .catch(err => showToast('Erro ao registrar entrada', 'danger'));
+}
+
+// ========== SAÍDA (VENDA) ==========
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('sellBtn') || e.target.closest('.sellBtn')) {
+        const row = e.target.closest('tr');
+        const id = row.dataset.id;
+        const nome = row.dataset.nome;
+        
+        document.getElementById('sell_produto_id').value = id;
+        document.getElementById('sell_nome').value = nome;
+        document.getElementById('sell_quantidade').value = 1;
+        
+        new bootstrap.Modal(document.getElementById('sellModal')).show();
+    }
+});
+
+function submitSell() {
+    const formData = new FormData(document.getElementById('sellForm'));
+    formData.append('acao', 'vender_produto');
+    
+    fetch('', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('sellModal')).hide();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(data.message, 'danger');
+        }
+    })
+    .catch(err => showToast('Erro ao registrar saída', 'danger'));
+}
+
+// ========== EXCLUIR PRODUTO ==========
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('deleteBtn') || e.target.closest('.deleteBtn')) {
+        const row = e.target.closest('tr');
+        const id = row.dataset.id;
+        const nome = row.dataset.nome;
+        
+        if (!confirm(`Deseja realmente excluir o produto "${nome}"?\n\nEsta ação é irreversível.`)) {
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('acao', 'apagar_produto');
+        formData.append('produto_id', id);
+        
+        fetch('', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                row.remove();
+            } else {
+                showToast(data.message, 'danger');
+            }
+        })
+        .catch(err => showToast('Erro ao excluir produto', 'danger'));
+    }
+});
+
+// ------------- PESQUISA -------------
+const pesquisaInput = document.getElementById('pesquisa');
+if (pesquisaInput) {
+    pesquisaInput.addEventListener('input', function() {
+        const termo = normalizeStr(this.value);
+        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+            const nome = textoNomeDoRow(tr);
+
+            const loteTd = tr.querySelector('td:nth-child(5)');
+            const lote = loteTd ? normalizeStr(loteTd.textContent) : '';
+
+            const precoTd = tr.querySelector('td:nth-child(3)');
+            const preco = precoTd ? normalizeStr(precoTd.textContent) : '';
+
+            const matches = nome.includes(termo) || lote.includes(termo) || preco.includes(termo);
+            tr.style.display = matches ? '' : 'none';
+        });
+    });
+}
+
+// ------------- ORDENAÇÃO -------------
+const ordenarSelect = document.getElementById('ordenar');
+if (ordenarSelect) {
+    ordenarSelect.addEventListener('change', function() {
+        const tbody = document.getElementById('tabela-produtos');
+        if (!tbody) return;
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const val = this.value;
+
+        rows.sort((a, b) => {
+            switch (val) {
+                case 'nome-asc': {
+                    const aText = textoNomeDoRow(a);
+                    const bText = textoNomeDoRow(b);
+                    return aText.localeCompare(bText, 'pt', { sensitivity: 'base' });
+                }
+                case 'nome-desc': {
+                    const aText = textoNomeDoRow(a);
+                    const bText = textoNomeDoRow(b);
+                    return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
+                }
+                case 'preco-asc': {
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    return aNum - bNum;
+                }
+                case 'preco-desc': {
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    return bNum - aNum;
+                }
+                case 'quantidade-asc': {
+                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    return aNum - bNum;
+                }
+                case 'quantidade-desc': {
+                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    return bNum - aNum;
+                }
+                default:
+                    return 0;
+            }
+        });
+
+        rows.forEach(r => tbody.appendChild(r));
+    });
+}
+
+// Filtro por tag
+document.querySelectorAll('.tag-item').forEach(tag => {
+    tag.addEventListener('click', function() {
+        const tagId = this.dataset.tagId;
+        document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+            const icones = tr.querySelectorAll('.tags-vinculadas i');
+            let possuiTag = false;
+            icones.forEach(icon => {
+                if (icon.dataset.tagId === tagId) {
+                    possuiTag = true;
+                }
+            });
+            tr.style.display = possuiTag ? '' : 'none';
+        });
+    });
+});
+
+function resetFiltro() {
+    document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
+        tr.style.display = '';
+    });
+}
+
+// =================== BOTÃO E OVERLAYS DE AJUDA ===================
+
+<!-- Blur atrás dos overlays -->
+<div id="overlay-blur-produtos" class="full-screen-blur" style="display:none;"></div>
+
+<!-- Overlay 1: Introdução à página de produtos -->
+<div id="overlay-produtos-intro" style="display:none;">
+  <div class="welcome-card">
+    <h2>Produtos</h2>
+    <p>Esta é a área de produtos da sua empresa. Aqui você gerencia seu catálogo, controla preços, estoque e realiza operações de entrada e saída.</p>
+    <button id="closeOverlayProdutos1">Próximo</button>
+  </div>
+</div>
+
+<!-- Overlay 2: Destaque para botões de ação -->
+<div id="overlay-produtos-acoes" class="welcome-overlay" style="display:none;">
+  <div class="welcome-card">
+    <h2>Ações de Produtos</h2>
+    <p>Use os botões <b>Entrada</b> para registrar compras e <b>Saída</b> para registrar vendas. Você também pode editar informações e excluir produtos.</p>
+    <button id="closeOverlayProdutos2">Fechar</button>
+  </div>
+</div>
+
+<!-- Botão de ajuda flutuante -->
+<button id="help-btn-produtos">?</button>
+
+<style>
+/* Classe para botões ficarem acima do blur */
+.fora-do-blur-produtos {
+  position: relative !important;
+  z-index: 10002 !important;
+}
+
+.fora-do-blur-produtos:hover {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #ff6600 !important;
+  transform: none !important;
+}
+
+/* Blur que cobre toda a tela */
+#overlay-blur-produtos {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+/* Overlay introdução aos produtos */
+#overlay-produtos-intro {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 10000;
+    padding: 30px;
+    padding-top: 700px;
+    background: transparent;
+}
+
+/* Overlay de ações */
+#overlay-produtos-acoes {
+    display: none;
+    position: absolute;
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cards das overlays */
+#overlay-produtos-intro .welcome-card,
+#overlay-produtos-acoes .welcome-card {
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-produtos-intro .welcome-card h2,
+#overlay-produtos-acoes .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-produtos-intro .welcome-card p,
+#overlay-produtos-acoes .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-produtos-intro .welcome-card button,
+#overlay-produtos-acoes .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Botão de ajuda flutuante */
+#help-btn-produtos {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    background: #ff6600 !important;
+    color: #fff !important;
+    border: none !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 16px rgba(255,102,0,0.5) !important;
+    transition: all 0.3s ease !important;
+}
+
+#help-btn-produtos:hover {
+    box-shadow: 0 6px 24px rgba(255,102,0,0.7) !important;
+    transform: scale(1.1) !important;
+    background: #ff7700 !important;
+}
+</style>
+
+<script>
+// ========== FUNÇÕES UTILITÁRIAS ==========
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('actionToast');
+    const toastBody = document.getElementById('toastMessage');
+    
+    toast.classList.remove('bg-success', 'bg-danger', 'bg-warning');
+    toast.classList.add(type === 'success' ? 'bg-success' : 'bg-danger');
+    
+    toastBody.textContent = message;
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+function updateTableRow(produtoId) {
+    // Recarrega apenas a linha afetada via AJAX
+    fetch(`get_produto.php?id=${produtoId}`)
+        .then(res => res.json())
         .then(data => {
             if (data.success) {
                 const row = document.querySelector(`tr[data-id="${produtoId}"]`);
@@ -933,6 +1541,66 @@ document.querySelectorAll('.tag-item').forEach(tag => {
 function resetFiltro() {
     document.querySelectorAll('#tabela-produtos tr').forEach(tr => {
         tr.style.display = '';
+    });
+}
+
+// =================== SISTEMA DE OVERLAYS ===================
+const helpBtnProdutos = document.getElementById('help-btn-produtos');
+const overlayIntro = document.getElementById('overlay-produtos-intro');
+const overlayAcoes = document.getElementById('overlay-produtos-acoes');
+const blurProdutos = document.getElementById('overlay-blur-produtos');
+const btnCloseIntro = document.getElementById('closeOverlayProdutos1');
+const btnCloseAcoes = document.getElementById('closeOverlayProdutos2');
+
+// Abre primeira overlay
+if (helpBtnProdutos) {
+    helpBtnProdutos.addEventListener('click', () => {
+        overlayIntro.style.display = 'flex';
+        blurProdutos.style.display = 'block';
+    });
+}
+
+// Fecha primeira overlay e abre segunda
+if (btnCloseIntro) {
+    btnCloseIntro.addEventListener('click', () => {
+        overlayIntro.style.display = 'none';
+        
+        // Mantém blur ativo
+        blurProdutos.style.display = 'block';
+
+        // Pega a primeira linha da tabela para posicionar próximo aos botões de ação
+        const primeiraLinha = document.querySelector('#tabela-produtos tr');
+        if (primeiraLinha) {
+            const btnEntrada = primeiraLinha.querySelector('.buyBtn');
+            if (btnEntrada) {
+                const rect = btnEntrada.getBoundingClientRect();
+                
+                // Posiciona overlay2 próximo aos botões de ação
+                overlayAcoes.style.position = 'absolute';
+                overlayAcoes.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                overlayAcoes.style.left = `${rect.left + window.scrollX}px`;
+                overlayAcoes.style.display = 'flex';
+                overlayAcoes.style.zIndex = '10001';
+
+                // Adiciona classe para todos os botões de ação ficarem acima do blur
+                document.querySelectorAll('.editBtn, .buyBtn, .sellBtn, .deleteBtn').forEach(btn => {
+                    btn.classList.add('fora-do-blur-produtos');
+                });
+            }
+        }
+    });
+}
+
+// Fecha segunda overlay
+if (btnCloseAcoes) {
+    btnCloseAcoes.addEventListener('click', () => {
+        overlayAcoes.style.display = 'none';
+        blurProdutos.style.display = 'none';
+
+        // Remove classe dos botões
+        document.querySelectorAll('.editBtn, .buyBtn, .sellBtn, .deleteBtn').forEach(btn => {
+            btn.classList.remove('fora-do-blur-produtos');
+        });
     });
 }
 </script>
