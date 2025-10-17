@@ -1,7 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-
+require_once __DIR__ . '/../../session_check.php';
 $lojaId = $_SESSION['loja_id'] ?? 0;
 $usuarioId = $_SESSION['usuario_id'] ?? 0;
 $tipo_login = $_SESSION['tipo_login'] ?? 'funcionario';

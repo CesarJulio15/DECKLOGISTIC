@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/../../session_check.php';
 $lojaId = $_SESSION['loja_id'];
 ?>
 <!DOCTYPE html>
