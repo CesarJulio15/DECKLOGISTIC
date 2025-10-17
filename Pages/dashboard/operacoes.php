@@ -158,9 +158,25 @@ $result = $conn->query($sqlComLimit);
 <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-.paginacao a { display:inline-block; width:30px; height:30px; text-align:center; line-height:30px; border:1px solid #ccc; border-radius:4px; text-decoration:none; color:#000; }
-.paginacao a.active { background:#333; color:#fff; border-color:#333; }
-.paginacao { margin-top:15px; display:flex; gap:5px; }
+.paginacao { margin-top:15px; display:flex; gap:5px; justify-content:center; }
+.paginacao a { 
+    width:30px; 
+    height:30px; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    border:1px solid #555; 
+    border-radius:4px; 
+    text-decoration:none; 
+    color:#fff;
+    background-color: transparent;
+}
+.paginacao a.active { 
+    border: 2px solid #ff6600 !important;
+    color: #fff !important;
+    font-weight: normal;
+    background-color: transparent;
+}
 #btnApagar { background:#f00; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:5px;}
 #btnApagar i { color:#fff; }
 #modalFundo { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:1000; justify-content:center; align-items:center; }
