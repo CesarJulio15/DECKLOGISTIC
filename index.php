@@ -133,7 +133,7 @@
         <div class="row align-items-center justify-content-between g-lg-5">
           <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
             <div class="image-wrapper">
-              <img src="assets/img/about/fotoDeckers.webp" class="img-fluid rounded" alt="About Us Image">
+              <img src="img/FotoTop.webp" class="img-fluid rounded" alt="About Us Image">
             </div>
           </div>
 
@@ -225,7 +225,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
           </div>
           <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
             <div class="intro-image">
-              <img src="assets/img/features/features-2.webp" alt="Features" class="img-fluid">
+              <img src="img/FotoSite.webp" alt="Features" class="img-fluid">
             </div>
           </div>
         </div>
@@ -439,7 +439,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
             <div class="col-lg-7">
               <div class="visual-content">
                 <div class="main-image">
-                  <img src="assets/img/features/features-4.webp" alt="" class="img-fluid">
+                  <img src="img/FotoSite2.webp" alt="" class="img-fluid">
                   <div class="floating-card">
                     <i class="bi bi-graph-up-arrow"></i>
                     <div class="card-content">
