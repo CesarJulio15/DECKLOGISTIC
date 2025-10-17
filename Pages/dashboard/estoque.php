@@ -132,6 +132,168 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
   </div>
 </div>
 
+<!-- Modal Histórico -->
+<div id="modalHistorico" style="
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); justify-content:center; align-items:center;
+">
+  <div style="
+      background:#fff; padding:20px; border-radius:8px;
+      width:90%; max-width:600px; position:relative;
+  ">
+    <button id="btnFecharModal" style="
+        position:absolute; top:10px; right:10px;
+        font-size:16px; cursor:pointer;
+    ">✖</button>
+    <h3>Histórico Estoque - Últimos 6 Meses</h3>
+    <div id="chartHistorico" style="height:300px;"></div>
+  </div>
+</div>
+
+<!-- =================== OVERLAYS DE AJUDA =================== -->
+
+<!-- Blur atrás dos overlays -->
+<div id="overlay-blur-estoque" class="full-screen-blur" style="display:none;"></div>
+
+<!-- Overlay 1: Introdução à página de estoque -->
+<div id="overlay-estoque-intro" style="display:none;">
+  <div class="welcome-card">
+    <h2>Estoque</h2>
+    <p>Esta é a área de estoque da sua empresa. Aqui você gerencia produtos, monitora quantidades, analisa movimentações e identifica itens em falta ou parados.</p>
+    <button id="closeOverlayEstoque1">Próximo</button>
+  </div>
+</div>
+
+<!-- Overlay 2: Destaque para botões de histórico e giro -->
+<div id="overlay-estoque-acoes" class="welcome-overlay" style="display:none;">
+  <div class="welcome-card">
+    <h2>Análises de Estoque</h2>
+    <p>Use esses botões para visualizar o histórico dos últimos 6 meses e analisar o giro de estoque dos seus produtos.</p>
+    <button id="closeOverlayEstoque2">Fechar</button>
+  </div>
+</div>
+
+<!-- Botão de ajuda flutuante -->
+<button id="help-btn-estoque">?</button>
+
+<style>
+/* Classe para botões ficarem acima do blur */
+.fora-do-blur-estoque {
+  position: relative !important;
+  z-index: 10002 !important;
+}
+
+.fora-do-blur-estoque:hover {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #ff6600 !important;
+  transform: none !important;
+}
+
+/* Blur que cobre toda a tela */
+#overlay-blur-estoque {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+}
+
+/* Overlay introdução ao estoque */
+#overlay-estoque-intro {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-end;
+    align-items: flex-start;
+    z-index: 10000;
+    padding: 30px;
+    padding-top: 700px;
+    background: transparent;
+}
+
+/* Overlay de ações */
+#overlay-estoque-acoes {
+    display: none;
+    position: absolute;
+    z-index: 10001;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cards das overlays */
+#overlay-estoque-intro .welcome-card,
+#overlay-estoque-acoes .welcome-card {
+  margin-top: 50px;
+    background: #222;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+    padding: 22px 28px;
+    max-width: 340px;
+    font-size: 15px;
+    pointer-events: auto;
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+    text-align: left;
+}
+
+#overlay-estoque-intro .welcome-card h2,
+#overlay-estoque-acoes .welcome-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+#overlay-estoque-intro .welcome-card p,
+#overlay-estoque-acoes .welcome-card p {
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+#overlay-estoque-intro .welcome-card button,
+#overlay-estoque-acoes .welcome-card button {
+    margin-top: 12px;
+    background: #ff6600 !important;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Botão de ajuda flutuante */
+#help-btn-estoque {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+#help-btn-estoque:hover {
+    box-shadow: 0 6px 24px rgba(255,102,0,0.4);
+    transform: scale(1.1);
+}
+</style>
+
 <!-- =================== JAVASCRIPT =================== -->
 <script>
 const lojaId = <?= $lojaId ?>;
@@ -275,6 +437,53 @@ const btnHistorico = document.getElementById("btnHistorico");
 const modal = document.getElementById("modalHistorico");
 document.getElementById("btnFecharModal").onclick = () => modal.style.display = "none";
 btnHistorico.onclick = async () => { modal.style.display = "flex"; await loadHistoricoEstoque(); };
+
+// =================== SISTEMA DE OVERLAYS ===================
+const helpBtnEstoque = document.getElementById('help-btn-estoque');
+const overlayIntro = document.getElementById('overlay-estoque-intro');
+const overlayAcoes = document.getElementById('overlay-estoque-acoes');
+const blurEstoque = document.getElementById('overlay-blur-estoque');
+const btnCloseIntro = document.getElementById('closeOverlayEstoque1');
+const btnCloseAcoes = document.getElementById('closeOverlayEstoque2');
+
+// Abre primeira overlay
+helpBtnEstoque.addEventListener('click', () => {
+  overlayIntro.style.display = 'flex';
+  blurEstoque.style.display = 'block';
+});
+
+// Fecha primeira overlay e abre segunda
+btnCloseIntro.addEventListener('click', () => {
+  overlayIntro.style.display = 'none';
+  
+  // Mantém blur ativo
+  blurEstoque.style.display = 'block';
+
+  // Pega posição do botão "Ver histórico 6 meses"
+  const btnHistorico = document.getElementById('btnHistorico');
+  const rect = btnHistorico.getBoundingClientRect();
+  
+  // Posiciona overlay2 próximo aos botões
+  overlayAcoes.style.position = 'absolute';
+  overlayAcoes.style.top = `${rect.bottom + window.scrollY + 10}px`;
+  overlayAcoes.style.left = `${rect.left + window.scrollX}px`;
+  overlayAcoes.style.display = 'flex';
+  overlayAcoes.style.zIndex = '10001';
+
+  // Adiciona classe para botões ficarem acima do blur
+  btnHistorico.classList.add('fora-do-blur-estoque');
+  document.getElementById('btnGiro').classList.add('fora-do-blur-estoque');
+});
+
+// Fecha segunda overlay
+btnCloseAcoes.addEventListener('click', () => {
+  overlayAcoes.style.display = 'none';
+  blurEstoque.style.display = 'none';
+
+  // Remove classe dos botões
+  document.getElementById('btnHistorico').classList.remove('fora-do-blur-estoque');
+  document.getElementById('btnGiro').classList.remove('fora-do-blur-estoque');
+});
 
 // ---------- Inicialização ----------
 document.addEventListener("DOMContentLoaded", () => {
