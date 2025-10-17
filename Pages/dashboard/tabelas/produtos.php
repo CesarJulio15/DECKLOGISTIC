@@ -99,15 +99,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Content-Type: application/json');
         $id = intval($_POST['produto_id'] ?? 0);
 
-        $conn->query("DELETE FROM produto_tag WHERE produto_id=$id");
-        $conn->query("DELETE FROM recomendacoes_reabastecimento WHERE produto_id=$id");
-        $conn->query("DELETE FROM movimentacoes_estoque WHERE produto_id=$id");
-        $conn->query("DELETE FROM itens_venda WHERE produto_id=$id");
-        $conn->query("DELETE FROM historico_produtos WHERE produto_id=$id");
-        $conn->query("DELETE FROM produtos WHERE id=$id AND loja_id=$lojaId");
+        try {
+            // Remove tags associadas
+            $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
 
-        echo json_encode(['success' => true, 'message' => '🗑️ Produto excluído com sucesso!']);
-        exit;
+
+            // Remove movimentações de estoque
+            $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Remove itens de venda
+            $stmt = $conn->prepare("DELETE FROM itens_venda WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Remove histórico do produto
+            $stmt = $conn->prepare("DELETE FROM historico_produtos WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Apaga produto do banco
+            $stmt = $conn->prepare("DELETE FROM produtos WHERE id = ? AND loja_id = ?");
+            if ($stmt) {
+                $stmt->bind_param("ii", $id, $lojaId);
+                if ($stmt->execute()) {
+                    if ($stmt->affected_rows > 0) {
+                        $stmt->close();
+                        echo json_encode(['success' => true, 'message' => '🗑️ Produto excluído com sucesso!']);
+                        exit;
+                    } else {
+                        $stmt->close();
+                        echo json_encode(['success' => false, 'message' => '❌ Produto não encontrado ou já foi excluído.']);
+                        exit;
+                    }
+                }
+                $stmt->close();
+            }
+
+            echo json_encode(['success' => false, 'message' => '❌ Erro ao preparar consulta de exclusão.']);
+            exit;
+
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => '❌ Erro ao excluir produto: ' . $e->getMessage()]);
+            exit;
+        }
     }
 
     // ENTRADA (COMPRAR PRODUTO) - AJAX
@@ -369,7 +419,7 @@ if ($tagVincResult) {
         </div>
         
         <button class="btn-novo" id="import-btn" data-bs-toggle="modal" data-bs-target="#importModal">Importar</button>
-        <button id="criar-tag-btn" onclick="window.location.href='../tag.php'">Criar Tag</button>
+  
         
         <select id="ordenar">
             <option value="">Ordenar...</option>
