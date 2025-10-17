@@ -1,6 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
+require_once __DIR__ . '/../../session_check.php';
 
 // Verifica login
 if (!isset($_SESSION['usuario_id'])) {

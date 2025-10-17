@@ -1,4 +1,6 @@
-
+<?php 
+include __DIR__ . '../../../session_check.php';
+?>
 
 <!DOCTYPE html>
 <html lang="en">

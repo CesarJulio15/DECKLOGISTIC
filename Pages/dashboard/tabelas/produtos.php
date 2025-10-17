@@ -1,6 +1,7 @@
 <?php 
 include '../../../conexao.php'; 
 session_start();
+require_once __DIR__ . '/../../../session_check.php';
 
 // Verifica se está logado
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['tipo_login'])) {

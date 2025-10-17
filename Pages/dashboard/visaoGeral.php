@@ -1,7 +1,7 @@
 <?php
 session_start();
 include __DIR__ . '/../../conexao.php';
-
+require_once __DIR__ . '/../../session_check.php';
 // Permite empresa ou funcionario visualizar
 if (!isset($_SESSION['loja_id']) || !in_array($_SESSION['tipo_login'] ?? '', ['empresa', 'funcionario'])) {
     // Exibe mensagem amigável se não autenticado
