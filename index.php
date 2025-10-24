@@ -791,65 +791,6 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
 
     </section><!-- /Services Section -->
 
-    <!-- Call To Action Section -->
-    <section id="call-to-action" class="call-to-action section light-background">
-
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="advertise-1 d-flex flex-column flex-lg-row gap-4 align-items-center position-relative">
-
-          <div class="content-left flex-grow-1" data-aos="fade-right" data-aos-delay="200">
-            <span class="badge text-uppercase mb-2">Não Perca!</span>
-            <h2>Revolucione Sua Experiência Digital Hoje</h2>
-            <p class="my-4">A Strategia acelera o crescimento do seu negócio por meio de soluções inovadoras e tecnologia de ponta. Junte-se a milhares de clientes satisfeitos que transformaram suas operações.</p>
-
-            <div class="features d-flex flex-wrap gap-3 mb-4">
-              <div class="feature-item">
-                <i class="bi bi-check-circle-fill"></i>
-                <span>Suporte Premium</span>
-              </div>
-              <div class="feature-item">
-                <i class="bi bi-check-circle-fill"></i>
-                <span>Integração em Nuvem</span>
-              </div>
-              <div class="feature-item">
-                <i class="bi bi-check-circle-fill"></i>
-                <span>Analytics em Tempo Real</span>
-              </div>
-            </div>
-
-            <div class="cta-buttons d-flex flex-wrap gap-3">
-              <a href="#" class="btn btn-primary">Iniciar Teste Gratuito</a>
-              <a href="#" class="btn btn-outline">Saiba Mais</a>
-            </div>
-          </div>
-
-          <div class="content-right position-relative" data-aos="fade-left" data-aos-delay="300">
-            <img src="assets/img/misc/misc-5.webp" alt="Digital Platform" class="img-fluid rounded-4">
-            <div class="floating-card">
-              <div class="card-icon">
-                <i class="bi bi-graph-up-arrow"></i>
-              </div>
-              <div class="card-content">
-                <span class="stats-number">245%</span>
-                <span class="stats-text">Taxa de Crescimento</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="decoration">
-            <div class="circle-1"></div>
-            <div class="circle-2"></div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section><!-- /Call To Action Section -->
-
-    
-
     <!-- Stats Section -->
     <section id="stats" class="stats section light-background">
 
@@ -1135,7 +1076,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
             <div class="swiper-slide">
   <div class="team-member">
     <div class="member-image">
-      <img src="assets/img/person/person-f-5.webp" class="img-fluid" alt="" loading="lazy">
+      <img src="assets/img/person/arthurPFP.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
         <a href="https://github.com/THUCOxz"><i class="bi bi-github"></i></a>
         <a href="https://www.linkedin.com/in/arthur-filipe-5a4726325/"><i class="bi bi-linkedin"></i></a>
@@ -1152,7 +1093,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
 <div class="swiper-slide">
   <div class="team-member">
     <div class="member-image">
-      <img src="assets/img/person/person-m-8.webp" class="img-fluid" alt="" loading="lazy">
+      <img src="assets/img/person/gabrielPFP.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
         <a href="https://github.com/GabrielPrudente10"><i class="bi bi-github"></i></a>
         <a href="https://www.linkedin.com/in/gabriel-magalh%C3%A3es-220726325/"><i class="bi bi-linkedin"></i></a>
@@ -1169,7 +1110,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
 <div class="swiper-slide">
   <div class="team-member">
     <div class="member-image">
-      <img src="assets/img/person/person-f-9.webp" class="img-fluid" alt="" loading="lazy">
+      <img src="assets/img/person/guilhermePFP.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
         <a href="https://github.com/GuilhermeoAparecido"><i class="bi bi-github"></i></a>
       </div>
@@ -1185,7 +1126,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
 <div class="swiper-slide">
   <div class="team-member">
     <div class="member-image">
-      <img src="assets/img/person/person-m-12.webp" class="img-fluid" alt="" loading="lazy">
+      <img src="assets/img/person/julioPFP.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
         <a href="https://github.com/CesarJulio15"><i class="bi bi-github"></i></a>
         <a href="https://www.linkedin.com/in/juliocesardev25/"><i class="bi bi-linkedin"></i></a>
@@ -1202,7 +1143,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
 <div class="swiper-slide">
   <div class="team-member">
     <div class="member-image">
-      <img src="assets/img/person/person-f-7.webp" class="img-fluid" alt="" loading="lazy">
+      <img src="assets/img/person/rafaelPFP.webp" class="img-fluid" alt="" loading="lazy">
       <div class="member-social">
         <a href="https://github.com/RafaelOliveira5501"><i class="bi bi-github"></i></a>
         <a href="https://www.linkedin.com/in/rafaoliversilva/"><i class="bi bi-linkedin"></i></a>

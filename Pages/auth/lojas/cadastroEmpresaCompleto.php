@@ -56,14 +56,20 @@
         .substring(0, 15);
     }
 
-    function formatarCNAE(cnae) {
-      // CNAE-F: 7 dígitos (formato: 1234-5/67)
-      return cnae
-        .replace(/\D/g, "")
-        .replace(/^(\d{4})(\d)/, "$1-$2")
-        .replace(/(\d{1})(\d)/, "$1/$2")
-        .substring(0, 10);
-    }
+function formatarCNAE(cnae) {
+  const digits = String(cnae).replace(/\D/g, "").slice(0, 7); // só até 7 dígitos
+  if (digits.length === 0) return "";
+
+  const parte1 = digits.slice(0, 4);       // 4 primeiros dígitos
+  const parte2 = digits.slice(4, 5);       // 5º dígito (se existir)
+  const parte3 = digits.slice(5, 7);       // 6º e 7º dígitos (se existirem)
+
+  let resultado = parte1;
+  if (parte2) resultado += "-" + parte2;
+  if (parte3) resultado += "/" + parte3;
+
+  return resultado;
+}
 
     // ===============================
     // Eventos ao digitar
