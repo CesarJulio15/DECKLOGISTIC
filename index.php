@@ -1101,9 +1101,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Gabriel Prudente</h3>
-         <span>Especialista em Marketing</span>
-      <p>Cuida da comunicação visual e divulgação do projeto, mostrando como o DeckLogistic pode transformar o gerenciamento logístico de pequenas e médias empresas.</p>
-    </div>
+      <span>Desenvolvedor Líder</span>
+<p>Responsável pela arquitetura do sistema, integração com o banco de dados e implementação das principais funcionalidades de estoque e finanças.</p>    </div>
   </div>
 </div><!-- End slide item -->
 
@@ -1151,8 +1150,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Rafael Oliveira</h3>
-      <span>Desenvolvedor Líder</span>
-      <p>Responsável pela arquitetura do sistema, integração com o banco de dados e implementação das principais funcionalidades de estoque e finanças.</p>
+       <span>Especialista em Marketing</span>
+      <p>Cuida da comunicação visual e divulgação do projeto, mostrando como o DeckLogistic pode transformar o gerenciamento logístico de pequenas e médias empresas.</p>
     </div>
   </div>
 </div><!-- End slide item -->
