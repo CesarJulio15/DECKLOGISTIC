@@ -84,7 +84,7 @@
 
             <div class="hero-actions" data-aos="fade-up" data-aos-delay="400">
               
-              <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="action-btn secondary glightbox">
+              <a href="https://youtu.be/CmHQWP49Jsg?si=EguFdk88lyEuBH4Z" class="action-btn secondary glightbox">
                 <i class="bi bi-play-circle"></i>
                 <span>Assista a uma Demonstração Rápida</span>
               </a>
