@@ -1101,8 +1101,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Gabriel Prudente</h3>
-         <span>Gerente de Projeto</span>
-      <p>Coordena o desenvolvimento do DeckLogistic, organiza as etapas do cronograma e assegura que todas as metas técnicas e acadêmicas sejam cumpridas.</p>
+         <span>Especialista em Marketing</span>
+      <p>Cuida da comunicação visual e divulgação do projeto, mostrando como o DeckLogistic pode transformar o gerenciamento logístico de pequenas e médias empresas.</p>
     </div>
   </div>
 </div><!-- End slide item -->
@@ -1134,8 +1134,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Júlio Cesar</h3>
-      <span>Especialista em Marketing</span>
-      <p>Cuida da comunicação visual e divulgação do projeto, mostrando como o DeckLogistic pode transformar o gerenciamento logístico de pequenas e médias empresas.</p>
+      <span>Gerente de Projeto</span>
+      <p>Coordena o desenvolvimento do DeckLogistic, organiza as etapas do cronograma e assegura que todas as metas técnicas e acadêmicas sejam cumpridas.</p>
     </div>
   </div>
 </div><!-- End slide item -->
