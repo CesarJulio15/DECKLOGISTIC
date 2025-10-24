@@ -44,7 +44,7 @@
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container position-relative d-flex align-items-center justify-content-between">
 
-      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+      <a href="index.php" class="logo d-flex align-items-center me-auto me-xl-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.webp" alt=""> -->
         <h1 class="sitename">DECKLOGISTIC</h1>
@@ -678,7 +678,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
           </div>
           <div class="col-lg-6">
             <div class="hero-visual" data-aos="fade-left" data-aos-delay="150">
-              <img src="assets/img/services/services-1.webp" alt="Services" class="img-fluid">
+              <img src="assets/img/services/caderno.webp" alt="Services" class="img-fluid">
             </div>
           </div>
         </div>
