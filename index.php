@@ -56,7 +56,6 @@
           <li><a href="#about">Sobre</a></li>
           <li><a href="#features">Funcionalidades</a></li>
           <li><a href="#services">Serviços</a></li>
-          <li><a href="#pricing">Preços</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -99,21 +98,7 @@
                     <div class="card-icon">
                       <i class="bi bi-graph-up-arrow"></i>
                     </div>
-                    <div class="card-info">
-                      <h4><span data-purecounter-start="0" data-purecounter-end="89" class="purecounter"></span>%</h4>
-                      <p>Success Benchmark</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="floating-card card-2" data-aos="fade-left" data-aos-delay="700">
-                  <div class="card-content">
-                    <div class="card-icon">
-                      <i class="bi bi-people"></i>
-                    </div>
-                    <div class="card-info">
-                      <h4><span data-purecounter-start="0" data-purecounter-end="500" class="purecounter"></span>+</h4>
-                      <p>Satisfied Clients</p>
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -209,7 +194,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
               <p>Oferecemos ferramentas e soluções que otimizam processos, aumentam a eficiência e ajudam sua empresa a alcançar novos resultados.</p>
               <div class="feature-stats">
                 <div class="stat-item">
-                  <span class="stat-number">150+</span>
+                  <span class="stat-number">5+</span>
                   <span class="stat-label">Funcionalidades</span>
                 </div>
                 <div class="stat-item">
@@ -783,165 +768,10 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                 </div>
               </div>
             </div><!-- End Service Card -->
-
           </div>
         </div>
-
       </div>
-
     </section><!-- /Services Section -->
-
-    <!-- Stats Section -->
-    <section id="stats" class="stats section light-background">
-
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="row align-items-center">
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="avatars d-flex align-items-center">
-              <img src="assets/img/person/person-m-2.webp" alt="Avatar 1" class="rounded-circle" loading="lazy">
-              <img src="assets/img/person/person-m-3.webp" alt="Avatar 2" class="rounded-circle" loading="lazy">
-              <img src="assets/img/person/person-f-5.webp" alt="Avatar 3" class="rounded-circle" loading="lazy">
-              <img src="assets/img/person/person-m-5.webp" alt="Avatar 4" class="rounded-circle" loading="lazy">
-            </div>
-          </div>
-
-          <div class="col-lg-8">
-            <div class="row counters">
-              <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <h2><span data-purecounter-start="0" data-purecounter-end="185" data-purecounter-duration="1" class="purecounter"></span>+</h2>
-                <p>Nemo enim ipsam</p>
-              </div>
-
-              <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
-                <h2><span data-purecounter-start="0" data-purecounter-end="32" data-purecounter-duration="1" class="purecounter"></span>K</h2>
-                <p>Voluptatem sequi</p>
-              </div>
-
-              <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
-                <h2><span data-purecounter-start="0" data-purecounter-end="128" data-purecounter-duration="1" class="purecounter"></span>+</h2>
-                <p>Dolor sit consectetur</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </section><!-- /Stats Section -->
-
-   <!-- Pricing Section -->
-<section id="pricing" class="pricing section">
-
-  <!-- Section Title -->
-  <div class="container section-title" data-aos="fade-up">
-    <h2>Planos e Preços</h2>
-    <p>Soluções escaláveis para gestão de estoque, controle financeiro e logística — escolha o plano que melhor se adapta ao porte da sua empresa.</p>
-  </div><!-- End Section Title -->
-
-  <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-    <div class="row gy-4">
-      <!-- Essencial -->
-      <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
-        <div class="pricing-card">
-          <div class="plan-header">
-            <div class="plan-icon">
-              <i class="bi bi-box"></i>
-            </div>
-            <h3>Essencial</h3>
-            <p>Controle básico para pequenas empresas e microempreendedores</p>
-          </div>
-          <div class="plan-pricing">
-            <div class="price">
-              <span class="currency">R$</span>
-              <span class="amount">49</span>
-              <span class="period">/mês</span>
-            </div>
-          </div>
-          <div class="plan-features">
-            <ul>
-              <li><i class="bi bi-check-circle-fill"></i> Cadastro e movimentação de produtos</li>
-              <li><i class="bi bi-check-circle-fill"></i> Relatório de estoque e alertas de baixo estoque</li>
-              <li><i class="bi bi-check-circle-fill"></i> Lançamentos financeiros básicos (receitas e despesas)</li>
-              <li class="disabled"><i class="bi bi-x-circle-fill"></i> Integração com múltiplos armazéns</li>
-              <li class="disabled"><i class="bi bi-x-circle-fill"></i> Previsão de demanda</li>
-            </ul>
-          </div>
-          <div class="plan-cta">
-            <a href="#" class="btn-plan">Assinar Essencial</a>
-          </div>
-        </div>
-      </div><!-- End Essencial -->
-
-      <!-- Profissional -->
-      <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
-        <div class="pricing-card popular">
-          <div class="popular-tag">Mais Escolhido</div>
-          <div class="plan-header">
-            <div class="plan-icon">
-              <i class="bi bi-briefcase"></i>
-            </div>
-            <h3>Profissional</h3>
-            <p>Para equipes operacionais que precisam de automação e controle avançado</p>
-          </div>
-          <div class="plan-pricing">
-            <div class="price">
-              <span class="currency">R$</span>
-              <span class="amount">199</span>
-              <span class="period">/mês</span>
-            </div>
-          </div>
-          <div class="plan-features">
-            <ul>
-              <li><i class="bi bi-check-circle-fill"></i> Gestão de múltiplos armazéns e localizações</li>
-              <li><i class="bi bi-check-circle-fill"></i> Integração com sistemas contábeis / exportação CSV</li>
-              <li><i class="bi bi-check-circle-fill"></i> Relatórios financeiros detalhados e fluxo de caixa</li>
-              <li><i class="bi bi-check-circle-fill"></i> Controle de permissões por usuário e equipes</li>
-              <li class="disabled"><i class="bi bi-x-circle-fill"></i> Previsão de demanda por IA (opcional)</li>
-            </ul>
-          </div>
-          <div class="plan-cta">
-            <a href="#" class="btn-plan">Assinar Profissional</a>
-          </div>
-        </div>
-      </div><!-- End Profissional -->
-
-      <!-- Corporativo -->
-      <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="400">
-        <div class="pricing-card">
-          <div class="plan-header">
-            <div class="plan-icon">
-              <i class="bi bi-building"></i>
-            </div>
-            <h3>Corporativo</h3>
-            <p>Soluções completas para grandes operações e integração com ERPs</p>
-          </div>
-          <div class="plan-pricing">
-            <div class="price">
-              <span class="currency">R$</span>
-              <span class="amount">499</span>
-              <span class="period">/mês</span>
-            </div>
-          </div>
-          <div class="plan-features">
-            <ul>
-              <li><i class="bi bi-check-circle-fill"></i> Integração ERP e APIs personalizadas</li>
-              <li><i class="bi bi-check-circle-fill"></i> Previsão de demanda e otimização de rotas</li>
-              <li><i class="bi bi-check-circle-fill"></i> Relatórios financeiros avançados e conciliação bancária</li>
-              <li><i class="bi bi-check-circle-fill"></i> SLA, suporte técnico dedicado e treinamento</li>
-              <li><i class="bi bi-check-circle-fill"></i> Auditoria e trilha de auditoria por usuário</li>
-            </ul>
-          </div>
-          <div class="plan-cta">
-            <a href="#" class="btn-plan">Solicitar Demonstração</a>
-          </div>
-        </div>
-      </div><!-- End Corporativo -->
-    </div>
-
-  </div>
-
-</section><!-- /Pricing Section -->
 
    <!-- Faq Section -->
 <section id="faq" class="faq section">
