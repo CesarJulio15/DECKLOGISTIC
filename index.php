@@ -1048,11 +1048,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
             <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/herobiz-bootstrap-business-template/ -->
             Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
           </div>
-        </div>
-
-        <div class="social-links order-first order-lg-last mb-3 mb-lg-0">
-          <a href=""><i class="bi bi-linkedin"></i></a>
-        </div>
+            </div>
 
       </div>
     </div>
