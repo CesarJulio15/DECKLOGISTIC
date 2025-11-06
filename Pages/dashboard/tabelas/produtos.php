@@ -634,23 +634,57 @@ if ($tagVincResult) {
     
     <form method="POST" style="margin-bottom:18px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
       <input type="hidden" name="acao" value="adicionar_produto">
-      <input type="text" name="nome" placeholder="Nome do produto" required 
-             style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff;">
-      <input type="number" step="0.01" name="preco" placeholder="Preço (R$)" required 
-             style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:100px;">
-      <input type="number" step="0.01" name="custo" placeholder="Custo (R$)" required 
-             style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:100px;">
-      <input type="number" name="estoque" placeholder="Estoque inicial" required 
-             style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:100px;">
-      <button type="submit" 
-              style="padding:8px 16px; border-radius:6px; border:1px solid #444; background:linear-gradient(135deg, #ff9900 80%, #ffc800 100%); color:#fff; font-weight:600;">
-        Salvar
+      <input type="text" name="nome" id="novo_nome" placeholder="Nome do produto" required 
+          style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff;">
+      <input type="number" step="0.01" name="preco" id="novo_preco" placeholder="Preço (R$)" required 
+          style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:100px;">
+      <input type="number" step="0.01" name="custo" id="novo_custo" placeholder="Custo (R$)" required 
+          style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:100px;">
+      <input type="number" name="estoque" id="novo_estoque" placeholder="Estoque inicial" required 
+          style="padding:8px; border-radius:6px; border:1px solid #444; background:#222; color:#fff; max-width:100px;">
+      <button type="button" id="btnAdicionarProduto"
+        style="padding:8px 16px; border-radius:6px; border:1px solid #444; background:linear-gradient(135deg, #ff9900 80%, #ffc800 100%); color:#fff; font-weight:600;">
+     Salvar
       </button>
       <button type="reset" 
-              style="padding:8px 16px; border-radius:6px; border:1px solid #fff; background:#222; color:#fff;">
-        Limpar
+        style="padding:8px 16px; border-radius:6px; border:1px solid #fff; background:#222; color:#fff;">
+     Limpar
       </button>
     </form>
+
+<script>
+document.getElementById('btnAdicionarProduto').onclick = function() {
+    const nome = document.getElementById('novo_nome').value.trim();
+    const preco = document.getElementById('novo_preco').value;
+    const custo = document.getElementById('novo_custo').value;
+    const estoque = document.getElementById('novo_estoque').value;
+    if (!nome || !preco || !custo || !estoque) {
+     showToast('Preencha todos os campos!', 'danger');
+     return;
+    }
+    const formData = new FormData();
+    formData.append('acao', 'adicionar_produto');
+    formData.append('nome', nome);
+    formData.append('preco', preco);
+    formData.append('custo', custo);
+    formData.append('estoque', estoque);
+    fetch('', {
+     method: 'POST',
+     headers: { 'X-Requested-With': 'XMLHttpRequest' },
+     body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+     if (data.success) {
+         showToast(data.message, 'success');
+         setTimeout(() => window.location.reload(), 800);
+     } else {
+         showToast(data.message || 'Erro ao adicionar produto', 'danger');
+     }
+    })
+    .catch(() => showToast('Erro ao adicionar produto', 'danger'));
+};
+</script>
 
     <div class="tags-area" style="display:flex; align-items:center; gap:10px;">
         <?php foreach ($tags as $tag): ?>
