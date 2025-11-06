@@ -10,7 +10,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
 // Sempre pega o ID da loja
 $lojaId = $_SESSION['tipo_login'] === 'empresa'
-    ? $_SESSION['usuario_id']  // empresa logada
+    ? $_SESSION['loja_id']     // empresa logada
     : $_SESSION['loja_id'];    // funcionário logado
 ?>
 <!DOCTYPE html>

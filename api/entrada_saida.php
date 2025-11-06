@@ -11,14 +11,23 @@ if (!$usuarioId) {
 }
 
 // 2) obter loja_id do usuário
-$stmt = $conn->prepare("SELECT loja_id FROM usuarios WHERE id = ?");
-$stmt->bind_param("i", $usuarioId);
-$stmt->execute();
-$res = $stmt->get_result();
-$userRow = $res->fetch_assoc();
-$stmt->close();
+$lojaId = isset($_GET['loja_id']) ? (int)$_GET['loja_id'] : 0;
 
-$lojaId = isset($userRow['loja_id']) ? (int)$userRow['loja_id'] : 0;
+if (!$lojaId) {
+    // Se não foi passado loja_id na URL, tenta pegar da sessão ou do usuário
+    if (isset($_SESSION['tipo_login']) && $_SESSION['tipo_login'] === 'empresa') {
+        $lojaId = $_SESSION['loja_id'];
+    } else {
+        $stmt = $conn->prepare("SELECT loja_id FROM usuarios WHERE id = ?");
+        $stmt->bind_param("i", $usuarioId);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $userRow = $res->fetch_assoc();
+        $stmt->close();
+        
+        $lojaId = isset($userRow['loja_id']) ? (int)$userRow['loja_id'] : 0;
+    }
+}
 if (!$lojaId) {
     echo json_encode(['error' => 'Loja não associada ao usuário. Verifique usuarios.loja_id'], JSON_UNESCAPED_UNICODE);
     exit;
