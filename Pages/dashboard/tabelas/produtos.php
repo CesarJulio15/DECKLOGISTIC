@@ -1295,7 +1295,25 @@ function submitEdit() {
         if (data.success) {
             showToast(data.message, 'success');
             const produtoId = document.getElementById('edit_produto_id').value;
-            updateTableRow(produtoId);
+            // Atualiza a linha na tabela sem reload e sem delay
+            fetch(`get_produto.php?id=${produtoId}`)
+                .then(res => res.json())
+                .then(prodData => {
+                    if (prodData.success && prodData.produto) {
+                        const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+                        if (row) {
+                            row.dataset.preco = prodData.produto.preco_unitario;
+                            row.dataset.quantidade = prodData.produto.quantidade_estoque;
+                            row.dataset.nome = prodData.produto.nome;
+                            row.querySelector('span:last-of-type').textContent = prodData.produto.nome;
+                            row.querySelector('td:nth-child(2)').textContent = `R$ ${parseFloat(prodData.produto.preco_unitario).toFixed(2).replace('.', ',')}`;
+                            row.querySelector('td:nth-child(3)').textContent = prodData.produto.quantidade_estoque;
+                        }
+                        // Força reflow visual
+                        row.classList.add('table-success');
+                        setTimeout(() => row.classList.remove('table-success'), 1200);
+                    }
+                });
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
         } else {
             throw new Error(data.message || 'Erro ao editar produto');
