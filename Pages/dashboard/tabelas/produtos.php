@@ -28,7 +28,14 @@ if (!$lojaId) {
 }
 
 // ====== BACKEND GERENCIAMENTO PRODUTOS (AJAX) ======
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    // Previne qualquer saída HTML
+    ob_clean();
+    header('Content-Type: application/json');
+    
+    // Garante que nenhum HTML será incluído na resposta
+    error_reporting(0);
+    
     $acao = $_POST['acao'] ?? '';
 
     // ADICIONAR PRODUTO
@@ -86,7 +93,7 @@ if ($acao === 'adicionar_produto') {
             }
         }
 
-        header("Location: produtos.php");
+        echo json_encode(['success' => true, 'message' => '✅ Produto adicionado com sucesso!']);
         exit;
     }
 }
@@ -94,7 +101,6 @@ if ($acao === 'adicionar_produto') {
 
     // EDITAR PRODUTO (AJAX)
     if ($acao === 'editar_produto') {
-        header('Content-Type: application/json');
         $id = intval($_POST['produto_id'] ?? 0);
         $nome = trim($_POST['nome'] ?? '');
         $preco = floatval($_POST['preco'] ?? 0);
@@ -1149,19 +1155,28 @@ function submitEdit() {
     
     fetch('', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formData
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) {
+            throw new Error('Erro na resposta do servidor');
+        }
+        return res.json();
+    })
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            const produtoId = document.getElementById('edit_produto_id').value;
+            updateTableRow(produtoId);
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-            setTimeout(() => location.reload(), 1500);
         } else {
-            showToast(data.message, 'danger');
+            throw new Error(data.message || 'Erro ao editar produto');
         }
     })
-    .catch(err => showToast('Erro ao editar produto', 'danger'));
+    .catch(err => showToast(err.message || 'Erro ao editar produto', 'danger'));
 }
 
 // ========== ENTRADA (COMPRA) ==========
@@ -1186,19 +1201,28 @@ function submitBuy() {
 
     fetch('', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formData
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) {
+            throw new Error('Erro na resposta do servidor');
+        }
+        return res.json();
+    })
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            const produtoId = document.getElementById('buy_produto_id').value;
+            updateTableRow(produtoId);
             bootstrap.Modal.getInstance(document.getElementById('buyModal')).hide();
-            setTimeout(() => location.reload(), 1500);
         } else {
-            showToast(data.message, 'danger');
+            throw new Error(data.message || 'Erro ao registrar entrada');
         }
     })
-    .catch(err => showToast('Erro ao registrar entrada', 'danger'));
+    .catch(err => showToast(err.message || 'Erro ao registrar entrada', 'danger'));
 }
 
 // ========== SAÍDA (VENDA) ==========
@@ -1222,19 +1246,28 @@ function submitSell() {
     
     fetch('', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formData
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) {
+            throw new Error('Erro na resposta do servidor');
+        }
+        return res.json();
+    })
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            const produtoId = document.getElementById('sell_produto_id').value;
+            updateTableRow(produtoId);
             bootstrap.Modal.getInstance(document.getElementById('sellModal')).hide();
-            setTimeout(() => location.reload(), 1500);
         } else {
-            showToast(data.message, 'danger');
+            throw new Error(data.message || 'Erro ao registrar saída');
         }
     })
-    .catch(err => showToast('Erro ao registrar saída', 'danger'));
+    .catch(err => showToast(err.message || 'Erro ao registrar saída', 'danger'));
 }
 
 // ========== EXCLUIR PRODUTO ==========
