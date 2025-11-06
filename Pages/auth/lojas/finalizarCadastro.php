@@ -42,6 +42,70 @@ $senha_hash = $_SESSION['cadastro']['senha'];
     $inscricao_estadual = !empty($_POST['inscricao_estadual']) ? base64_decode($_POST['inscricao_estadual']) : null;
 
     if ($razao_social && $fantasia && $nome_empresa && $email) {
+        // Verificações de duplicidade
+        $duplicados = [];
+        // CNPJ
+        if (!empty($cnpj)) {
+            $sql = "SELECT id FROM lojas WHERE REPLACE(REPLACE(REPLACE(cnpj, '.', ''), '/', ''), '-', '') = ?";
+            $check = $conn->prepare($sql);
+            $check->bind_param("s", $cnpj);
+            $check->execute();
+            $result = $check->get_result();
+            if ($result->num_rows > 0) {
+                $duplicados[] = 'CNPJ';
+            }
+        }
+        // CNAE
+        if (!empty($cnae)) {
+            $sql = "SELECT id FROM lojas WHERE cnae = ?";
+            $check = $conn->prepare($sql);
+            $check->bind_param("s", $cnae);
+            $check->execute();
+            $result = $check->get_result();
+            if ($result->num_rows > 0) {
+                $duplicados[] = 'CNAE-Fiscal (Principal)';
+            }
+        }
+        // NIRC
+        if (!empty($nir)) {
+            $sql = "SELECT id FROM lojas WHERE nir = ?";
+            $check = $conn->prepare($sql);
+            $check->bind_param("s", $nir);
+            $check->execute();
+            $result = $check->get_result();
+            if ($result->num_rows > 0) {
+                $duplicados[] = 'NIRC';
+            }
+        }
+        // Inscrição Estadual
+        if (!empty($inscricao_estadual)) {
+            $sql = "SELECT id FROM lojas WHERE inscricao_estadual = ?";
+            $check = $conn->prepare($sql);
+            $check->bind_param("s", $inscricao_estadual);
+            $check->execute();
+            $result = $check->get_result();
+            if ($result->num_rows > 0) {
+                $duplicados[] = 'Inscrição Estadual';
+            }
+        }
+        // Código do Estabelecimento
+        if (!empty($cod_estabelecimento)) {
+            $sql = "SELECT id FROM lojas WHERE cod_estabelecimento = ?";
+            $check = $conn->prepare($sql);
+            $check->bind_param("s", $cod_estabelecimento);
+            $check->execute();
+            $result = $check->get_result();
+            if ($result->num_rows > 0) {
+                $duplicados[] = 'Código do Estabelecimento';
+            }
+        }
+
+        if (!empty($duplicados)) {
+            $msg = '❌ Os seguintes campos já estão cadastrados em outra loja: ' . implode(', ', $duplicados);
+            echo "<script>alert('$msg'); window.location.href='cadastro.php';</script>";
+            exit;
+        }
+
         // Inserção no banco
         $sql = "INSERT INTO lojas (
                     nome, email, senha_hash, razao_social, cod_estabelecimento, cep, endereco, numero, complemento,
@@ -56,21 +120,6 @@ $senha_hash = $_SESSION['cadastro']['senha'];
             $bairro, $municipio, $uf, $pais, $telefone, $regime_federal, $cnae, $regime_estadual, $nir,
             $escrituracao_centralizada, $inscricao_estadual, $data_nirc, $area_construida_m2, $cnpj
         );
-
-         // Verifica se o CNPJ já existe em outra loja
-        if (!empty($cnpj)) {
-            $check = $conn->prepare("SELECT id FROM lojas WHERE REPLACE(REPLACE(REPLACE(cnpj, '.', ''), '/', ''), '-', '') = ? AND id != ?");
-            $check->bind_param("si", $cnpj, $loja_id);
-            $check->execute();
-            $result = $check->get_result();
-            if ($result->num_rows > 0) {
-                echo "<script>
-                    alert('❌ CNPJ já cadastrado em outra loja!');
-                    window.location.href='cadastro.php';
-                </script>";
-                exit;
-            }
-        } 
 
         if($stmt->execute()){
             unset($_SESSION['cadastro']); // Limpa sessão
