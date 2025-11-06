@@ -1,0 +1,28 @@
+[06-Nov-2025 09:40:06 America/Sao_Paulo] Tentando inserir produto: loja_id=26, nome=abcd, lote=20
+[06-Nov-2025 09:40:06 America/Sao_Paulo] Produto inserido com sucesso: ID=99
+[06-Nov-2025 09:40:06 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 1 erros
+[06-Nov-2025 09:41:18 America/Sao_Paulo] Tentando inserir produto: loja_id=26, nome=abcd, lote=20
+[06-Nov-2025 09:41:18 America/Sao_Paulo] Produto inserido com sucesso: ID=100
+[06-Nov-2025 09:41:18 America/Sao_Paulo] Inserindo movimentação: produto_id=100, qtd=50, data=2025-11-06, usuario=26, custo=10
+[06-Nov-2025 09:41:18 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 1 erros
+[06-Nov-2025 09:43:03 America/Sao_Paulo] Valor original da data: 11/6/2025
+[06-Nov-2025 09:43:03 America/Sao_Paulo] Data processada: 2025-11-06
+[06-Nov-2025 09:43:03 America/Sao_Paulo] Tentando inserir produto: loja_id=26, nome=abcd, lote=20
+[06-Nov-2025 09:43:03 America/Sao_Paulo] Produto inserido com sucesso: ID=101
+[06-Nov-2025 09:43:03 America/Sao_Paulo] Data processada com sucesso: 2025-11-06
+[06-Nov-2025 09:43:03 America/Sao_Paulo] Inserindo movimentação: produto_id=101, qtd=50, data=2025-11-06, usuario=26, custo=10
+[06-Nov-2025 09:43:03 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 1 erros
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Valor original da data: 11/6/2025
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Data processada: 2025-11-06
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Tentando inserir produto: loja_id=26, nome=abcd, lote=20
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Produto inserido com sucesso: ID=102
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Data processada com sucesso: 2025-11-06
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Preparando inserção de movimentação:
+[06-Nov-2025 09:44:11 America/Sao_Paulo] - produto_id: 102
+[06-Nov-2025 09:44:11 America/Sao_Paulo] - quantidade: 50
+[06-Nov-2025 09:44:11 America/Sao_Paulo] - data_mov: 2025-11-06
+[06-Nov-2025 09:44:11 America/Sao_Paulo] - usuario_id: 26
+[06-Nov-2025 09:44:11 America/Sao_Paulo] - custo: 10
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Query preparada, tentando executar com data formatada: 2025-11-06
+[06-Nov-2025 09:44:11 America/Sao_Paulo] Importação finalizada: 1 produtos importados, 0 erros

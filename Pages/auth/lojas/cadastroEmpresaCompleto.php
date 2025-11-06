@@ -297,13 +297,24 @@ function formatarCNAE(cnae) {
          title="Letras, números e hífen">
 </div>
 
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
   <label style="display: inline-flex; align-items: center;">
-    <input type="checkbox" required style="margin-right: 10px;">
-    Eu li e concordo com os 
-    <a href="../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline;">
+    <input type="checkbox" required style="margin-right: 8px;">
+    Eu li e concordo com os  
+    <a href="../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline; margin-left: 5px; margin-right: 20px;">
       Termos de Uso
     </a>
   </label>
+
+  <label style="display: inline-flex; align-items: center;">
+    <input type="checkbox" required style="margin-right: 8px;">
+    Eu li e concordo com as  
+    <a href="../../../politicaPrivacidade.php" target="_blank" style="color: #00a3e0; text-decoration: underline; margin-left: 5px;">
+      Políticas de Privacidade
+    </a>
+  </label>
+</div>
+
 
   <div class="form-group" style="display: flex; gap: 10px; margin-top: 30px;">
     <button type="button" onclick="location.href='cadastro.php'">Voltar</button>

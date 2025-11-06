@@ -83,6 +83,11 @@ strong {
     border: 1px solid #FF7F00;
 }
 
+.claro {
+    color: #FFB366;
+    font-weight: 600;
+}
+
 @media (max-width: 700px) {
     .container {
         max-width: 98vw;

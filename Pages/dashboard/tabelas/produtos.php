@@ -875,10 +875,101 @@ a.active {
                                 </div>
                                 <form id="uploadForm" enctype="multipart/form-data">
                                     <input class="form-control mb-3" type="file" id="formFile" name="excel_file" accept=".xlsx, .xls" required>
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-primary" id="submitImport">
                                         <i class="fas fa-upload me-2"></i>Fazer Upload e Importar
                                     </button>
                                 </form>
+                                
+                                <script>
+                                document.getElementById('uploadForm').addEventListener('submit', function(e) {
+                                    e.preventDefault();
+                                    
+                                    const formData = new FormData(this);
+                                    const submitBtn = document.getElementById('submitImport');
+                                    const importResult = document.getElementById('importResult');
+                                    const importedData = document.getElementById('importedData');
+                                    
+                                    // Desabilita botão durante upload
+                                    submitBtn.disabled = true;
+                                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processando...';
+                                    
+                                    fetch('importacao.php', {
+                                        method: 'POST',
+                                        body: formData
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        console.log('Resposta da importação:', data); // Debug
+                                        
+                                        if (data.success) {
+                                            document.getElementById('successMessage').textContent = `${data.imported} produtos importados com sucesso!`;
+                                            
+                                            // Limpa e preenche tabela de resultados
+                                            importedData.innerHTML = '';
+                                            data.data.forEach(produto => {
+                                                importedData.innerHTML += `
+                                                    <tr>
+                                                        <td>${produto.nome}</td>
+                                                        <td>${produto.descricao || '-'}</td>
+                                                        <td>${produto.lote || '-'}</td>
+                                                        <td>${produto.quantidade_estoque}</td>
+                                                        <td>R$ ${parseFloat(produto.preco_unitario).toFixed(2)}</td>
+                                                        <td>R$ ${parseFloat(produto.custo_unitario).toFixed(2)}</td>
+                                                        <td>${produto.data_reabastecimento || '-'}</td>
+                                                    </tr>
+                                                `;
+                                            });
+                                            
+                                            // Mostra área de resultados
+                                            importResult.classList.remove('d-none');
+                                            
+                                            // Atualiza a tabela de produtos principal
+                                            window.location.reload();
+                                            
+                                        } else {
+                                            // Mostra erros se houver
+                                            const errorList = data.errors.join('<br>');
+                                            document.getElementById('successMessage').innerHTML = `
+                                                <div class="alert alert-danger">
+                                                    <strong>Erros na importação:</strong><br>
+                                                    ${errorList}
+                                                </div>
+                                            `;
+                                            importResult.classList.remove('d-none');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Erro na importação:', error);
+                                        
+                                        // Tenta ler a resposta como texto para debug
+                                        error.response?.text().then(text => {
+                                            console.log('Resposta do servidor:', text);
+                                        }).catch(() => {});
+                                        
+                                        let errorMessage = 'Erro desconhecido ao processar importação.';
+                                        
+                                        if (error.response) {
+                                            errorMessage = `Erro do servidor: ${error.response.status} ${error.response.statusText}`;
+                                        } else if (error.message) {
+                                            errorMessage = error.message;
+                                        }
+                                        
+                                        document.getElementById('successMessage').innerHTML = `
+                                            <div class="alert alert-danger">
+                                                <strong>Erro ao processar importação:</strong><br>
+                                                ${errorMessage}<br><br>
+                                                <small>Verifique o console do navegador (F12) para mais detalhes.</small>
+                                            </div>
+                                        `;
+                                        importResult.classList.remove('d-none');
+                                    })
+                                    .finally(() => {
+                                        // Reativa botão
+                                        submitBtn.disabled = false;
+                                        submitBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Fazer Upload e Importar';
+                                    });
+                                });
+                                </script>
                             </div>
 
                             <hr>
