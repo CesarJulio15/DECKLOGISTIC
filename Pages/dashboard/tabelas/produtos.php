@@ -46,6 +46,18 @@ if ($acao === 'adicionar_produto') {
     $estoque = intval($_POST['estoque'] ?? 0);
     $lote = '';
 
+    // Validação: verifica se já existe produto com esse nome na loja
+    $stmtCheck = $conn->prepare("SELECT id FROM produtos WHERE nome = ? AND loja_id = ?");
+    $stmtCheck->bind_param("si", $nome, $lojaId);
+    $stmtCheck->execute();
+    $resultCheck = $stmtCheck->get_result();
+    if ($resultCheck->num_rows > 0) {
+        $stmtCheck->close();
+        echo json_encode(['success' => false, 'message' => '❌ Já existe um produto com este nome!']);
+        exit;
+    }
+    $stmtCheck->close();
+
     // Se usuário for empresa ($tipo_login === 'empresa'), deixamos null (ou 0) no campo usuario_id do produto
     $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
 
@@ -105,6 +117,18 @@ if ($acao === 'adicionar_produto') {
         $nome = trim($_POST['nome'] ?? '');
         $preco = floatval($_POST['preco'] ?? 0);
         $estoque = intval($_POST['estoque'] ?? 0);
+
+        // Validação: verifica se já existe outro produto com esse nome na loja
+        $stmtCheck = $conn->prepare("SELECT id FROM produtos WHERE nome = ? AND loja_id = ? AND id != ?");
+        $stmtCheck->bind_param("sii", $nome, $lojaId, $id);
+        $stmtCheck->execute();
+        $resultCheck = $stmtCheck->get_result();
+        if ($resultCheck->num_rows > 0) {
+            $stmtCheck->close();
+            echo json_encode(['success' => false, 'message' => '❌ Já existe outro produto com este nome!']);
+            exit;
+        }
+        $stmtCheck->close();
 
         $stmt = $conn->prepare("UPDATE produtos SET nome=?, preco_unitario=?, quantidade_estoque=? WHERE id=? AND loja_id=?");
         if ($stmt) {
@@ -673,6 +697,24 @@ document.getElementById('btnAdicionarProduto').onclick = function() {
      showToast('Preencha todos os campos!', 'danger');
      return;
     }
+    
+    // Validação frontend: verifica nome duplicado
+    const rows = document.querySelectorAll('#tabela-produtos tr');
+    const nomeNormalizado = nome.toLowerCase().trim();
+    let nomeDuplicado = false;
+    
+    rows.forEach(row => {
+        const nomeExistente = row.dataset.nome;
+        if (nomeExistente && nomeExistente.toLowerCase().trim() === nomeNormalizado) {
+            nomeDuplicado = true;
+        }
+    });
+    
+    if (nomeDuplicado) {
+        showToast('❌ Já existe um produto com este nome!', 'danger');
+        return;
+    }
+    
     const formData = new FormData();
     formData.append('acao', 'adicionar_produto');
     formData.append('nome', nome);
@@ -1296,6 +1338,29 @@ document.addEventListener('click', function(e) {
 function submitEdit() {
     const formData = new FormData(document.getElementById('editForm'));
     formData.append('acao', 'editar_produto');
+    
+    // Validação frontend: verifica nome duplicado
+    const produtoId = document.getElementById('edit_produto_id').value;
+    const novoNome = document.getElementById('edit_nome').value.trim();
+    const nomeNormalizado = novoNome.toLowerCase();
+    
+    const rows = document.querySelectorAll('#tabela-produtos tr');
+    let nomeDuplicado = false;
+    
+    rows.forEach(row => {
+        const rowId = row.dataset.id;
+        const nomeExistente = row.dataset.nome;
+        
+        // Ignora a linha do próprio produto sendo editado
+        if (rowId !== produtoId && nomeExistente && nomeExistente.toLowerCase().trim() === nomeNormalizado) {
+            nomeDuplicado = true;
+        }
+    });
+    
+    if (nomeDuplicado) {
+        showToast('❌ Já existe outro produto com este nome!', 'danger');
+        return;
+    }
     
     fetch('', {
         method: 'POST',
