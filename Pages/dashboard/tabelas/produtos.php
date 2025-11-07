@@ -1036,8 +1036,84 @@ a.active {
                                             // Mostra área de resultados
                                             importResult.classList.remove('d-none');
                                             
-                                            // Atualiza a tabela de produtos principal
-                                            setTimeout(() => window.location.reload(), 2000);
+                                            // Atualiza a tabela de produtos em tempo real
+                                            if (data.updated_products && Array.isArray(data.updated_products)) {
+                                                data.updated_products.forEach(produto => {
+                                                    const row = document.querySelector(`tr[data-id="${produto.id}"]`);
+                                                    if (row) {
+                                                        // Produto existe - atualiza
+                                                        row.dataset.preco = produto.preco_unitario;
+                                                        row.dataset.quantidade = produto.quantidade_estoque;
+                                                        
+                                                        const precoTd = row.querySelector('td:nth-child(2)');
+                                                        if (precoTd) {
+                                                            precoTd.textContent = `R$ ${parseFloat(produto.preco_unitario).toFixed(2).replace('.', ',')}`;
+                                                        }
+                                                        
+                                                        const quantidadeTd = row.querySelector('td:nth-child(3)');
+                                                        if (quantidadeTd) {
+                                                            quantidadeTd.textContent = produto.quantidade_estoque;
+                                                        }
+                                                        
+                                                        // Efeito visual de atualização
+                                                        row.classList.add('table-warning');
+                                                        setTimeout(() => row.classList.remove('table-warning'), 2000);
+                                                    } else {
+                                                        // Produto novo - adiciona na tabela
+                                                        const tbody = document.getElementById('tabela-produtos');
+                                                        const newRow = document.createElement('tr');
+                                                        newRow.dataset.id = produto.id;
+                                                        newRow.dataset.nome = produto.nome;
+                                                        newRow.dataset.preco = produto.preco_unitario;
+                                                        newRow.dataset.quantidade = produto.quantidade_estoque;
+                                                        
+                                                        newRow.innerHTML = `
+                                                            <td style="display:flex; align-items:center; gap:10px; position:relative;">
+                                                                <div class="add-tag-square" data-produto-id="${produto.id}" tabindex="0" title="Adicionar tag">+</div>
+                                                                <div class="tag-dropdown" id="tag-dropdown-${produto.id}"></div>
+                                                                <span class="tags-vinculadas" id="tags-produto-${produto.id}" style="display:inline-flex; gap:5px; align-items:center;"></span>
+                                                                <span>${produto.nome}</span>
+                                                            </td>
+                                                            <td>R$ ${parseFloat(produto.preco_unitario).toFixed(2).replace('.', ',')}</td>
+                                                            <td>${produto.quantidade_estoque}</td>
+                                                            <td>
+                                                                <button class="btn btn-sm editBtn" type="button" title="Editar" 
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Editar
+                                                                </button>
+                                                                <button class="btn btn-sm buyBtn" type="button" title="Comprar"
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Entrada
+                                                                </button>
+                                                                <button class="btn btn-sm sellBtn" type="button" title="Vender"
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Saída
+                                                                </button>
+                                                                <button class="btn btn-sm deleteBtn" type="button" title="Apagar"
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Excluir
+                                                                </button>
+                                                            </td>
+                                                        `;
+                                                        
+                                                        tbody.appendChild(newRow);
+                                                        
+                                                        // Efeito visual de novo produto
+                                                        newRow.classList.add('table-success');
+                                                        setTimeout(() => newRow.classList.remove('table-success'), 2000);
+                                                    }
+                                                });
+                                                
+                                                // Re-bind dos eventos após adicionar novos elementos
+                                                bindTagDropdownEvents();
+                                                
+                                                showToast('Tabela atualizada com sucesso!', 'success');
+                                            }
+                                            
+                                            // Fecha modal após 3 segundos
+                                            setTimeout(() => {
+                                                bootstrap.Modal.getInstance(document.getElementById('importModal')).hide();
+                                            }, 3000);
                                         }
                                     })
                                     .catch(error => {

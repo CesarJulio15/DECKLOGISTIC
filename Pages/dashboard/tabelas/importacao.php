@@ -102,7 +102,9 @@ try {
     }
 
     $imported = 0;
+    $updated = 0;
     $importedData = [];
+    $updatedProducts = []; // Array para produtos atualizados/criados
     $errors = [];
 
     foreach ($rows as $index => $row) {
@@ -270,6 +272,14 @@ try {
                 
                 $updated++;
                 
+                // Adiciona produto atualizado ao array de retorno
+                $updatedProducts[] = [
+                    'id' => $produtoId,
+                    'nome' => $nome,
+                    'preco_unitario' => $novoPreco,
+                    'quantidade_estoque' => $novoEstoque
+                ];
+                
             } else {
                 // Produto não existe - cria novo
                 $usuario_id_produto = ($tipo_login === 'empresa') ? 0 : $usuarioId;
@@ -307,7 +317,17 @@ try {
                 }
                 
                 $imported++;
+                
+                // Adiciona novo produto ao array de retorno
+                $updatedProducts[] = [
+                    'id' => $produtoId,
+                    'nome' => $nome,
+                    'preco_unitario' => $preco_unitario,
+                    'quantidade_estoque' => $quantidade_estoque
+                ];
             }
+            
+            $stmtCheck->close();
             
             $conn->commit();
             $importedData[] = [
@@ -332,18 +352,14 @@ try {
     if (ob_get_length()) ob_clean();
     
     $response = [
-        'success' => $imported > 0,
-        'imported' => $imported,
+        'success' => $imported > 0 || $updated > 0,
+        'imported' => $imported + $updated,
+        'new' => $imported,
+        'updated' => $updated,
+        'message' => "$imported produtos adicionados, $updated produtos atualizados",
         'data' => $importedData,
-        'errors' => $errors,
-        'debug' => [
-            'loja_id' => $lojaId,
-            'session_data' => [
-                'usuario_id' => $_SESSION['usuario_id'] ?? null,
-                'tipo_login' => $_SESSION['tipo_login'] ?? null,
-                'loja_id' => $_SESSION['loja_id'] ?? null
-            ]
-        ]
+        'updated_products' => $updatedProducts, // Adiciona produtos atualizados
+        'errors' => $errors
     ];
     
     header('Content-Type: application/json; charset=utf-8');

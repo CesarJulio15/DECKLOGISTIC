@@ -114,3 +114,32 @@
 [07-Nov-2025 15:05:01 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=peixe, lote=20
 [07-Nov-2025 15:05:01 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
 [07-Nov-2025 15:05:01 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 15:09:29 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 15:09:29 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 15:09:29 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 15:09:29 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=peixe, lote=20
+[07-Nov-2025 15:09:29 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 15:09:29 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 15:09:55 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 15:09:55 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 15:09:55 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 15:09:55 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 15:09:55 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 15:09:55 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 15:10:08 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 15:10:08 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 15:10:08 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 15:10:08 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=CELULAR, lote=20
+[07-Nov-2025 15:10:08 America/Sao_Paulo] PHP Warning:  Undefined variable $tipo_login in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 275
+[07-Nov-2025 15:10:08 America/Sao_Paulo] PHP Warning:  Undefined variable $usuarioId in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 275
+[07-Nov-2025 15:10:08 America/Sao_Paulo] Importação finalizada: 1 produtos importados, 0 erros
+[07-Nov-2025 15:16:02 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 15:16:02 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 15:16:02 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 15:16:02 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=CELULAR, lote=20
+[07-Nov-2025 15:16:02 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 15:16:15 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 15:16:15 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 15:16:15 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 15:16:15 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=peixe, lote=20
+[07-Nov-2025 15:16:15 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
