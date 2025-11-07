@@ -43,11 +43,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     // Alterar Nome
     if (isset($_POST['alterar_nome'])) {
         $novo_nome = trim($_POST['nome']);
-        if (!empty($novo_nome)) {
+        
+        // Validação de tamanho
+        if (strlen($novo_nome) > 255) {
+            $mensagem = '❌ O nome não pode ter mais de 255 caracteres!';
+            $tipo_mensagem = 'error';
+        } elseif (!empty($novo_nome)) {
             $stmt = $conn->prepare("UPDATE lojas SET nome=? WHERE id=?");
             $stmt->bind_param("si", $novo_nome, $_SESSION['loja_id']);
             $stmt->execute();
-            $mensagem = 'Nome alterado com sucesso!';
+            $mensagem = '✅ Nome alterado com sucesso!';
             $tipo_mensagem = 'success';
         }
     }
@@ -185,7 +190,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
                              style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
                     </span>
                     <strong>Nome:</strong>
-                    <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" required
+                    <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" 
+                           maxlength="255" required
                     <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
                     <?php if ($tipo_login === 'empresa'): ?>
                         <button type="submit" name="alterar_nome">Salvar</button>
