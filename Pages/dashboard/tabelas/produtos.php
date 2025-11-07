@@ -202,6 +202,17 @@ if ($acao === 'adicionar_produto') {
         $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
         $custo_compra = isset($_POST['custo']) ? floatval($_POST['custo']) : null;
 
+        // Validação: quantidade e custo devem ser positivos
+        if ($qtd <= 0) {
+            echo json_encode(['success' => false, 'message' => '❌ A quantidade deve ser maior que zero.']);
+            exit;
+        }
+
+        if ($custo_compra !== null && $custo_compra < 0) {
+            echo json_encode(['success' => false, 'message' => '❌ O custo não pode ser negativo.']);
+            exit;
+        }
+
         $stmtProduto = $conn->prepare("SELECT quantidade_estoque, custo_unitario FROM produtos WHERE id=? AND loja_id=?");
         $stmtProduto->bind_param("ii", $id, $lojaId);
         $stmtProduto->execute();
@@ -1256,6 +1267,14 @@ function textoNomeDoRow(tr) {
     return normalizeStr(span ? span.textContent : '');
 }
 
+// Função para extrair valor numérico do preço formatado
+function parsePrecoText(text) {
+    if (!text) return 0;
+    // Remove "R$" e espaços, troca vírgula por ponto
+    const cleaned = text.replace(/[R$\s]/g, '').replace(',', '.');
+    return parseFloat(cleaned) || 0;
+}
+
 // ========== EDITAR PRODUTO ==========
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('editBtn') || e.target.closest('.editBtn')) {
@@ -1361,6 +1380,25 @@ function submitBuy() {
     const formData = new FormData(document.getElementById('buyForm'));
     formData.append('acao', 'comprar_produto');
 
+    // Validação no frontend
+    const quantidade = parseInt(document.getElementById('buy_quantidade').value);
+    const custo = parseFloat(document.getElementById('buy_custo').value);
+
+    if (quantidade <= 0) {
+        showToast('A quantidade deve ser maior que zero!', 'danger');
+        return;
+    }
+
+    if (custo < 0) {
+        showToast('O custo não pode ser negativo!', 'danger');
+        return;
+    }
+
+    if (isNaN(quantidade) || isNaN(custo)) {
+        showToast('Por favor, preencha todos os campos corretamente!', 'danger');
+        return;
+    }
+
     fetch('', {
         method: 'POST',
         headers: {
@@ -1377,8 +1415,33 @@ function submitBuy() {
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            
+            // Pega os valores para atualizar a linha
             const produtoId = document.getElementById('buy_produto_id').value;
-            updateTableRow(produtoId);
+            const quantidadeAdicionada = parseInt(document.getElementById('buy_quantidade').value);
+            
+            // Atualiza a linha na tabela
+            const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+            if (row) {
+                // Pega a quantidade atual e soma
+                const quantidadeAtual = parseInt(row.dataset.quantidade);
+                const novaQuantidade = quantidadeAtual + quantidadeAdicionada;
+                
+                // Atualiza o atributo data-quantidade
+                row.dataset.quantidade = novaQuantidade;
+                
+                // Atualiza a célula de quantidade na tabela
+                const quantidadeTd = row.querySelector('td:nth-child(3)');
+                if (quantidadeTd) {
+                    quantidadeTd.textContent = novaQuantidade;
+                }
+                
+                // Efeito visual de sucesso
+                row.classList.add('table-success');
+                setTimeout(() => row.classList.remove('table-success'), 1200);
+            }
+            
+            // Fecha o modal
             bootstrap.Modal.getInstance(document.getElementById('buyModal')).hide();
         } else {
             throw new Error(data.message || 'Erro ao registrar entrada');
@@ -1422,8 +1485,33 @@ function submitSell() {
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            
+            // Pega os valores para atualizar a linha
             const produtoId = document.getElementById('sell_produto_id').value;
-            updateTableRow(produtoId);
+            const quantidadeVendida = parseInt(document.getElementById('sell_quantidade').value);
+            
+            // Atualiza a linha na tabela
+            const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+            if (row) {
+                // Pega a quantidade atual e subtrai
+                const quantidadeAtual = parseInt(row.dataset.quantidade);
+                const novaQuantidade = quantidadeAtual - quantidadeVendida;
+                
+                // Atualiza o atributo data-quantidade
+                row.dataset.quantidade = novaQuantidade;
+                
+                // Atualiza a célula de quantidade na tabela
+                const quantidadeTd = row.querySelector('td:nth-child(3)');
+                if (quantidadeTd) {
+                    quantidadeTd.textContent = novaQuantidade;
+                }
+                
+                // Efeito visual de sucesso
+                row.classList.add('table-success');
+                setTimeout(() => row.classList.remove('table-success'), 1200);
+            }
+            
+            // Fecha o modal
             bootstrap.Modal.getInstance(document.getElementById('sellModal')).hide();
         } else {
             throw new Error(data.message || 'Erro ao registrar saída');
@@ -1506,23 +1594,27 @@ if (ordenarSelect) {
                     return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
                 }
                 case 'preco-asc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    // Coluna 2 é o preço (índice nth-child(2))
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(2)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(2)')?.textContent || '');
                     return aNum - bNum;
                 }
                 case 'preco-desc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    // Coluna 2 é o preço
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(2)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(2)')?.textContent || '');
                     return bNum - aNum;
                 }
                 case 'quantidade-asc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    // Coluna 3 é a quantidade (índice nth-child(3))
+                    const aNum = parseInt(a.querySelector('td:nth-child(3)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(3)')?.textContent || '0') || 0;
                     return aNum - bNum;
                 }
                 case 'quantidade-desc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    // Coluna 3 é a quantidade
+                    const aNum = parseInt(a.querySelector('td:nth-child(3)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(3')?.textContent || '0') || 0;
                     return bNum - aNum;
                 }
                 default:
