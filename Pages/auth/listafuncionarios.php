@@ -15,7 +15,9 @@ $lojaId = $_SESSION['loja_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['funcionario_id'], $_POST['novo_nome'])) {
     $id = intval($_POST['funcionario_id']);
     $novoNome = trim($_POST['novo_nome']);
-    if ($id && $novoNome) {
+    
+    // Validação de tamanho
+    if ($id && $novoNome && strlen($novoNome) <= 255) {
         $stmt = $conn->prepare("UPDATE usuarios SET nome=? WHERE id=? AND loja_id=?");
         $stmt->bind_param("sii", $novoNome, $id, $lojaId);
         $stmt->execute();
@@ -108,7 +110,9 @@ $stmt->close();
                     <td data-label="Nome">
                         <form method="POST" class="form-inline" style="margin:0;">
                             <input type="hidden" name="funcionario_id" value="<?= $func['id'] ?>">
-                            <input type="text" name="novo_nome" class="input-nome" value="<?= htmlspecialchars($func['nome']) ?>">
+                            <input type="text" name="novo_nome" class="input-nome" 
+                                   value="<?= htmlspecialchars($func['nome']) ?>" 
+                                   maxlength="255" required>
                             <button type="submit" class="btn-acao" title="Salvar novo nome">
                                 <i class="fa-solid fa-save"></i>
                             </button>

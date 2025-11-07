@@ -3,7 +3,6 @@ session_start();
 include __DIR__ . '/../../conexao.php';
 include __DIR__ . '../../../session_check.php';
 
-
 // ===============================
 // Define se é loja ou funcionário
 // ===============================
@@ -32,16 +31,29 @@ if ($tipo_login === 'empresa') {
 }
 
 // ===============================
+// Variável para mensagens de erro/sucesso
+// ===============================
+$mensagem = '';
+$tipo_mensagem = '';
+
+// ===============================
 // Processa alterações (somente loja)
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     // Alterar Nome
     if (isset($_POST['alterar_nome'])) {
         $novo_nome = trim($_POST['nome']);
-        if (!empty($novo_nome)) {
+        
+        // Validação de tamanho
+        if (strlen($novo_nome) > 255) {
+            $mensagem = '❌ O nome não pode ter mais de 255 caracteres!';
+            $tipo_mensagem = 'error';
+        } elseif (!empty($novo_nome)) {
             $stmt = $conn->prepare("UPDATE lojas SET nome=? WHERE id=?");
             $stmt->bind_param("si", $novo_nome, $_SESSION['loja_id']);
             $stmt->execute();
+            $mensagem = '✅ Nome alterado com sucesso!';
+            $tipo_mensagem = 'success';
         }
     }
 
@@ -49,9 +61,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     if (isset($_POST['alterar_email'])) {
         $novo_email = trim($_POST['email']);
         if (!empty($novo_email)) {
-            $stmt = $conn->prepare("UPDATE lojas SET email=? WHERE id=?");
-            $stmt->bind_param("si", $novo_email, $_SESSION['loja_id']);
-            $stmt->execute();
+            // Verifica se o email já existe em lojas (exceto o próprio usuário)
+            $stmtCheckLojas = $conn->prepare("SELECT id FROM lojas WHERE email = ? AND id != ?");
+            $stmtCheckLojas->bind_param("si", $novo_email, $_SESSION['loja_id']);
+            $stmtCheckLojas->execute();
+            $resultLojas = $stmtCheckLojas->get_result();
+            
+            // Verifica se o email já existe em usuarios (funcionários)
+            $stmtCheckUsuarios = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+            $stmtCheckUsuarios->bind_param("s", $novo_email);
+            $stmtCheckUsuarios->execute();
+            $resultUsuarios = $stmtCheckUsuarios->get_result();
+            
+            if ($resultLojas->num_rows > 0 || $resultUsuarios->num_rows > 0) {
+                // Email já existe
+                $mensagem = '❌ Este email já está em uso!';
+                $tipo_mensagem = 'error';
+            } else {
+                // Email disponível - pode atualizar
+                $stmt = $conn->prepare("UPDATE lojas SET email=? WHERE id=?");
+                $stmt->bind_param("si", $novo_email, $_SESSION['loja_id']);
+                $stmt->execute();
+                $mensagem = '✅ Email alterado com sucesso!';
+                $tipo_mensagem = 'success';
+            }
+            
+            $stmtCheckLojas->close();
+            $stmtCheckUsuarios->close();
         }
     }
 
@@ -64,11 +100,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
             $stmt = $conn->prepare("UPDATE lojas SET senha_hash=? WHERE id=?");
             $stmt->bind_param("si", $senha_hash, $_SESSION['loja_id']);
             $stmt->execute();
+            $mensagem = '✅ Senha alterada com sucesso!';
+            $tipo_mensagem = 'success';
         }
     }
 
-    header("Location: config.php");
-    exit;
+    // Recarrega dados atualizados
+    $stmt = $conn->prepare("SELECT id, nome, email FROM lojas WHERE id = ?");
+    $stmt->bind_param("i", $_SESSION['loja_id']);
+    $stmt->execute();
+    $dados_usuario = $stmt->get_result()->fetch_assoc();
 }
 ?>
 <!DOCTYPE html>
@@ -80,6 +121,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
     <link rel="stylesheet" href="../../assets/config.css">
     <link rel="stylesheet" href="../../assets/sidebar.css"> 
+    <style>
+        .mensagem {
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .mensagem.success {
+            background-color: #10b981;
+            color: white;
+        }
+        .mensagem.error {
+            background-color: #ef4444;
+            color: white;
+        }
+    </style>
 </head>
 <body>
   <div class="sidebar">
@@ -108,10 +166,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
 
   <div class="content">
     <div class="conteudo">
-      <h1>Minha Conta</h1>
-      <div class="caixa-conta">
-        <div class="perfil">
-          <h2><?= htmlspecialchars($dados_usuario['nome'] ?? '') ?></h2>
+        <h1>Minha Conta</h1>
+        
+        <?php if (!empty($mensagem)): ?>
+            <div class="mensagem <?= $tipo_mensagem ?>">
+                <?= htmlspecialchars($mensagem) ?>
+            </div>
+        <?php endif; ?>
+        
+        <div class="caixa-conta">
+            <div class="perfil">
+                <h2><?= htmlspecialchars($dados_usuario['nome'] ?? '') ?></h2>
+            </div>
+
+            <!-- Formulário Nome -->
+            <form method="POST">
+                <div class="linha-info">
+                    <span class="icone">
+                        <img src="../../img/icon-name.svg" alt="Ícone Nome" 
+                             style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
+                    </span>
+                    <strong>Nome:</strong>
+                    <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" 
+                           maxlength="255" required
+                    <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
+                    <?php if ($tipo_login === 'empresa'): ?>
+                        <button type="submit" name="alterar_nome">Salvar</button>
+                    <?php endif; ?>
+                </div>
+            </form>
+
+            <!-- Formulário Email -->
+            <form method="POST">
+                <div class="linha-info">
+                    <span class="icone"><img src="../../img/icon-email.svg" alt="Ícone Email"
+                  style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
+                </span>
+                    <strong>Email:</strong>
+                    <input type="email" name="email" value="<?= htmlspecialchars($dados_usuario['email'] ?? '') ?>" required
+                    <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
+                    <?php if ($tipo_login === 'empresa'): ?>
+                        <button type="submit" name="alterar_email">Salvar</button>
+                    <?php endif; ?>
+                </div>
+            </form>
+
+            <?php if ($tipo_login === 'empresa'): ?>
+                <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
+    <a href="listafuncionarios.php" class="btn-cadastrar" style="margin-top:10px;">Ver Funcionários</a>
+    <a href="../../Pages/auth/2FA.php" class="btn-alterar-senha">Alterar Senha</a>
+
+                <!-- Excluir conta -->
+            <?php endif; ?>
+
+            <!-- Logout -->
+            <a href="../auth/logout.php" class="btn-sair">Sair da conta</a>
+
+                   <form action="../auth/excluirConta.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
+                    <button type="submit" class="btn-excluir">
+                        <span>Excluir Conta</span>
+                        <img src="../../img/icon-lixo.svg" alt="Excluir Conta" style="width:12px; position:relative; top:3px; margin-left:3px;">
+                    </button>
+                </form>
+
         </div>
 
         <!-- Formulário Nome -->
@@ -161,6 +278,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
         </form>
       </div>
     </div>
-  </div>
+</div>
+
+<script>
+    // Auto-remove mensagem após 5 segundos
+    setTimeout(() => {
+        const mensagem = document.querySelector('.mensagem');
+        if (mensagem) {
+            mensagem.style.transition = 'opacity 0.5s';
+            mensagem.style.opacity = '0';
+            setTimeout(() => mensagem.remove(), 500);
+        }
+    }, 5000);
+</script>
 </body>
 </html>

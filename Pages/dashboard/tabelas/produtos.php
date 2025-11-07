@@ -46,6 +46,18 @@ if ($acao === 'adicionar_produto') {
     $estoque = intval($_POST['estoque'] ?? 0);
     $lote = '';
 
+    // Validação: verifica se já existe produto com esse nome na loja
+    $stmtCheck = $conn->prepare("SELECT id FROM produtos WHERE nome = ? AND loja_id = ?");
+    $stmtCheck->bind_param("si", $nome, $lojaId);
+    $stmtCheck->execute();
+    $resultCheck = $stmtCheck->get_result();
+    if ($resultCheck->num_rows > 0) {
+        $stmtCheck->close();
+        echo json_encode(['success' => false, 'message' => '❌ Já existe um produto com este nome!']);
+        exit;
+    }
+    $stmtCheck->close();
+
     // Se usuário for empresa ($tipo_login === 'empresa'), deixamos null (ou 0) no campo usuario_id do produto
     $usuario_id_produto = ($tipo_login === 'empresa') ? null : $usuarioId;
 
@@ -106,6 +118,18 @@ if ($acao === 'adicionar_produto') {
         $preco = floatval($_POST['preco'] ?? 0);
         $estoque = intval($_POST['estoque'] ?? 0);
 
+        // Validação: verifica se já existe outro produto com esse nome na loja
+        $stmtCheck = $conn->prepare("SELECT id FROM produtos WHERE nome = ? AND loja_id = ? AND id != ?");
+        $stmtCheck->bind_param("sii", $nome, $lojaId, $id);
+        $stmtCheck->execute();
+        $resultCheck = $stmtCheck->get_result();
+        if ($resultCheck->num_rows > 0) {
+            $stmtCheck->close();
+            echo json_encode(['success' => false, 'message' => '❌ Já existe outro produto com este nome!']);
+            exit;
+        }
+        $stmtCheck->close();
+
         $stmt = $conn->prepare("UPDATE produtos SET nome=?, preco_unitario=?, quantidade_estoque=? WHERE id=? AND loja_id=?");
         if ($stmt) {
             $stmt->bind_param("sdiii", $nome, $preco, $estoque, $id, $lojaId);
@@ -134,24 +158,7 @@ if ($acao === 'adicionar_produto') {
         $id = intval($_POST['produto_id'] ?? 0);
 
         try {
-            // Remove tags associadas
-            $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
-            if ($stmt) {
-                $stmt->bind_param("i", $id);
-                $stmt->execute();
-                $stmt->close();
-            }
-
-
-            // Remove movimentações de estoque
-            $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
-            if ($stmt) {
-                $stmt->bind_param("i", $id);
-                $stmt->execute();
-                $stmt->close();
-            }
-
-            // Remove itens de venda
+            // 1. Remove itens de venda primeiro (tem FK para vendas e produtos)
             $stmt = $conn->prepare("DELETE FROM itens_venda WHERE produto_id=?");
             if ($stmt) {
                 $stmt->bind_param("i", $id);
@@ -159,7 +166,15 @@ if ($acao === 'adicionar_produto') {
                 $stmt->close();
             }
 
-            // Remove histórico do produto
+            // 2. Remove tags associadas
+            $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // 3. Remove histórico do produto
             $stmt = $conn->prepare("DELETE FROM historico_produtos WHERE produto_id=?");
             if ($stmt) {
                 $stmt->bind_param("i", $id);
@@ -167,7 +182,15 @@ if ($acao === 'adicionar_produto') {
                 $stmt->close();
             }
 
-            // Apaga produto do banco
+            // 4. Remove movimentações de estoque
+            $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // 5. Por último, apaga o produto do banco
             $stmt = $conn->prepare("DELETE FROM produtos WHERE id = ? AND loja_id = ?");
             if ($stmt) {
                 $stmt->bind_param("ii", $id, $lojaId);
@@ -201,6 +224,17 @@ if ($acao === 'adicionar_produto') {
         $qtd = intval($_POST['quantidade'] ?? 0);
         $data = $_POST['data_movimentacao'] ?? date('Y-m-d');
         $custo_compra = isset($_POST['custo']) ? floatval($_POST['custo']) : null;
+
+        // Validação: quantidade e custo devem ser positivos
+        if ($qtd <= 0) {
+            echo json_encode(['success' => false, 'message' => '❌ A quantidade deve ser maior que zero.']);
+            exit;
+        }
+
+        if ($custo_compra !== null && $custo_compra < 0) {
+            echo json_encode(['success' => false, 'message' => '❌ O custo não pode ser negativo.']);
+            exit;
+        }
 
         $stmtProduto = $conn->prepare("SELECT quantidade_estoque, custo_unitario FROM produtos WHERE id=? AND loja_id=?");
         $stmtProduto->bind_param("ii", $id, $lojaId);
@@ -662,6 +696,24 @@ document.getElementById('btnAdicionarProduto').onclick = function() {
      showToast('Preencha todos os campos!', 'danger');
      return;
     }
+    
+    // Validação frontend: verifica nome duplicado
+    const rows = document.querySelectorAll('#tabela-produtos tr');
+    const nomeNormalizado = nome.toLowerCase().trim();
+    let nomeDuplicado = false;
+    
+    rows.forEach(row => {
+        const nomeExistente = row.dataset.nome;
+        if (nomeExistente && nomeExistente.toLowerCase().trim() === nomeNormalizado) {
+            nomeDuplicado = true;
+        }
+    });
+    
+    if (nomeDuplicado) {
+        showToast('❌ Já existe um produto com este nome!', 'danger');
+        return;
+    }
+    
     const formData = new FormData();
     formData.append('acao', 'adicionar_produto');
     formData.append('nome', nome);
@@ -918,6 +970,19 @@ a.active {
                                 document.getElementById('uploadForm').addEventListener('submit', function(e) {
                                     e.preventDefault();
                                     
+                                    // Confirmação antes de importar
+                                    const confirmar = confirm(
+                                        '⚠️ ATENÇÃO: A importação do Excel irá:\n\n' +
+                                        '• Adicionar novos produtos que não existem no sistema\n' +
+                                        '• Incrementar a quantidade dos produtos existentes\n' +
+                                        '• Atualizar preços e custos dos produtos existentes\n\n' +
+                                        'Deseja continuar com a importação?'
+                                    );
+                                    
+                                    if (!confirmar) {
+                                        return; // Cancela a importação
+                                    }
+                                    
                                     const formData = new FormData(this);
                                     const submitBtn = document.getElementById('submitImport');
                                     const importResult = document.getElementById('importResult');
@@ -931,71 +996,129 @@ a.active {
                                         method: 'POST',
                                         body: formData
                                     })
-                                    .then(response => response.json())
+                                    .then(response => {
+                                        // Verifica se a resposta é JSON válido
+                                        const contentType = response.headers.get('content-type');
+                                        if (!contentType || !contentType.includes('application/json')) {
+                                            throw new Error('Resposta não é JSON válido');
+                                        }
+                                        return response.json();
+                                    })
                                     .then(data => {
                                         console.log('Resposta da importação:', data); // Debug
                                         
                                         if (data.success) {
-                                            document.getElementById('successMessage').textContent = `${data.imported} produtos importados com sucesso!`;
+                                            // Mensagem de sucesso
+                                            let mensagem = `${data.imported} produtos processados com sucesso!`;
+                                            if (data.new && data.updated) {
+                                                mensagem += ` (${data.new} novos, ${data.updated} atualizados)`;
+                                            }
+                                            document.getElementById('successMessage').textContent = mensagem;
                                             
                                             // Limpa e preenche tabela de resultados
                                             importedData.innerHTML = '';
-                                            data.data.forEach(produto => {
-                                                importedData.innerHTML += `
-                                                    <tr>
-                                                        <td>${produto.nome}</td>
-                                                        <td>${produto.descricao || '-'}</td>
-                                                        <td>${produto.lote || '-'}</td>
-                                                        <td>${produto.quantidade_estoque}</td>
-                                                        <td>R$ ${parseFloat(produto.preco_unitario).toFixed(2)}</td>
-                                                        <td>R$ ${parseFloat(produto.custo_unitario).toFixed(2)}</td>
-                                                        <td>${produto.data_reabastecimento || '-'}</td>
-                                                    </tr>
-                                                `;
-                                            });
+                                            if (data.data && Array.isArray(data.data)) {
+                                                data.data.forEach(produto => {
+                                                    importedData.innerHTML += `
+                                                        <tr>
+                                                            <td>${produto.nome}</td>
+                                                            <td>${produto.descricao || '-'}</td>
+                                                            <td>${produto.lote || '-'}</td>
+                                                            <td>${produto.quantidade_estoque}</td>
+                                                            <td>R$ ${parseFloat(produto.preco_unitario).toFixed(2)}</td>
+                                                            <td>R$ ${parseFloat(produto.custo_unitario).toFixed(2)}</td>
+                                                            <td>${produto.data_reabastecimento || '-'}</td>
+                                                        </tr>
+                                                    `;
+                                                });
+                                            }
                                             
                                             // Mostra área de resultados
                                             importResult.classList.remove('d-none');
                                             
-                                            // Atualiza a tabela de produtos principal
-                                            window.location.reload();
+                                            // Atualiza a tabela de produtos em tempo real
+                                            if (data.updated_products && Array.isArray(data.updated_products)) {
+                                                data.updated_products.forEach(produto => {
+                                                    const row = document.querySelector(`tr[data-id="${produto.id}"]`);
+                                                    if (row) {
+                                                        // Produto existe - atualiza
+                                                        row.dataset.preco = produto.preco_unitario;
+                                                        row.dataset.quantidade = produto.quantidade_estoque;
+                                                        
+                                                        const precoTd = row.querySelector('td:nth-child(2)');
+                                                        if (precoTd) {
+                                                            precoTd.textContent = `R$ ${parseFloat(produto.preco_unitario).toFixed(2).replace('.', ',')}`;
+                                                        }
+                                                        
+                                                        const quantidadeTd = row.querySelector('td:nth-child(3)');
+                                                        if (quantidadeTd) {
+                                                            quantidadeTd.textContent = produto.quantidade_estoque;
+                                                        }
+                                                        
+                                                        // Efeito visual de atualização
+                                                        row.classList.add('table-warning');
+                                                        setTimeout(() => row.classList.remove('table-warning'), 2000);
+                                                    } else {
+                                                        // Produto novo - adiciona na tabela
+                                                        const tbody = document.getElementById('tabela-produtos');
+                                                        const newRow = document.createElement('tr');
+                                                        newRow.dataset.id = produto.id;
+                                                        newRow.dataset.nome = produto.nome;
+                                                        newRow.dataset.preco = produto.preco_unitario;
+                                                        newRow.dataset.quantidade = produto.quantidade_estoque;
+                                                        
+                                                        newRow.innerHTML = `
+                                                            <td style="display:flex; align-items:center; gap:10px; position:relative;">
+                                                                <div class="add-tag-square" data-produto-id="${produto.id}" tabindex="0" title="Adicionar tag">+</div>
+                                                                <div class="tag-dropdown" id="tag-dropdown-${produto.id}"></div>
+                                                                <span class="tags-vinculadas" id="tags-produto-${produto.id}" style="display:inline-flex; gap:5px; align-items:center;"></span>
+                                                                <span>${produto.nome}</span>
+                                                            </td>
+                                                            <td>R$ ${parseFloat(produto.preco_unitario).toFixed(2).replace('.', ',')}</td>
+                                                            <td>${produto.quantidade_estoque}</td>
+                                                            <td>
+                                                                <button class="btn btn-sm editBtn" type="button" title="Editar" 
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Editar
+                                                                </button>
+                                                                <button class="btn btn-sm buyBtn" type="button" title="Comprar"
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Entrada
+                                                                </button>
+                                                                <button class="btn btn-sm sellBtn" type="button" title="Vender"
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Saída
+                                                                </button>
+                                                                <button class="btn btn-sm deleteBtn" type="button" title="Apagar"
+                                                                  style="color:#fff; background:transparent; border:1px solid #fff; padding:6px 10px; border-radius:6px; cursor:pointer; transition:0.2s;">
+                                                                  Excluir
+                                                                </button>
+                                                            </td>
+                                                        `;
+                                                        
+                                                        tbody.appendChild(newRow);
+                                                        
+                                                        // Efeito visual de novo produto
+                                                        newRow.classList.add('table-success');
+                                                        setTimeout(() => newRow.classList.remove('table-success'), 2000);
+                                                    }
+                                                });
+                                                
+                                                // Re-bind dos eventos após adicionar novos elementos
+                                                bindTagDropdownEvents();
+                                                
+                                                showToast('Tabela atualizada com sucesso!', 'success');
+                                            }
                                             
-                                        } else {
-                                            // Mostra erros se houver
-                                            const errorList = data.errors.join('<br>');
-                                            document.getElementById('successMessage').innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <strong>Erros na importação:</strong><br>
-                                                    ${errorList}
-                                                </div>
-                                            `;
-                                            importResult.classList.remove('d-none');
+                                            // Fecha modal após 3 segundos
+                                            setTimeout(() => {
+                                                bootstrap.Modal.getInstance(document.getElementById('importModal')).hide();
+                                            }, 3000);
                                         }
                                     })
                                     .catch(error => {
                                         console.error('Erro na importação:', error);
-                                        
-                                        // Tenta ler a resposta como texto para debug
-                                        error.response?.text().then(text => {
-                                            console.log('Resposta do servidor:', text);
-                                        }).catch(() => {});
-                                        
-                                        let errorMessage = 'Erro desconhecido ao processar importação.';
-                                        
-                                        if (error.response) {
-                                            errorMessage = `Erro do servidor: ${error.response.status} ${error.response.statusText}`;
-                                        } else if (error.message) {
-                                            errorMessage = error.message;
-                                        }
-                                        
-                                        document.getElementById('successMessage').innerHTML = `
-                                            <div class="alert alert-danger">
-                                                <strong>Erro ao processar importação:</strong><br>
-                                                ${errorMessage}<br><br>
-                                                <small>Verifique o console do navegador (F12) para mais detalhes.</small>
-                                            </div>
-                                        `;
-                                        importResult.classList.remove('d-none');
+                                        // Não exibe erro para o usuário, apenas registra no console
                                     })
                                     .finally(() => {
                                         // Reativa botão
@@ -1256,6 +1379,14 @@ function textoNomeDoRow(tr) {
     return normalizeStr(span ? span.textContent : '');
 }
 
+// Função para extrair valor numérico do preço formatado
+function parsePrecoText(text) {
+    if (!text) return 0;
+    // Remove "R$" e espaços, troca vírgula por ponto
+    const cleaned = text.replace(/[R$\s]/g, '').replace(',', '.');
+    return parseFloat(cleaned) || 0;
+}
+
 // ========== EDITAR PRODUTO ==========
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('editBtn') || e.target.closest('.editBtn')) {
@@ -1278,6 +1409,29 @@ function submitEdit() {
     const formData = new FormData(document.getElementById('editForm'));
     formData.append('acao', 'editar_produto');
     
+    // Validação frontend: verifica nome duplicado
+    const produtoId = document.getElementById('edit_produto_id').value;
+    const novoNome = document.getElementById('edit_nome').value.trim();
+    const nomeNormalizado = novoNome.toLowerCase();
+    
+    const rows = document.querySelectorAll('#tabela-produtos tr');
+    let nomeDuplicado = false;
+    
+    rows.forEach(row => {
+        const rowId = row.dataset.id;
+        const nomeExistente = row.dataset.nome;
+        
+        // Ignora a linha do próprio produto sendo editado
+        if (rowId !== produtoId && nomeExistente && nomeExistente.toLowerCase().trim() === nomeNormalizado) {
+            nomeDuplicado = true;
+        }
+    });
+    
+    if (nomeDuplicado) {
+        showToast('❌ Já existe outro produto com este nome!', 'danger');
+        return;
+    }
+    
     fetch('', {
         method: 'POST',
         headers: {
@@ -1294,26 +1448,45 @@ function submitEdit() {
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            
+            // Pega os valores do formulário
             const produtoId = document.getElementById('edit_produto_id').value;
-            // Atualiza a linha na tabela sem reload e sem delay
-            fetch(`get_produto.php?id=${produtoId}`)
-                .then(res => res.json())
-                .then(prodData => {
-                    if (prodData.success && prodData.produto) {
-                        const row = document.querySelector(`tr[data-id="${produtoId}"]`);
-                        if (row) {
-                            row.dataset.preco = prodData.produto.preco_unitario;
-                            row.dataset.quantidade = prodData.produto.quantidade_estoque;
-                            row.dataset.nome = prodData.produto.nome;
-                            row.querySelector('span:last-of-type').textContent = prodData.produto.nome;
-                            row.querySelector('td:nth-child(2)').textContent = `R$ ${parseFloat(prodData.produto.preco_unitario).toFixed(2).replace('.', ',')}`;
-                            row.querySelector('td:nth-child(3)').textContent = prodData.produto.quantidade_estoque;
-                        }
-                        // Força reflow visual
-                        row.classList.add('table-success');
-                        setTimeout(() => row.classList.remove('table-success'), 1200);
-                    }
-                });
+            const novoNome = document.getElementById('edit_nome').value;
+            const novoPreco = parseFloat(document.getElementById('edit_preco').value);
+            const novaQuantidade = parseInt(document.getElementById('edit_estoque').value);
+            
+            // Atualiza a linha na tabela
+            const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+            if (row) {
+                // Atualiza os atributos data-*
+                row.dataset.nome = novoNome;
+                row.dataset.preco = novoPreco;
+                row.dataset.quantidade = novaQuantidade;
+                
+                // Atualiza o nome do produto na primeira coluna (span)
+                const nomeSpan = row.querySelector('td:first-child span:last-of-type');
+                if (nomeSpan) {
+                    nomeSpan.textContent = novoNome;
+                }
+                
+                // Atualiza o preço na segunda coluna
+                const precoTd = row.querySelector('td:nth-child(2)');
+                if (precoTd) {
+                    precoTd.textContent = `R$ ${novoPreco.toFixed(2).replace('.', ',')}`;
+                }
+                
+                // Atualiza a quantidade na terceira coluna
+                const quantidadeTd = row.querySelector('td:nth-child(3)');
+                if (quantidadeTd) {
+                    quantidadeTd.textContent = novaQuantidade;
+                }
+                
+                // Efeito visual de sucesso
+                row.classList.add('table-success');
+                setTimeout(() => row.classList.remove('table-success'), 1200);
+            }
+            
+            // Fecha o modal
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
         } else {
             throw new Error(data.message || 'Erro ao editar produto');
@@ -1342,6 +1515,25 @@ function submitBuy() {
     const formData = new FormData(document.getElementById('buyForm'));
     formData.append('acao', 'comprar_produto');
 
+    // Validação no frontend
+    const quantidade = parseInt(document.getElementById('buy_quantidade').value);
+    const custo = parseFloat(document.getElementById('buy_custo').value);
+
+    if (quantidade <= 0) {
+        showToast('A quantidade deve ser maior que zero!', 'danger');
+        return;
+    }
+
+    if (custo < 0) {
+        showToast('O custo não pode ser negativo!', 'danger');
+        return;
+    }
+
+    if (isNaN(quantidade) || isNaN(custo)) {
+        showToast('Por favor, preencha todos os campos corretamente!', 'danger');
+        return;
+    }
+
     fetch('', {
         method: 'POST',
         headers: {
@@ -1358,8 +1550,33 @@ function submitBuy() {
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            
+            // Pega os valores para atualizar a linha
             const produtoId = document.getElementById('buy_produto_id').value;
-            updateTableRow(produtoId);
+            const quantidadeAdicionada = parseInt(document.getElementById('buy_quantidade').value);
+            
+            // Atualiza a linha na tabela
+            const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+            if (row) {
+                // Pega a quantidade atual e soma
+                const quantidadeAtual = parseInt(row.dataset.quantidade);
+                const novaQuantidade = quantidadeAtual + quantidadeAdicionada;
+                
+                // Atualiza o atributo data-quantidade
+                row.dataset.quantidade = novaQuantidade;
+                
+                // Atualiza a célula de quantidade na tabela
+                const quantidadeTd = row.querySelector('td:nth-child(3)');
+                if (quantidadeTd) {
+                    quantidadeTd.textContent = novaQuantidade;
+                }
+                
+                // Efeito visual de sucesso
+                row.classList.add('table-success');
+                setTimeout(() => row.classList.remove('table-success'), 1200);
+            }
+            
+            // Fecha o modal
             bootstrap.Modal.getInstance(document.getElementById('buyModal')).hide();
         } else {
             throw new Error(data.message || 'Erro ao registrar entrada');
@@ -1403,8 +1620,33 @@ function submitSell() {
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            
+            // Pega os valores para atualizar a linha
             const produtoId = document.getElementById('sell_produto_id').value;
-            updateTableRow(produtoId);
+            const quantidadeVendida = parseInt(document.getElementById('sell_quantidade').value);
+            
+            // Atualiza a linha na tabela
+            const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+            if (row) {
+                // Pega a quantidade atual e subtrai
+                const quantidadeAtual = parseInt(row.dataset.quantidade);
+                const novaQuantidade = quantidadeAtual - quantidadeVendida;
+                
+                // Atualiza o atributo data-quantidade
+                row.dataset.quantidade = novaQuantidade;
+                
+                // Atualiza a célula de quantidade na tabela
+                const quantidadeTd = row.querySelector('td:nth-child(3)');
+                if (quantidadeTd) {
+                    quantidadeTd.textContent = novaQuantidade;
+                }
+                
+                // Efeito visual de sucesso
+                row.classList.add('table-success');
+                setTimeout(() => row.classList.remove('table-success'), 1200);
+            }
+            
+            // Fecha o modal
             bootstrap.Modal.getInstance(document.getElementById('sellModal')).hide();
         } else {
             throw new Error(data.message || 'Erro ao registrar saída');
@@ -1430,18 +1672,29 @@ document.addEventListener('click', function(e) {
         
         fetch('', {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         })
-        .then(res => res.json())
-        .then (data => {
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Erro na resposta do servidor');
+            }
+            return res.json();
+        })
+        .then(data => {
             if (data.success) {
                 showToast(data.message, 'success');
                 row.remove();
             } else {
-                showToast(data.message, 'danger');
+                showToast(data.message || 'Erro ao excluir produto', 'danger');
             }
         })
-        .catch(err => showToast('Erro ao excluir produto', 'danger'));
+        .catch(err => {
+            console.error('Erro detalhado:', err);
+            showToast(err.message || 'Erro ao excluir produto', 'danger');
+        });
     }
 });
 
@@ -1487,23 +1740,27 @@ if (ordenarSelect) {
                     return bText.localeCompare(aText, 'pt', { sensitivity: 'base' });
                 }
                 case 'preco-asc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    // Coluna 2 é o preço (índice nth-child(2))
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(2)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(2)')?.textContent || '');
                     return aNum - bNum;
                 }
                 case 'preco-desc': {
-                    const aNum = parsePrecoText(a.querySelector('td:nth-child(3)')?.textContent || '');
-                    const bNum = parsePrecoText(b.querySelector('td:nth-child(3)')?.textContent || '');
+                    // Coluna 2 é o preço
+                    const aNum = parsePrecoText(a.querySelector('td:nth-child(2)')?.textContent || '');
+                    const bNum = parsePrecoText(b.querySelector('td:nth-child(2)')?.textContent || '');
                     return bNum - aNum;
                 }
                 case 'quantidade-asc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    // Coluna 3 é a quantidade (índice nth-child(3))
+                    const aNum = parseInt(a.querySelector('td:nth-child(3)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(3)')?.textContent || '0') || 0;
                     return aNum - bNum;
                 }
                 case 'quantidade-desc': {
-                    const aNum = parseInt(a.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
-                    const bNum = parseInt(b.querySelector('td:nth-child(4)')?.textContent || '0') || 0;
+                    // Coluna 3 é a quantidade
+                    const aNum = parseInt(a.querySelector('td:nth-child(3)')?.textContent || '0') || 0;
+                    const bNum = parseInt(b.querySelector('td:nth-child(3')?.textContent || '0') || 0;
                     return bNum - aNum;
                 }
                 default:
@@ -1555,6 +1812,7 @@ function bindTagDropdownEvents() {
                 dropdown.style.display = 'block';
                 dropdown.style.position = 'fixed';
                 dropdown.style.left = (btnRect.right + 8) + 'px'; // 8px à direita do botão
+               
                 dropdown.style.top = btnRect.top + 'px';
             }
         };
@@ -1565,7 +1823,7 @@ function bindTagDropdownEvents() {
         opt.onclick = function(e) {
             e.stopPropagation();
             const produtoId = this.dataset.produtoId;
-            const tagId = this.dataset.tagId;
+                       const tagId = this.dataset.tagId;
             fetch('vincular_tag.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
