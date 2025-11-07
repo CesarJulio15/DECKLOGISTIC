@@ -26,3 +26,91 @@
 [06-Nov-2025 09:44:11 America/Sao_Paulo] - custo: 10
 [06-Nov-2025 09:44:11 America/Sao_Paulo] Query preparada, tentando executar com data formatada: 2025-11-06
 [06-Nov-2025 09:44:11 America/Sao_Paulo] Importação finalizada: 1 produtos importados, 0 erros
+[07-Nov-2025 14:16:40 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Produto inserido com sucesso: ID=6
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Data processada com sucesso: 2025-11-06
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Preparando inserção de movimentação:
+[07-Nov-2025 14:16:41 America/Sao_Paulo] - produto_id: 6
+[07-Nov-2025 14:16:41 America/Sao_Paulo] - quantidade: 50
+[07-Nov-2025 14:16:41 America/Sao_Paulo] - data_mov: 2025-11-06
+[07-Nov-2025 14:16:41 America/Sao_Paulo] - usuario_id: 4
+[07-Nov-2025 14:16:41 America/Sao_Paulo] - custo: 10
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Query preparada, tentando executar com data formatada: 2025-11-06
+[07-Nov-2025 14:16:41 America/Sao_Paulo] Importação finalizada: 1 produtos importados, 0 erros
+[07-Nov-2025 14:33:05 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:33:05 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:33:05 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:33:05 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:33:05 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 253
+[07-Nov-2025 14:33:05 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 14:33:24 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:33:24 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:33:24 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:33:24 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:33:24 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 253
+[07-Nov-2025 14:33:24 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 14:35:03 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:35:03 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:35:03 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:35:03 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:35:03 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 253
+[07-Nov-2025 14:35:03 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 14:36:34 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:36:34 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:36:34 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:36:34 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:36:53 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:36:54 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:36:54 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:36:54 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:40:33 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:40:33 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:40:33 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:40:33 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:44:01 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:44:01 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:44:01 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:44:01 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:45:30 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:45:30 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:45:30 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:45:30 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:47:07 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:47:07 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:47:07 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:47:07 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=abcd, lote=20
+[07-Nov-2025 14:47:07 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 14:47:07 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 14:50:15 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:50:15 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:50:15 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:50:15 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=CELULAR, lote=20
+[07-Nov-2025 14:50:15 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 14:50:15 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 14:54:32 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:54:32 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:54:32 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:54:32 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=CELULAR, lote=20
+[07-Nov-2025 14:54:32 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 14:54:32 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 14:57:54 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 14:57:54 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 14:57:54 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 14:57:54 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=CELULAR, lote=20
+[07-Nov-2025 14:57:54 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 14:57:54 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 15:03:42 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 15:03:42 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 15:03:42 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 15:03:42 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=CELULAR, lote=20
+[07-Nov-2025 15:03:42 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 15:03:42 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros
+[07-Nov-2025 15:05:01 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[07-Nov-2025 15:05:01 America/Sao_Paulo] Valor original da data: 11/6/2025
+[07-Nov-2025 15:05:01 America/Sao_Paulo] Data processada: 2025-11-06
+[07-Nov-2025 15:05:01 America/Sao_Paulo] Tentando inserir produto: loja_id=4, nome=peixe, lote=20
+[07-Nov-2025 15:05:01 America/Sao_Paulo] PHP Warning:  Undefined variable $updated in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 271
+[07-Nov-2025 15:05:01 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 0 erros

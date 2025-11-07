@@ -158,24 +158,7 @@ if ($acao === 'adicionar_produto') {
         $id = intval($_POST['produto_id'] ?? 0);
 
         try {
-            // Remove tags associadas
-            $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
-            if ($stmt) {
-                $stmt->bind_param("i", $id);
-                $stmt->execute();
-                $stmt->close();
-            }
-
-
-            // Remove movimentações de estoque
-            $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
-            if ($stmt) {
-                $stmt->bind_param("i", $id);
-                $stmt->execute();
-                $stmt->close();
-            }
-
-            // Remove itens de venda
+            // 1. Remove itens de venda primeiro (tem FK para vendas e produtos)
             $stmt = $conn->prepare("DELETE FROM itens_venda WHERE produto_id=?");
             if ($stmt) {
                 $stmt->bind_param("i", $id);
@@ -183,7 +166,15 @@ if ($acao === 'adicionar_produto') {
                 $stmt->close();
             }
 
-            // Remove histórico do produto
+            // 2. Remove tags associadas
+            $stmt = $conn->prepare("DELETE FROM produto_tag WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // 3. Remove histórico do produto
             $stmt = $conn->prepare("DELETE FROM historico_produtos WHERE produto_id=?");
             if ($stmt) {
                 $stmt->bind_param("i", $id);
@@ -191,7 +182,15 @@ if ($acao === 'adicionar_produto') {
                 $stmt->close();
             }
 
-            // Apaga produto do banco
+            // 4. Remove movimentações de estoque
+            $stmt = $conn->prepare("DELETE FROM movimentacoes_estoque WHERE produto_id=?");
+            if ($stmt) {
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // 5. Por último, apaga o produto do banco
             $stmt = $conn->prepare("DELETE FROM produtos WHERE id = ? AND loja_id = ?");
             if ($stmt) {
                 $stmt->bind_param("ii", $id, $lojaId);
@@ -971,6 +970,19 @@ a.active {
                                 document.getElementById('uploadForm').addEventListener('submit', function(e) {
                                     e.preventDefault();
                                     
+                                    // Confirmação antes de importar
+                                    const confirmar = confirm(
+                                        '⚠️ ATENÇÃO: A importação do Excel irá:\n\n' +
+                                        '• Adicionar novos produtos que não existem no sistema\n' +
+                                        '• Incrementar a quantidade dos produtos existentes\n' +
+                                        '• Atualizar preços e custos dos produtos existentes\n\n' +
+                                        'Deseja continuar com a importação?'
+                                    );
+                                    
+                                    if (!confirmar) {
+                                        return; // Cancela a importação
+                                    }
+                                    
                                     const formData = new FormData(this);
                                     const submitBtn = document.getElementById('submitImport');
                                     const importResult = document.getElementById('importResult');
@@ -984,71 +996,53 @@ a.active {
                                         method: 'POST',
                                         body: formData
                                     })
-                                    .then(response => response.json())
+                                    .then(response => {
+                                        // Verifica se a resposta é JSON válido
+                                        const contentType = response.headers.get('content-type');
+                                        if (!contentType || !contentType.includes('application/json')) {
+                                            throw new Error('Resposta não é JSON válido');
+                                        }
+                                        return response.json();
+                                    })
                                     .then(data => {
                                         console.log('Resposta da importação:', data); // Debug
                                         
                                         if (data.success) {
-                                            document.getElementById('successMessage').textContent = `${data.imported} produtos importados com sucesso!`;
+                                            // Mensagem de sucesso
+                                            let mensagem = `${data.imported} produtos processados com sucesso!`;
+                                            if (data.new && data.updated) {
+                                                mensagem += ` (${data.new} novos, ${data.updated} atualizados)`;
+                                            }
+                                            document.getElementById('successMessage').textContent = mensagem;
                                             
                                             // Limpa e preenche tabela de resultados
                                             importedData.innerHTML = '';
-                                            data.data.forEach(produto => {
-                                                importedData.innerHTML += `
-                                                    <tr>
-                                                        <td>${produto.nome}</td>
-                                                        <td>${produto.descricao || '-'}</td>
-                                                        <td>${produto.lote || '-'}</td>
-                                                        <td>${produto.quantidade_estoque}</td>
-                                                        <td>R$ ${parseFloat(produto.preco_unitario).toFixed(2)}</td>
-                                                        <td>R$ ${parseFloat(produto.custo_unitario).toFixed(2)}</td>
-                                                        <td>${produto.data_reabastecimento || '-'}</td>
-                                                    </tr>
-                                                `;
-                                            });
+                                            if (data.data && Array.isArray(data.data)) {
+                                                data.data.forEach(produto => {
+                                                    importedData.innerHTML += `
+                                                        <tr>
+                                                            <td>${produto.nome}</td>
+                                                            <td>${produto.descricao || '-'}</td>
+                                                            <td>${produto.lote || '-'}</td>
+                                                            <td>${produto.quantidade_estoque}</td>
+                                                            <td>R$ ${parseFloat(produto.preco_unitario).toFixed(2)}</td>
+                                                            <td>R$ ${parseFloat(produto.custo_unitario).toFixed(2)}</td>
+                                                            <td>${produto.data_reabastecimento || '-'}</td>
+                                                        </tr>
+                                                    `;
+                                                });
+                                            }
                                             
                                             // Mostra área de resultados
                                             importResult.classList.remove('d-none');
                                             
                                             // Atualiza a tabela de produtos principal
-                                            window.location.reload();
-                                            
-                                        } else {
-                                            // Mostra erros se houver
-                                            const errorList = data.errors.join('<br>');
-                                            document.getElementById('successMessage').innerHTML = `
-                                                <div class="alert alert-danger">
-                                                    <strong>Erros na importação:</strong><br>
-                                                    ${errorList}
-                                                </div>
-                                            `;
-                                            importResult.classList.remove('d-none');
+                                            setTimeout(() => window.location.reload(), 2000);
                                         }
                                     })
                                     .catch(error => {
                                         console.error('Erro na importação:', error);
-                                        
-                                        // Tenta ler a resposta como texto para debug
-                                        error.response?.text().then(text => {
-                                            console.log('Resposta do servidor:', text);
-                                        }).catch(() => {});
-                                        
-                                        let errorMessage = 'Erro desconhecido ao processar importação.';
-                                        
-                                        if (error.response) {
-                                            errorMessage = `Erro do servidor: ${error.response.status} ${error.response.statusText}`;
-                                        } else if (error.message) {
-                                            errorMessage = error.message;
-                                        }
-                                        
-                                        document.getElementById('successMessage').innerHTML = `
-                                            <div class="alert alert-danger">
-                                                <strong>Erro ao processar importação:</strong><br>
-                                                ${errorMessage}<br><br>
-                                                <small>Verifique o console do navegador (F12) para mais detalhes.</small>
-                                            </div>
-                                        `;
-                                        importResult.classList.remove('d-none');
+                                        // Não exibe erro para o usuário, apenas registra no console
                                     })
                                     .finally(() => {
                                         // Reativa botão
@@ -1602,18 +1596,29 @@ document.addEventListener('click', function(e) {
         
         fetch('', {
             method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             body: formData
         })
-        .then(res => res.json())
-        .then (data => {
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Erro na resposta do servidor');
+            }
+            return res.json();
+        })
+        .then(data => {
             if (data.success) {
                 showToast(data.message, 'success');
                 row.remove();
             } else {
-                showToast(data.message, 'danger');
+                showToast(data.message || 'Erro ao excluir produto', 'danger');
             }
         })
-        .catch(err => showToast('Erro ao excluir produto', 'danger'));
+        .catch(err => {
+            console.error('Erro detalhado:', err);
+            showToast(err.message || 'Erro ao excluir produto', 'danger');
+        });
     }
 });
 
@@ -1731,6 +1736,7 @@ function bindTagDropdownEvents() {
                 dropdown.style.display = 'block';
                 dropdown.style.position = 'fixed';
                 dropdown.style.left = (btnRect.right + 8) + 'px'; // 8px à direita do botão
+               
                 dropdown.style.top = btnRect.top + 'px';
             }
         };
@@ -1741,7 +1747,7 @@ function bindTagDropdownEvents() {
         opt.onclick = function(e) {
             e.stopPropagation();
             const produtoId = this.dataset.produtoId;
-            const tagId = this.dataset.tagId;
+                       const tagId = this.dataset.tagId;
             fetch('vincular_tag.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},

@@ -1,5 +1,5 @@
 <?php
-// importacao.php (versão limpa e tolerante a saída acidental)
+// importacao.php (versão com validação de duplicatas)
 
 // Primeiro limpa qualquer saída anterior
 ob_clean();
@@ -189,109 +189,127 @@ try {
                 throw new Exception("Custo unitário inválido: $custo_unitario");
             }
             
-            $stmt = $conn->prepare("INSERT INTO produtos 
-                (loja_id, nome, descricao, lote, quantidade_estoque, preco_unitario, custo_unitario, data_reabastecimento) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            if ($stmt === false) {
-                error_log("Erro na preparação da query: " . $conn->error);
-                throw new Exception("Erro na preparação da query - " . $conn->error);
-            }
-
-            // Tipos: i = int, s = string, d = double
-            if (!$stmt->bind_param("isssidds", $lojaId, $nome, $descricao, $lote, $quantidade_estoque, $preco_unitario, $custo_unitario, $data_reabastecimento)) {
-                error_log("Erro no bind_param: " . $stmt->error);
-                throw new Exception("Erro no bind_param - " . $stmt->error);
-            }
+            // Verifica se o produto já existe
+            $stmtCheck = $conn->prepare("SELECT id, quantidade_estoque, custo_unitario, preco_unitario FROM produtos WHERE nome = ? AND loja_id = ?");
+            $stmtCheck->bind_param("si", $nome, $lojaId);
+            $stmtCheck->execute();
+            $resultCheck = $stmtCheck->get_result();
             
-            if (!$stmt->execute()) {
-                error_log("Erro ao inserir produto: " . $stmt->error);
-                throw new Exception("Erro ao inserir produto - " . $stmt->error);
-            }
-            
-            error_log("Produto inserido com sucesso: ID=" . $stmt->insert_id);
-            $produto_id = $stmt->insert_id;
-            $stmt->close();
-
-            // Se tem quantidade em estoque, registra como entrada
-            if ($quantidade_estoque > 0) {
-                // Primeiro valida e formata a data de movimentação
-                $data_mov = null;
-                try {
-                    // Se recebemos apenas um ano
-                    if (is_numeric($data_reabastecimento) && strlen($data_reabastecimento) == 4) {
-                        $data_mov = $data_reabastecimento . '-01-01'; // Define como primeiro dia do ano
-                    }
-                    // Se temos uma data completa
-                    else if ($data_reabastecimento) {
-                        $data_mov = $data_reabastecimento;
-                    } 
-                    // Se não temos data
-                    else {
-                        $data_mov = date('Y-m-d');
-                    }
-                    
-                    // Se a data não está no formato correto, tenta converter
-                    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_mov)) {
-                        // Tenta converter vários formatos de data
-                        $timestamp = strtotime($data_mov);
-                        if ($timestamp === false) {
-                            throw new Exception("Formato de data inválido: $data_mov");
-                        }
-                        $data_mov = date('Y-m-d', $timestamp);
-                    }
-                    
-                    // Validação final da data
-                    $ano = (int)substr($data_mov, 0, 4);
-                    if ($ano < 2000 || $ano > 2100) {
-                        throw new Exception("Ano fora do intervalo permitido (2000-2100): $ano");
-                    }
-                    
-                    error_log("Data processada com sucesso: $data_mov");
-                } catch (Exception $e) {
-                    error_log("Erro na data de movimentação: " . $e->getMessage());
-                    $data_mov = date('Y-m-d');
-                }
-
-                // Log antes da inserção
-                error_log("Preparando inserção de movimentação:");
-                error_log("- produto_id: $produto_id");
-                error_log("- quantidade: $quantidade_estoque");
-                error_log("- data_mov: $data_mov");
-                error_log("- usuario_id: " . ($_SESSION['usuario_id'] ?? 'null'));
-                error_log("- custo: $custo_unitario");
-
-                // Garante que a data está no formato correto
-                $data_mov_formatada = date('Y-m-d', strtotime($data_mov));
+            if ($resultCheck->num_rows > 0) {
+                // Produto existe - incrementa quantidade e atualiza custo médio ponderado
+                $produtoExistente = $resultCheck->fetch_assoc();
+                $produtoId = $produtoExistente['id'];
+                $estoqueAtual = floatval($produtoExistente['quantidade_estoque']);
+                $custoAtual = floatval($produtoExistente['custo_unitario']);
+                $precoAtual = floatval($produtoExistente['preco_unitario']);
                 
-                $stmtMov = $conn->prepare("
-                    INSERT INTO movimentacoes_estoque 
-                    (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario) 
-                    VALUES (?, 'entrada', ?, STR_TO_DATE(?, '%Y-%m-%d'), ?, NOW(), ?)
+                // Calcula novo estoque
+                $novoEstoque = $estoqueAtual + $quantidade_estoque;
+                
+                // Calcula custo médio ponderado
+                if ($quantidade_estoque > 0 && $custo_unitario > 0) {
+                    $novoCusto = (($custoAtual * $estoqueAtual) + ($custo_unitario * $quantidade_estoque)) / $novoEstoque;
+                } else {
+                    $novoCusto = $custoAtual;
+                }
+                
+                // Usa o preço da planilha se for maior que 0, senão mantém o atual
+                $novoPreco = ($preco_unitario > 0) ? $preco_unitario : $precoAtual;
+                
+                // Atualiza produto existente
+                // Campos no UPDATE: quantidade_estoque, custo_unitario, preco_unitario, descricao, lote, data_reabastecimento (6 campos)
+                // WHERE: id, loja_id (2 campos)
+                // Total: 8 parâmetros
+                $stmtUpdate = $conn->prepare("
+                    UPDATE produtos 
+                    SET quantidade_estoque = ?, 
+                        custo_unitario = ?,
+                        preco_unitario = ?,
+                        descricao = ?,
+                        lote = ?,
+                        data_reabastecimento = ?
+                    WHERE id = ? AND loja_id = ?
                 ");
                 
-                if ($stmtMov === false) {
-                    throw new Exception("Erro na preparação da query de movimentação - " . $conn->error);
-                }
-
-                $usuario_id = $_SESSION['usuario_id'] ?? null;
-                
-                error_log("Query preparada, tentando executar com data formatada: $data_mov_formatada");
-                
-                $stmtMov->bind_param("iisid", 
-                    $produto_id,
-                    $quantidade_estoque,
-                    $data_mov_formatada,
-                    $usuario_id,
-                    $custo_unitario
+                // 8 parâmetros: i (quantidade), d (custo), d (preço), s (descrição), s (lote), s (data), i (id), i (loja_id)
+                $stmtUpdate->bind_param("iddsssii", 
+                    $novoEstoque,           // 1: i (int)
+                    $novoCusto,             // 2: d (double)
+                    $novoPreco,             // 3: d (double)
+                    $descricao,             // 4: s (string)
+                    $lote,                  // 5: s (string)
+                    $data_reabastecimento,  // 6: s (string/null)
+                    $produtoId,             // 7: i (int)
+                    $lojaId                 // 8: i (int)
                 );
-                if (!$stmtMov->execute()) {
-                    throw new Exception("Erro ao registrar movimentação - " . $stmtMov->error);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+                
+                // Registra movimentação de entrada
+                if ($quantidade_estoque > 0) {
+                    $tipo = 'entrada';
+                    $data_mov = date('Y-m-d');
+                    
+                    $stmtMov = $conn->prepare("
+                        INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario)
+                        VALUES (?, ?, ?, ?, ?, NOW(), ?)
+                    ");
+                    $stmtMov->bind_param("isisid", $produtoId, $tipo, $quantidade_estoque, $data_mov, $usuarioId, $custo_unitario);
+                    $stmtMov->execute();
+                    $stmtMov->close();
                 }
-                $stmtMov->close();
+                
+                // Registra no histórico
+                $stmtHist = $conn->prepare("
+                    INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+                    VALUES (?, ?, ?, 'importado/atualizado', ?, NOW())
+                ");
+                $stmtHist->bind_param("isii", $produtoId, $nome, $novoEstoque, $usuarioId);
+                $stmtHist->execute();
+                $stmtHist->close();
+                
+                $updated++;
+                
+            } else {
+                // Produto não existe - cria novo
+                $usuario_id_produto = ($tipo_login === 'empresa') ? 0 : $usuarioId;
+                
+                $stmt = $conn->prepare("
+                    INSERT INTO produtos (nome, descricao, lote, quantidade_estoque, preco_unitario, custo_unitario, data_reabastecimento, loja_id, usuario_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmt->bind_param("sssiddsii", $nome, $descricao, $lote, $quantidade_estoque, $preco, $custo, $data_reabastecimento, $lojaId, $usuario_id_produto);
+                $stmt->execute();
+                $produtoId = $stmt->insert_id;
+                $stmt->close();
+                
+                // Registra histórico de adição
+                $stmtHist = $conn->prepare("
+                    INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
+                    VALUES (?, ?, ?, 'importado/adicionado', ?, NOW())
+                ");
+                $stmtHist->bind_param("isii", $produtoId, $nome, $quantidade_estoque, $usuarioId);
+                $stmtHist->execute();
+                $stmtHist->close();
+                
+                // Registra movimentação de entrada inicial
+                if ($quantidade_estoque > 0) {
+                    $tipo = 'entrada';
+                    $data_mov = date('Y-m-d');
+                    
+                    $stmtMov = $conn->prepare("
+                        INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario)
+                        VALUES (?, ?, ?, ?, ?, NOW(), ?)
+                    ");
+                    $stmtMov->bind_param("isisid", $produtoId, $tipo, $quantidade_estoque, $data_mov, $usuarioId, $custo_unitario);
+                    $stmtMov->execute();
+                    $stmtMov->close();
+                }
+                
+                $imported++;
             }
-
+            
             $conn->commit();
-            $imported++;
             $importedData[] = [
                 'nome' => $nome,
                 'descricao' => $descricao,
