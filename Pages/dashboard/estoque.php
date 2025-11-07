@@ -287,5 +287,188 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+<!-- Blur atrás das overlays -->
+<div id="overlay-blur" class="full-screen-blur" style="display:none;"></div>
+
+<!-- Overlay 1: canto inferior direito -->
+<div id="overlay-estoque" style="display:none;">
+  <div class="welcome-card">
+    <h2>Estoque</h2>
+    <p>Essa é a área de estoque da sua empresa, aqui você vai gerir e analisar detalhadamente o controle de produtos e movimentações.</p>
+    <button id="closeOverlay1">Próximo</button>
+  </div>
+</div>
+
+<!-- Overlay 2: próxima aos botões de histórico e giro -->
+<div id="overlay-botoes" class="welcome-overlay" style="display:none;">
+  <div class="welcome-card">
+    <h2>Análises Detalhadas</h2>
+    <p>Aqui você pode visualizar o histórico de estoque dos últimos 6 meses e analisar o giro de estoque dos seus produtos.</p>
+    <button id="closeOverlay2">Concluir</button>
+  </div>
+</div>
+
+<style>
+/* Classe para botões ficarem acima do blur */
+.fora-do-blur {
+  position: relative;
+  z-index: 10002 !important;
+}
+
+.fora-do-blur:hover {
+  box-shadow: none !important;
+  transform: none !important;
+  background: inherit !important;
+  color: inherit !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+/* Blur que cobre toda a tela */
+#overlay-blur {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+}
+
+/* Overlay de estoque */
+#overlay-estoque {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-end;
+  align-items: flex-start;
+  z-index: 10000;
+  padding: 30px;
+  padding-top: 700px;
+  background: transparent;
+}
+
+/* Overlay botões */
+#overlay-botoes {
+  display: none;
+  position: absolute;
+  z-index: 10001;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Cards das overlays */
+#overlay-estoque .welcome-card,
+#overlay-botoes .welcome-card {
+  margin-top: 50px;
+  background: #222;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+  padding: 22px 28px;
+  max-width: 340px;
+  font-size: 15px;
+  pointer-events: auto;
+  position: relative;
+  margin-bottom: 10px;
+  z-index: 2;
+  text-align: left;
+}
+
+#overlay-estoque .welcome-card h2,
+#overlay-botoes .welcome-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+#overlay-estoque .welcome-card p,
+#overlay-botoes .welcome-card p {
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+
+#overlay-estoque .welcome-card button,
+#overlay-botoes .welcome-card button {
+  margin-top: 12px;
+  background: #ff6600 !important;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+/* Botão de ajuda flutuante */
+#help-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+
+<button id="help-btn">?</button>
+
+<script>
+const helpBtn = document.getElementById('help-btn');
+const overlay1 = document.getElementById('overlay-estoque');
+const overlay2 = document.getElementById('overlay-botoes');
+const blur = document.getElementById('overlay-blur');
+const btnClose1 = document.getElementById('closeOverlay1');
+const btnClose2 = document.getElementById('closeOverlay2');
+
+helpBtn.addEventListener('click', () => {
+  overlay1.style.display = 'flex';
+  blur.style.display = 'block';
+});
+
+btnClose1.addEventListener('click', () => {
+  overlay1.style.display = 'none';
+  
+  // Mantém blur ativo
+  blur.style.display = 'block';
+
+  // Posiciona overlay2 próxima ao botão histórico
+  const btnHistorico = document.getElementById('btnHistorico');
+  const rect = btnHistorico.getBoundingClientRect();
+  
+  overlay2.style.position = 'absolute';
+  overlay2.style.top = `${rect.bottom + window.scrollY + 10}px`;
+  overlay2.style.left = `${rect.left + window.scrollX}px`;
+  overlay2.style.display = 'flex';
+  overlay2.style.zIndex = '10001';
+
+  // Adiciona classe para os botões ficarem acima do blur
+  document.getElementById('btnHistorico').classList.add('fora-do-blur');
+  document.getElementById('btnGiro').classList.add('fora-do-blur');
+});
+
+btnClose2.addEventListener('click', () => {
+  overlay2.style.display = 'none';
+  blur.style.display = 'none';
+
+  // Remove classe dos botões
+  document.getElementById('btnHistorico').classList.remove('fora-do-blur');
+  document.getElementById('btnGiro').classList.remove('fora-do-blur');
+});
+</script>
+
 </body>
 </html>
