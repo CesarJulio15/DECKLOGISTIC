@@ -82,10 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     <link rel="stylesheet" href="../../assets/sidebar.css"> 
 </head>
 <body>
-<div class="content">
-  <!-- Sidebar -->
-<div class="sidebar">
-    <link rel="stylesheet" href="../../../assets/sidebar.css">
+  <div class="sidebar">
     <div class="logo-area">
       <img src="../../img/logo2.svg" alt="Logo">
     </div>
@@ -109,65 +106,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     </nav>
   </div>
 
-    <!-- Conteúdo principal -->
+  <div class="content">
     <div class="conteudo">
-        <h1>Minha Conta</h1>
-        <div class="caixa-conta">
-            <div class="perfil">
-                <h2><?= htmlspecialchars($dados_usuario['nome'] ?? '') ?></h2>
-            </div>
-
-            <!-- Formulário Nome -->
-            <form method="POST">
-                <div class="linha-info">
-                    <span class="icone">
-                        <img src="../../img/icon-name.svg" alt="Ícone Nome" 
-                             style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
-                    </span>
-                    <strong>Nome:</strong>
-                    <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" required
-                    <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
-                    <?php if ($tipo_login === 'empresa'): ?>
-                        <button type="submit" name="alterar_nome">Salvar</button>
-                    <?php endif; ?>
-                </div>
-            </form>
-
-            <!-- Formulário Email -->
-            <form method="POST">
-                <div class="linha-info">
-                    <span class="icone"><img src="../../img/icon-email.svg" alt="Ícone Email"
-                  style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
-                </span>
-                    <strong>Email:</strong>
-                    <input type="email" name="email" value="<?= htmlspecialchars($dados_usuario['email'] ?? '') ?>" required
-                    <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
-                    <?php if ($tipo_login === 'empresa'): ?>
-                        <button type="submit" name="alterar_email">Salvar</button>
-                    <?php endif; ?>
-                </div>
-            </form>
-
-            <?php if ($tipo_login === 'empresa'): ?>
-                <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
-    <a href="listafuncionarios.php" class="btn-cadastrar" style="margin-top:10px;">Ver Funcionários</a>
-    <a href="../../Pages/auth/2FA.php" class="btn-alterar-senha">Alterar Senha</a>
-
-                <!-- Excluir conta -->
-            <?php endif; ?>
-
-            <!-- Logout -->
-            <a href="../auth/logout.php" class="btn-sair">Sair da conta</a>
-
-                   <form action="../auth/excluirConta.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
-                    <button type="submit" class="btn-excluir">
-                        <span>Excluir Conta</span>
-                        <img src="../../img/icon-lixo.svg" alt="Excluir Conta" style="width:12px; position:relative; top:3px; margin-left:3px;">
-                    </button>
-                </form>
-
+      <h1>Minha Conta</h1>
+      <div class="caixa-conta">
+        <div class="perfil">
+          <h2><?= htmlspecialchars($dados_usuario['nome'] ?? '') ?></h2>
         </div>
+
+        <!-- Formulário Nome -->
+        <form method="POST">
+          <div class="linha-info">
+            <span class="icone">
+              <img src="../../img/icon-name.svg" alt="Ícone Nome" 
+                   style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
+            </span>
+            <strong>Nome:</strong>
+            <input type="text" name="nome" value="<?= htmlspecialchars($dados_usuario['nome'] ?? '') ?>" required
+            <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
+            <?php if ($tipo_login === 'empresa'): ?>
+              <button type="submit" name="alterar_nome">Salvar</button>
+            <?php endif; ?>
+          </div>
+        </form>
+
+        <!-- Formulário Email -->
+        <form method="POST">
+          <div class="linha-info">
+            <span class="icone"><img src="../../img/icon-email.svg" alt="Ícone Email"
+              style="display:inline-block; vertical-align:middle; filter: invert(1); width:20px; height:20px;">
+            </span>
+            <strong>Email:</strong>
+            <input type="email" name="email" value="<?= htmlspecialchars($dados_usuario['email'] ?? '') ?>" required
+            <?= $tipo_login !== 'empresa' ? 'readonly' : '' ?>>
+            <?php if ($tipo_login === 'empresa'): ?>
+              <button type="submit" name="alterar_email">Salvar</button>
+            <?php endif; ?>
+          </div>
+        </form>
+
+        <?php if ($tipo_login === 'empresa'): ?>
+          <a href="funcionarios/cadastrolojafuncionario.php" class="btn-cadastrar">Cadastrar Funcionário</a>
+          <a href="listafuncionarios.php" class="btn-cadastrar" style="margin-top:10px;">Ver Funcionários</a>
+          <a href="../../Pages/auth/2FA.php" class="btn-alterar-senha">Alterar Senha</a>
+        <?php endif; ?>
+
+        <a href="../auth/logout.php" class="btn-sair">Sair da conta</a>
+
+        <form action="../auth/excluirConta.php" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir a conta? Essa ação não pode ser desfeita!');">
+          <button type="submit" class="btn-excluir">
+            <span>Excluir Conta</span>
+            <img src="../../img/icon-lixo.svg" alt="Excluir Conta" style="width:12px; position:relative; top:3px; margin-left:3px;">
+          </button>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
 </body>
 </html>

@@ -88,34 +88,35 @@ if ($nome && $email && $senha && $senha2) {
     <div class="left-side"></div>
     <div class="right-side">
       <div class="form-container">
-        <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
-        <h1>Cadastre um funcionário</h1>
+
+
+        <h1 style="margin-top:0;">Cadastre um funcionário</h1>
 
         <?php if (!empty($msg)) echo "<p class='msg'>$msg</p>"; ?>
 
-        <form method="POST">
+        <form method="POST" autocomplete="on" style="width:100%;max-width:400px;margin:0 auto;">
           <div class="input-container">
             <i class="fa-solid fa-user"></i>
-            <input type="text" name="nome" placeholder="Nome do funcionário" required>
+            <input type="text" name="nome" placeholder="Nome do funcionário" required autocomplete="name" inputmode="text" pattern=".{2,}" minlength="2">
           </div>
 
           <div class="input-container">
             <i class="fa-solid fa-envelope"></i>
-            <input type="email" name="email" placeholder="Endereço de e-mail" required>
+            <input type="email" name="email" placeholder="Endereço de e-mail" required autocomplete="email" inputmode="email">
           </div>
 
           <div class="input-container">
             <i class="fa-solid fa-key"></i>
-            <input type="password" name="senha" placeholder="Insira uma Senha" required>
+            <input type="password" name="senha" placeholder="Insira uma Senha" required autocomplete="new-password" minlength="6">
           </div>
 
           <div class="input-container">
             <i class="fa-solid fa-key"></i>
-            <input type="password" name="senha2" placeholder="Repita a senha" required>
+            <input type="password" name="senha2" placeholder="Repita a senha" required autocomplete="new-password" minlength="6">
           </div>
 
-          <button type="submit" class="btn">Cadastrar Funcionário</button>
-          <button type="button" onclick="location.href='../config.php'" class="btn">Voltar</button>
+          <button type="submit" class="btn" style="font-size:1.1em;">Cadastrar Funcionário</button>
+          <button type="button" onclick="location.href='../config.php'" class="btn" style="background:#eee;color:#222;font-size:1.1em;">Voltar</button>
         </form>
       </div>
     </div>

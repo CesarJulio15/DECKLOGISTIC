@@ -149,179 +149,173 @@ function formatarCNAE(cnae) {
   </script>
 </head>
 <body>
-  <div class="left-side"></div>
-  <div class="container">
-    <h1>Finalize o cadastro da sua empresa</h1>
+  <div class="main-layout">
+    <div class="left-side"></div>
+    <div class="container">
+      <h1>Finalize o cadastro da sua empresa</h1>
 
-    <form onsubmit="criptografarCamposSigilosos()" action="finalizarCadastro.php" method="POST">
+      <form onsubmit="criptografarCamposSigilosos()" action="finalizarCadastro.php" method="POST">
 
-<div class="form-group">
-  <label for="razao">Razão Social</label>
-  <input type="text" id="razao" name="razao" maxlength="150" required 
-         pattern="[A-Za-zÀ-ú\s\-\.]+" placeholder="Ex: Indústrias XPTO LTDA"
-         title="Apenas letras, espaços, hífen e ponto">
+        <div class="form-area">
+          <div class="form-area-title">Dados da Empresa</div>
+          <div class="form-group">
+            <label for="razao">Razão Social</label>
+            <input type="text" id="razao" name="razao" maxlength="150" required 
+                   pattern="[A-Za-zÀ-ú\s\-\.]+" placeholder="Ex: Indústrias XPTO LTDA"
+                   title="Apenas letras, espaços, hífen e ponto">
+            <label for="fantasia">Nome Fantasia</label>
+            <input type="text" id="fantasia" name="fantasia" maxlength="100" required 
+                   pattern="[A-Za-zÀ-ú0-9\s\-\.]+" placeholder="Ex: Super XPTO"
+                   title="Apenas letras, números, espaços, hífen e ponto">
+          </div>
+        </div>
 
-  <label for="fantasia">Nome Fantasia</label>
-  <input type="text" id="fantasia" name="fantasia" maxlength="100" required 
-         pattern="[A-Za-zÀ-ú0-9\s\-\.]+" placeholder="Ex: Super XPTO"
-         title="Apenas letras, números, espaços, hífen e ponto">
-</div>
+        <div class="form-area">
+          <div class="form-area-title">Endereço</div>
+          <div class="form-group">
+            <label for="cep">CEP</label>
+            <input type="text" id="cep" name="cep" maxlength="9" required onblur="consultarCEP()" 
+                   placeholder="Ex: 01001-000" pattern="\d{5}-?\d{3}"
+                   title="Formato: 12345-678">
+            <label for="endereco">Endereço</label>
+            <input type="text" id="endereco" name="endereco" maxlength="120" required 
+                   placeholder="Ex: Av. Paulista">
+            <label for="numero">Número</label>
+            <input type="text" id="numero" name="numero" maxlength="6" required 
+                   placeholder="Ex: 1234" pattern="\d{1,6}"
+                   title="Apenas números, máximo 6 dígitos">
+            <label for="complemento">Complemento</label>
+            <input type="text" id="complemento" name="complemento" maxlength="50" 
+                   placeholder="Ex: Bloco B, Apto 21">
+          </div>
+          <div class="form-group">
+            <label for="bairro">Bairro</label>
+            <input type="text" id="bairro" name="bairro" maxlength="60" required 
+                   pattern="[A-Za-zÀ-ú\s\-]+" placeholder="Ex: Bela Vista"
+                   title="Apenas letras, espaços e hífen">
+            <label for="uf">UF</label>
+            <select id="uf" name="uf" required>
+              <option value="">Selecione</option>
+              <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+              <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+              <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+              <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+              <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+              <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+              <option>SP</option><option>SE</option><option>TO</option>
+            </select>
+            <label for="municipio">Município</label>
+            <input type="text" id="municipio" name="municipio" maxlength="60" required 
+                   pattern="[A-Za-zÀ-ú\s\-]+" placeholder="Ex: São Paulo"
+                   title="Apenas letras, espaços e hífen">
+            <label for="pais">País</label>
+            <select id="pais" name="pais" required>
+              <option value="">Selecione</option>
+              <option selected>Brasil</option>
+              <option>Argentina</option>
+              <option>Paraguai</option>
+              <option>Uruguai</option>
+              <option>Chile</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fone">Telefone</label>
+            <input type="tel" id="fone" name="fone" maxlength="15" required 
+                   placeholder="Ex: (11) 91234-5678"
+                   title="Formato: (11) 91234-5678 ou (11) 1234-5678">
+          </div>
+        </div>
 
-<div class="form-group">
-  <label for="cep">CEP</label>
-  <input type="text" id="cep" name="cep" maxlength="9" required onblur="consultarCEP()" 
-         placeholder="Ex: 01001-000" pattern="\d{5}-?\d{3}"
-         title="Formato: 12345-678">
+        <div class="form-area">
+          <div class="form-area-title">Dados Fiscais</div>
+          <div class="form-group">
+            <label for="regime_federal">Regime Federal</label>
+            <select id="regime_federal" name="regime_federal" required>
+              <option value="">Selecione</option>
+              <option>Lucro Real</option>
+              <option>Lucro Presumido</option>
+              <option>Simples Nacional</option>
+              <option>MEI</option>
+            </select>
+            <label for="cnpj">CNPJ</label>
+            <input type="text" id="cnpj" name="cnpj" maxlength="18" required 
+                   placeholder="Ex: 12.345.678/0001-90"
+                   pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}"
+                   title="Formato: 12.345.678/0001-90">
+            <label for="cnae_f">CNAE-Fiscal (Principal)</label>
+            <input type="text" id="cnae_f" name="cnae_f" maxlength="10" 
+                   placeholder="Ex: 6201-5/00"
+                   pattern="\d{4}-\d{1}/\d{2}"
+                   title="Formato: 1234-5/67 (7 dígitos)">
+          </div>
+          <div class="form-group">
+            <label for="regime_estadual">Regime Estadual</label>
+            <select id="regime_estadual" name="regime_estadual" required>
+              <option value="">Selecione</option>
+              <option>Normal</option>
+              <option>Substituição Tributária</option>
+              <option>Isento</option>
+              <option>Não Contribuinte</option>
+            </select>
+            <label for="nir">NIRC (Número de Inscrição no Cadastro de Contribuintes)</label>
+            <input type="text" id="nir" name="nir" maxlength="10" 
+                   placeholder="Ex: 1234567890"
+                   pattern="\d{10}"
+                   title="10 dígitos numéricos">
+            <label for="escrituracao_centralizada">Escrituração Centralizada</label>
+            <select id="escrituracao_centralizada" name="escrituracao_centralizada" required>
+              <option value="">Selecione</option>
+              <option>Sim</option>
+              <option>Não</option>
+            </select>
+            <label for="inscricao_estadual">Inscrição Estadual</label>
+            <input type="text" id="inscricao_estadual" name="inscricao_estadual" maxlength="15"
+                   placeholder="Ex: 123.456.789.012"
+                   pattern="\d{3}\.\d{3}\.\d{3}\.\d{3}"
+                   title="12 dígitos (SP: 123.456.789.012)">
+          </div>
+          <div class="form-group">
+            <label for="data_nir">Data de Inscrição NIRC</label>
+            <input type="date" id="data_nir" name="data_nir">
+            <label for="area_construida">Área Construída (m²)</label>
+            <input type="text" id="area_construida" name="area_construida" maxlength="8"
+                   placeholder="Ex: 500" pattern="\d{1,8}"
+                   title="Apenas números, máximo 99999999">
+            <label for="cod_estabelecimento">Código do Estabelecimento</label>
+            <input type="text" id="cod_estabelecimento" name="cod_estabelecimento" maxlength="20"
+                   placeholder="Ex: EST-001" pattern="[A-Za-z0-9\-]+"
+                   title="Letras, números e hífen">
+          </div>
+        </div>
 
-  <label for="endereco">Endereço</label>
-  <input type="text" id="endereco" name="endereco" maxlength="120" required 
-         placeholder="Ex: Av. Paulista">
+        <div class="form-area termos-area">
+          <div class="form-area-title">Termos e Políticas</div>
+          <div class="termos-group">
+            <label>
+              <input type="checkbox" required style="margin-right: 8px;">
+              Eu li e concordo com os
+              <a href="../../../termosUso.php" target="_blank">
+                Termos de Uso
+              </a>
+            </label>
+            <label>
+              <input type="checkbox" required style="margin-right: 8px;">
+              Eu li e concordo com as
+              <a href="../../../politicaPrivacidade.php" target="_blank">
+                Políticas de Privacidade
+              </a>
+            </label>
+          </div>
+        </div>
 
-  <label for="numero">Número</label>
-  <input type="text" id="numero" name="numero" maxlength="6" required 
-         placeholder="Ex: 1234" pattern="\d{1,6}"
-         title="Apenas números, máximo 6 dígitos">
-
-  <label for="complemento">Complemento</label>
-  <input type="text" id="complemento" name="complemento" maxlength="50" 
-         placeholder="Ex: Bloco B, Apto 21">
-</div>
-
-<div class="form-group">
-  <label for="bairro">Bairro</label>
-  <input type="text" id="bairro" name="bairro" maxlength="60" required 
-         pattern="[A-Za-zÀ-ú\s\-]+" placeholder="Ex: Bela Vista"
-         title="Apenas letras, espaços e hífen">
-
-  <label for="uf">UF</label>
-  <select id="uf" name="uf" required>
-    <option value="">Selecione</option>
-    <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
-    <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
-    <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
-    <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
-    <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-    <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
-    <option>SP</option><option>SE</option><option>TO</option>
-  </select>
-
-  <label for="municipio">Município</label>
-  <input type="text" id="municipio" name="municipio" maxlength="60" required 
-         pattern="[A-Za-zÀ-ú\s\-]+" placeholder="Ex: São Paulo"
-         title="Apenas letras, espaços e hífen">
-
-  <label for="pais">País</label>
-  <select id="pais" name="pais" required>
-    <option value="">Selecione</option>
-    <option selected>Brasil</option>
-    <option>Argentina</option>
-    <option>Paraguai</option>
-    <option>Uruguai</option>
-    <option>Chile</option>
-  </select>
-</div>
-
-<div class="form-group">
-  <label for="fone">Telefone</label>
-  <input type="tel" id="fone" name="fone" maxlength="15" required 
-         placeholder="Ex: (11) 91234-5678"
-         title="Formato: (11) 91234-5678 ou (11) 1234-5678">
-</div>
-<hr><br>
-
-<div class="form-group">
-  <label for="regime_federal">Regime Federal</label>
-  <select id="regime_federal" name="regime_federal" required>
-    <option value="">Selecione</option>
-    <option>Lucro Real</option>
-    <option>Lucro Presumido</option>
-    <option>Simples Nacional</option>
-    <option>MEI</option>
-  </select>
-
-  <label for="cnpj">CNPJ</label>
-  <input type="text" id="cnpj" name="cnpj" maxlength="18" required 
-         placeholder="Ex: 12.345.678/0001-90"
-         pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}"
-         title="Formato: 12.345.678/0001-90">
-
-  <label for="cnae_f">CNAE-Fiscal (Principal)</label>
-  <input type="text" id="cnae_f" name="cnae_f" maxlength="10" 
-         placeholder="Ex: 6201-5/00"
-         pattern="\d{4}-\d{1}/\d{2}"
-         title="Formato: 1234-5/67 (7 dígitos)">
-</div>
-
-<div class="form-group">
-  <label for="regime_estadual">Regime Estadual</label>
-  <select id="regime_estadual" name="regime_estadual" required>
-    <option value="">Selecione</option>
-    <option>Normal</option>
-    <option>Substituição Tributária</option>
-    <option>Isento</option>
-    <option>Não Contribuinte</option>
-  </select>
-
-  <label for="nir">NIRC (Número de Inscrição no Cadastro de Contribuintes)</label>
-  <input type="text" id="nir" name="nir" maxlength="10" 
-         placeholder="Ex: 1234567890"
-         pattern="\d{10}"
-         title="10 dígitos numéricos">
-
-  <label for="escrituracao_centralizada">Escrituração Centralizada</label>
-  <select id="escrituracao_centralizada" name="escrituracao_centralizada" required>
-    <option value="">Selecione</option>
-    <option>Sim</option>
-    <option>Não</option>
-  </select>
-
-  <label for="inscricao_estadual">Inscrição Estadual</label>
-  <input type="text" id="inscricao_estadual" name="inscricao_estadual" maxlength="15"
-         placeholder="Ex: 123.456.789.012"
-         pattern="\d{3}\.\d{3}\.\d{3}\.\d{3}"
-         title="12 dígitos (SP: 123.456.789.012)">
-</div>
-
-<div class="form-group">
-  <label for="data_nir">Data de Inscrição NIRC</label>
-  <input type="date" id="data_nir" name="data_nir">
-
-  <label for="area_construida">Área Construída (m²)</label>
-  <input type="text" id="area_construida" name="area_construida" maxlength="8"
-         placeholder="Ex: 500" pattern="\d{1,8}"
-         title="Apenas números, máximo 99999999">
-
-  <label for="cod_estabelecimento">Código do Estabelecimento</label>
-  <input type="text" id="cod_estabelecimento" name="cod_estabelecimento" maxlength="20"
-         placeholder="Ex: EST-001" pattern="[A-Za-z0-9\-]+"
-         title="Letras, números e hífen">
-</div>
-
-  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
-  <label style="display: inline-flex; align-items: center;">
-    <input type="checkbox" required style="margin-right: 8px;">
-    Eu li e concordo com os  
-    <a href="../../../termosUso.php" target="_blank" style="color: #00a3e0; text-decoration: underline; margin-left: 5px; margin-right: 20px;">
-      Termos de Uso
-    </a>
-  </label>
-
-  <label style="display: inline-flex; align-items: center;">
-    <input type="checkbox" required style="margin-right: 8px;">
-    Eu li e concordo com as  
-    <a href="../../../politicaPrivacidade.php" target="_blank" style="color: #00a3e0; text-decoration: underline; margin-left: 5px;">
-      Políticas de Privacidade
-    </a>
-  </label>
-</div>
-
-
-  <div class="form-group" style="display: flex; gap: 10px; margin-top: 30px;">
-    <button type="button" onclick="location.href='cadastro.php'">Voltar</button>
-    <button type="submit" style="width: 200px;">Prosseguir</button>
-  </div>
-</form>
-
+        <div class="form-area" style="background: none; box-shadow: none; border: none; padding: 0; margin-top: 10px;">
+          <div class="form-group botoes-group">
+            <button type="submit" class="btn-prosseguir">Prosseguir</button>
+            <button type="button" class="btn-voltar" onclick="location.href='cadastro.php'">Voltar</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </body>
 </html>

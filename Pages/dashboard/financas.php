@@ -14,10 +14,23 @@ $lojaId = $_SESSION['loja_id'];
   <link rel="stylesheet" href="../../assets/sidebar.css">
   
 </head>
+
+<!-- BLOQUEIO MOBILE -->
+<div id="mobile-lock">
+  <div class="mobile-container">
+    <img src="../../img/logoDecklogistic.webp" alt="Logo" class="mobile-logo">
+    <h1>Versão Desktop Necessária</h1>
+    <p>Essa área do sistema foi projetada para telas grandes.  
+    Acesse pelo seu computador para visualizar o painel financeiro completo.</p>
+    <a href="../auth/config.php" class="mobile-btn">Acessar Configurações</a>
+    <div class="mobile-footer">
+      <p>© Decklogistic 2025 — Sistema Financeiro Empresarial</p>
+    </div>
+  </div>
+</div>
+
 <body>
 
-<div class="content">
-  <!-- Sidebar -->
 <div class="sidebar">
     <link rel="stylesheet" href="../../assets/sidebar.css">
     <div class="logo-area">
@@ -45,6 +58,100 @@ $lojaId = $_SESSION['loja_id'];
 
 
 <style>
+    /* --- BLOQUEIO MOBILE AJUSTADO --- */
+#mobile-lock {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  body > *:not(#mobile-lock) {
+    display: none !important;
+  }
+
+  #mobile-lock {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(circle at center, #0f0f0f 0%, #000 100%);
+    color: #fff;
+    text-align: center;
+    padding: 30px;
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .mobile-container {
+    width: 80%;
+    max-width: 750px;
+    min-height: 50vh; 
+    background: rgba(30, 30, 30, 0.85);
+    padding: 40px 24px;
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 25px rgba(255, 102, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5vh;   /* mais espaço acima */
+    margin-bottom: 5vh;/* mais espaço abaixo */
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .mobile-logo {
+    width: 160px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px #ff6600);
+  }
+
+  .mobile-container h1 {
+    font-size: 2.8rem;
+    margin-bottom: 14px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+  }
+
+  .mobile-container p {
+    font-size: 2rem;
+    color: #ccc;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  .mobile-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #ff6600, #ff8533);
+    color: #fff;
+    text-decoration: none;
+    padding: 18px 26px;
+    border-radius: 10px;
+    font-size: 1.4rem;
+    transition: 0.3s ease;
+  }
+
+  .mobile-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 102, 0, 0.3);
+  }
+
+  .mobile-footer {
+    margin-top: 26px;
+    font-size: 0.4rem;
+    color: #777;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+}
 .btn-modern {
     display: inline-block;
     padding: 10px 20px;
@@ -74,6 +181,7 @@ $lojaId = $_SESSION['loja_id'];
 
   <!-- Dashboard Cards -->
   <div class="dashboard">
+    
     <div class="card">
       <h3>Lucro Bruto</h3>
       <div id="lucroBruto" class="value">R$ 0,00</div>

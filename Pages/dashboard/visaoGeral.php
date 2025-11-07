@@ -38,6 +38,21 @@ $lojaId = $_SESSION['loja_id'];
   <link rel="stylesheet" href="../../assets/visaoGeral.css">
   <link rel="stylesheet" href="../../assets/sidebar .css">
 </head>
+
+<!-- BLOQUEIO MOBILE -->
+<div id="mobile-lock">
+  <div class="mobile-container">
+    <img src="../../img/logoDecklogistic.webp" alt="Logo" class="mobile-logo">
+    <h1>Versão Desktop Necessária</h1>
+    <p>Essa área do sistema foi projetada para telas grandes.  
+    Acesse pelo seu computador para visualizar o painel financeiro completo.</p>
+    <a href="../auth/config.php" class="mobile-btn">Acessar Configurações</a>
+    <div class="mobile-footer">
+      <p>© Decklogistic 2025 — Sistema Financeiro Empresarial</p>
+    </div>
+  </div>
+</div>
+
 <body>
 
 <div class="content">
@@ -70,6 +85,103 @@ $lojaId = $_SESSION['loja_id'];
     </nav>
   </div>
 <style>
+/* --- BLOQUEIO MOBILE AJUSTADO --- */
+#mobile-lock {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  body > *:not(#mobile-lock) {
+    display: none !important;
+  }
+
+  #mobile-lock {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(circle at center, #0f0f0f 0%, #000 100%);
+    color: #fff;
+    text-align: center;
+    padding: 30px;
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .mobile-container {
+    width: 90%;
+    max-width: 700px;
+    min-height: 40vh; /* maior: mais imponente */
+    background: rgba(25, 25, 25, 0.9);
+    padding: 60px 30px;
+    border-radius: 22px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 0 40px rgba(255, 102, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8vh;
+    margin-bottom: 8vh;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .mobile-logo {
+    width: 100px;
+    margin-bottom: 24px;
+    filter: drop-shadow(0 0 12px #ff6600);
+  }
+
+  .mobile-container h1 {
+    font-size: 2.4rem; /* título bem visível */
+    margin-bottom: 20px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+  }
+
+  .mobile-container p {
+    font-size: 1.2rem; /* texto maior */
+    color: #ddd;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    max-width: 80%;
+  }
+
+  .mobile-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #ff6600, #ff8533);
+    color: #fff;
+    text-decoration: none;
+    padding: 16px 34px; /* botão maior */
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: 0.3s ease;
+  }
+
+  .mobile-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(255, 102, 0, 0.35);
+  }
+
+  .mobile-footer {
+    margin-top: 36px;
+    font-size: 0.9rem;
+    color: #888;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+}
+
 .btn-modern {
     display: inline-block;
     padding: 10px 20px;

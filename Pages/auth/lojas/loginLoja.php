@@ -22,8 +22,8 @@ if (session_status() === PHP_SESSION_NONE) {
   <div class="left-side">
   </div>
   <div class="right-side">
-    <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
     <div class="form-container">
+      <img src="../../../img/logoDecklogistic.webp" alt="Logo" class="logo">
       <h1>Olá Novamente!</h1>
 
       <!-- Mostra erro, se existir -->

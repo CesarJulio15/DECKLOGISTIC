@@ -54,121 +54,43 @@ $stmt->close();
 <head>
     <meta charset="UTF-8">
     <title>Funcionários</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
     <link rel="stylesheet" href="../../assets/sidebar.css">
+    <link rel="stylesheet" href="../../assets/listafuncionarios.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background: #181818;
-            color: #fff;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-        .content {
-            margin-left: 260px;
-            padding: 40px 30px 30px 30px;
-            min-height: 100vh;
-            background: #181818;
-        }
-        h1 {
-
-            font-size: 2rem;
-            margin-bottom: 28px;
-        }
-        .funcionarios-card {
-            background: #222;
-            border-radius: 14px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.22);
-            padding: 28px 32px;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-            background: #232323;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 14px 12px;
-            text-align: left;
-            font-size: 15px;
-        }
-        th {
-            background: #181818;
-            color: #ffffffff;
-            border-bottom: 2px solid #ff6600;
-        }
-        tr {
-            border-bottom: 1px solid #292929;
-        }
-        tr:last-child {
-            border-bottom: none;
-        }
-        td {
-            color: #fff;
-        }
-        .btn-acao {
-            background: #ff6600;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 7px 16px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-right: 6px;
-            transition: background 0.2s;
-        }
-        .btn-acao:hover {
-            background: #ff9900;
-        }
-        .form-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .input-nome {
-            border-radius: 6px;
-            border: 1px solid #444;
-            padding: 6px 10px;
-            font-size: 15px;
-            background: #181818;
-            color: #fff;
-            width: 140px;
-        }
-        @media (max-width: 900px) {
-            .funcionarios-card { padding: 12px 6px; }
-            th, td { font-size: 13px; padding: 8px 6px; }
-        }
-    </style>
 </head>
 <body>
 <div class="sidebar">
-    <link rel="stylesheet" href="../../assets/sidebar.css">
-    <div class="logo-area">
-      <img src="../../img/logo2.svg" alt="Logo">
-    </div>
-    <nav class="nav-section">
-      <div class="nav-menus">
-       <ul class="nav-list top-section">
-    <li><a href="../dashboard/financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-    <li><a href="../dashboard/estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+        <link rel="stylesheet" href="../../assets/sidebar.css">
+        <div class="logo-area">
+            <img src="../../img/logo2.svg" alt="Logo">
+        </div>
+        <nav class="nav-section">
+            <div class="nav-menus">
+             <ul class="nav-list top-section">
+        <li><a href="../dashboard/financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+        <li><a href="../dashboard/estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
 </ul>
-        <hr>
-        <ul class="nav-list middle-section">
-          <li><a href="../dashboard/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
-          <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-          <li><a href="../dashboard/tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
-        </ul>
-      </div>
-      <div class="bottom-links">
-        <a href="config.php" class="active"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
-        <a href="../../Pages/auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
-      </div>
-    </nav>
+                <hr>
+                <ul class="nav-list middle-section">
+                    <li><a href="../dashboard/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+                    <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Operações"></span> Operações</a></li>
+                    <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+                    <li><a href="../dashboard/tag.php"><span><img src="../../img/tag.svg" alt="Tags"></span> Tags</a></li>
+                </ul>
+            </div>
+            <div class="bottom-links">
+                <a href="config.php" class="active"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+                <a href="../../Pages/auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+            </div>
+        </nav>
 </div>
+
+<!-- Botão de Conta fixo no mobile -->
+<a id="mobileContaBtn" href="config.php" role="button" aria-label="Ir para Conta">
+        <i class="fa-solid fa-user-gear" aria-hidden="true"></i> Conta
+</a>
 <div class="content">
     <h1>Funcionários</h1>
     <div class="funcionarios-card">
@@ -183,7 +105,7 @@ $stmt->close();
             <tbody>
             <?php foreach ($funcionarios as $func): ?>
                 <tr>
-                    <td>
+                    <td data-label="Nome">
                         <form method="POST" class="form-inline" style="margin:0;">
                             <input type="hidden" name="funcionario_id" value="<?= $func['id'] ?>">
                             <input type="text" name="novo_nome" class="input-nome" value="<?= htmlspecialchars($func['nome']) ?>">
@@ -192,8 +114,8 @@ $stmt->close();
                             </button>
                         </form>
                     </td>
-                    <td><?= htmlspecialchars($func['email']) ?></td>
-                    <td>
+                    <td data-label="Email"><?= htmlspecialchars($func['email']) ?></td>
+                    <td data-label="Ações">
                         <form method="POST" style="display:inline;" onsubmit="return confirm('Deseja realmente excluir este funcionário?');">
                             <input type="hidden" name="excluir_id" value="<?= $func['id'] ?>">
                             <button type="submit" class="btn-acao" style="background:#ff2d2d;" title="Excluir funcionário">

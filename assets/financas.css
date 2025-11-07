@@ -245,3 +245,28 @@ body {
 }
 
 
+/* Esconde o conteúdo no mobile */
+@media (max-width: 900px) {
+  body > *:not(.mobile-warning) {
+    display: none !important;
+  }
+
+  .mobile-warning {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+    height: 100vh;
+    background: #111;
+    color: #fff;
+    font-size: 1.2rem;
+  }
+}
+
+/* Esconde o aviso no desktop */
+@media (min-width: 901px) {
+  .mobile-warning {
+    display: none !important;
+  }
+}
