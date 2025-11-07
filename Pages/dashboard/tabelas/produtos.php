@@ -1294,26 +1294,45 @@ function submitEdit() {
     .then(data => {
         if (data.success) {
             showToast(data.message, 'success');
+            
+            // Pega os valores do formulário
             const produtoId = document.getElementById('edit_produto_id').value;
-            // Atualiza a linha na tabela sem reload e sem delay
-            fetch(`get_produto.php?id=${produtoId}`)
-                .then(res => res.json())
-                .then(prodData => {
-                    if (prodData.success && prodData.produto) {
-                        const row = document.querySelector(`tr[data-id="${produtoId}"]`);
-                        if (row) {
-                            row.dataset.preco = prodData.produto.preco_unitario;
-                            row.dataset.quantidade = prodData.produto.quantidade_estoque;
-                            row.dataset.nome = prodData.produto.nome;
-                            row.querySelector('span:last-of-type').textContent = prodData.produto.nome;
-                            row.querySelector('td:nth-child(2)').textContent = `R$ ${parseFloat(prodData.produto.preco_unitario).toFixed(2).replace('.', ',')}`;
-                            row.querySelector('td:nth-child(3)').textContent = prodData.produto.quantidade_estoque;
-                        }
-                        // Força reflow visual
-                        row.classList.add('table-success');
-                        setTimeout(() => row.classList.remove('table-success'), 1200);
-                    }
-                });
+            const novoNome = document.getElementById('edit_nome').value;
+            const novoPreco = parseFloat(document.getElementById('edit_preco').value);
+            const novaQuantidade = parseInt(document.getElementById('edit_estoque').value);
+            
+            // Atualiza a linha na tabela
+            const row = document.querySelector(`tr[data-id="${produtoId}"]`);
+            if (row) {
+                // Atualiza os atributos data-*
+                row.dataset.nome = novoNome;
+                row.dataset.preco = novoPreco;
+                row.dataset.quantidade = novaQuantidade;
+                
+                // Atualiza o nome do produto na primeira coluna (span)
+                const nomeSpan = row.querySelector('td:first-child span:last-of-type');
+                if (nomeSpan) {
+                    nomeSpan.textContent = novoNome;
+                }
+                
+                // Atualiza o preço na segunda coluna
+                const precoTd = row.querySelector('td:nth-child(2)');
+                if (precoTd) {
+                    precoTd.textContent = `R$ ${novoPreco.toFixed(2).replace('.', ',')}`;
+                }
+                
+                // Atualiza a quantidade na terceira coluna
+                const quantidadeTd = row.querySelector('td:nth-child(3)');
+                if (quantidadeTd) {
+                    quantidadeTd.textContent = novaQuantidade;
+                }
+                
+                // Efeito visual de sucesso
+                row.classList.add('table-success');
+                setTimeout(() => row.classList.remove('table-success'), 1200);
+            }
+            
+            // Fecha o modal
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
         } else {
             throw new Error(data.message || 'Erro ao editar produto');
