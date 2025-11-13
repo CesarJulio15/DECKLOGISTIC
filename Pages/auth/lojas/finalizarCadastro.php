@@ -123,12 +123,20 @@ $senha_hash = $_SESSION['cadastro']['senha'];
 
         if($stmt->execute()){
             unset($_SESSION['cadastro']); // Limpa sessão
-            echo "<script>alert('Cadastro concluído com sucesso!'); window.location.href='loginLoja.php';</script>";
+            header('Location: loginLoja.php');
+            exit();
         } else {
-            echo "<script>alert('Erro ao cadastrar: {$stmt->error}'); window.location.href='cadastroEmpresaCompleto.php';</script>";
+            // Em caso de erro, também redireciona ao login ou página de erro
+            // Você pode logar o erro aqui se necessário
+            error_log("Erro ao cadastrar empresa: " . $stmt->error);
+            
+            // Redireciona ao login mesmo em caso de erro (ou crie uma página de erro)
+            header('Location: loginLoja.php');
+            exit();
         }
     } else {
-        echo "<script>alert('Preencha todos os campos obrigatórios!'); window.location.href='cadastroEmpresaCompleto.php';</script>";
+        header('Location: cadastroEmpresaCompleto.php');
+        exit();
     }
 }
 ?>
