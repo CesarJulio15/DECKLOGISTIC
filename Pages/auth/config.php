@@ -230,8 +230,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
                 </form>
 
         </div>
-
-        
       </div>
     </div>
 </div>
