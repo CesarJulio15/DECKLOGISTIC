@@ -1,99 +1,102 @@
 <?php
-// Conexão com o banco de dados
-include __DIR__ . '/../conexao.php';
+session_start();
+header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../conexao.php';
 
-// Função para gerar o campo de data conforme o filtro
-function getDataField($filtro) {
-    switch($filtro) {
-        case 'bimestre':
-            return "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/2)+1,2,'0'))";
-        case 'trimestre':
-            return "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/3)+1,2,'0'))";
-        case 'semestre':
-            return "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/6)+1,2,'0'))";
-        case 'mes':
-            return "DATE_FORMAT(data_venda, '%Y-%m')";
-        case 'ano':
-            return "YEAR(data_venda)";
-        default:
-            return "DATE(data_venda)";
-    }
-}
-
-// Obtém o filtro da query string, default para 'dia'
-$filtro = $_GET['filtro'] ?? 'dia';
-$dataField = getDataField($filtro);
-
-// Consulta principal para obter receita e custo
-$sql = "SELECT $dataField AS periodo,
-               SUM(valor_total) AS receita,
-               SUM(custo_total) AS custo
-        FROM vendas
-        GROUP BY $dataField
-        ORDER BY periodo ASC";
-
-// Executa a consulta
-$res = mysqli_query($conn, $sql);
-
-if (!$res) {
-    echo json_encode(["error" => "Erro ao consultar os dados do banco."]);
+$lojaId = $_SESSION['loja_id'] ?? 0;
+if ($lojaId <= 0) {
+    echo json_encode(["error" => "Loja não autenticada"]);
     exit;
 }
 
-$labels = [];
-$dadosReceita = [];
-$dadosCusto = [];
+// --------- período ----------
+$periodo = $_GET['periodo'] ?? 'mes'; // 'mes' | '30d' | 'ano'
+$agruparPor = 'dia';
+$inicio = $fim = null;
 
-while ($row = mysqli_fetch_assoc($res)) {
-    $labels[] = $row['periodo'];
-    $dadosReceita[] = (float)$row['receita'];
-    $dadosCusto[] = (float)$row['custo'];
+$hoje = new DateTime('today');
+
+if ($periodo === '30d') {
+    $fim = clone $hoje;
+    $inicio = (clone $hoje)->modify('-29 days');
+    $agruparPor = 'dia';
+} elseif ($periodo === 'ano') {
+    $inicio = new DateTime(date('Y-01-01'));
+    $fim    = new DateTime(date('Y-12-31'));
+    $agruparPor = 'mes';
+} else { // 'mes' padrão
+    $inicio = new DateTime(date('Y-m-01'));
+    $fim    = new DateTime(date('Y-m-t'));
+    $agruparPor = 'dia';
 }
 
-// Totais para o filtro atual
-$condicao = match($filtro) {
-    'bimestre' => "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/2)+1,2,'0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/2)+1,2,'0'))",
-    'trimestre' => "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/3)+1,2,'0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/3)+1,2,'0'))",
-    'semestre' => "CONCAT(YEAR(data_venda), '-', LPAD(FLOOR((MONTH(data_venda)-1)/6)+1,2,'0')) = CONCAT(YEAR(CURDATE()), '-', LPAD(FLOOR((MONTH(CURDATE())-1)/6)+1,2,'0'))",
-    'mes' => "DATE_FORMAT(data_venda, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')",
-    'ano' => "YEAR(data_venda) = YEAR(CURDATE())",
-    default => "DATE(data_venda) = CURDATE()"
-};
+$iniStr = $inicio->format('Y-m-d');
+$fimStr = $fim->format('Y-m-d');
 
-// Receita e custo para o filtro atual
-$sqlReceita = "SELECT SUM(valor_total) AS total_receita FROM vendas WHERE $condicao";
-$receita = mysqli_fetch_assoc(mysqli_query($conn, $sqlReceita))['total_receita'] ?? 0;
+// --------- Lucro bruto por período a partir de vendas ----------
+if ($agruparPor === 'mes') {
+    $sqlV = "
+        SELECT DATE_FORMAT(v.data_venda, '%Y-%m') AS periodo,
+               SUM(v.valor_total - v.custo_total) AS lucro_bruto
+        FROM vendas v
+        WHERE v.loja_id = ?
+          AND v.data_venda BETWEEN ? AND ?
+        GROUP BY DATE_FORMAT(v.data_venda, '%Y-%m')
+        ORDER BY periodo ASC
+    ";
+} else {
+    $sqlV = "
+        SELECT DATE(v.data_venda) AS periodo,
+               SUM(v.valor_total - v.custo_total) AS lucro_bruto
+        FROM vendas v
+        WHERE v.loja_id = ?
+          AND v.data_venda BETWEEN ? AND ?
+        GROUP BY DATE(v.data_venda)
+        ORDER BY periodo ASC
+    ";
+}
 
-$sqlCusto = "SELECT SUM(custo_total) AS total_custo FROM vendas WHERE $condicao";
-$custo = mysqli_fetch_assoc(mysqli_query($conn, $sqlCusto))['total_custo'] ?? 0;
+$stmtV = $conn->prepare($sqlV);
+$stmtV->bind_param('iss', $lojaId, $iniStr, $fimStr);
+$stmtV->execute();
+$resV = $stmtV->get_result();
 
-// Lucro e variação
-$lucro = $receita - $custo;
-$percentual = 0;
-$seta = "↑";
-$classe = "positivo";
-if ($receita > 0) {
-    $percentual = ($lucro / $receita) * 100;
-    if ($percentual < 0) {
-        $seta = "↓";
-        $classe = "negativo";
+$lucroBrutoMap = [];
+$total = 0.0;
+
+while ($row = $resV->fetch_assoc()) {
+    $lucroBrutoMap[$row['periodo']] = (float)($row['lucro_bruto'] ?? 0);
+    $total += (float)($row['lucro_bruto'] ?? 0);
+}
+$stmtV->close();
+
+// --------- preencher faltas ----------
+$series = [];
+if ($agruparPor === 'mes') {
+    $cursor = new DateTime($inicio->format('Y-m-01'));
+    $limit  = new DateTime($fim->format('Y-m-01'));
+    $limit->modify('last day of this month');
+    while ($cursor <= $limit) {
+        $key = $cursor->format('Y-m');
+        $valor = $lucroBrutoMap[$key] ?? 0.0;
+        $series[] = ["data" => $key, "valor" => $valor];
+        $cursor->modify('first day of next month');
+    }
+} else {
+    $cursor = new DateTime($iniStr);
+    $limit  = new DateTime($fimStr);
+    while ($cursor <= $limit) {
+        $key = $cursor->format('Y-m-d');
+        $valor = $lucroBrutoMap[$key] ?? 0.0;
+        $series[] = ["data" => $key, "valor" => $valor];
+        $cursor->modify('+1 day');
     }
 }
 
-// Retorna os resultados como JSON
-$response = [
-    "periodo" => $filtro,
-    "total_receita" => number_format($receita, 2, ',', '.'),
-    "total_custo" => number_format($custo, 2, ',', '.'),
-    "lucro" => number_format($lucro, 2, ',', '.'),
-    "percentual" => number_format($percentual, 2, ',', '.'),
-    "seta" => $seta,
-    "classe" => $classe,
-    "labels" => $labels,
-    "dados_receita" => $dadosReceita,
-    "dados_custo" => $dadosCusto
-];
-
-// Retorna o JSON
-echo json_encode($response);
+echo json_encode([
+    "total" => $total,
+    "series" => $series,
+    "periodo" => $periodo,
+    "agrupamento" => $agruparPor
+]);
 ?>
