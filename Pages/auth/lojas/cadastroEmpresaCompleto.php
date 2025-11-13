@@ -24,6 +24,8 @@
       cnpj.value = criptografar(cnpj.value.replace(/\D/g, "")); 
       ie.value   = criptografar(ie.value.replace(/\D/g, "")); 
       nir.value  = criptografar(nir.value.replace(/\D/g, "")); 
+      
+      return true; // Permite o envio do formulário
     }
 
     // ===============================
@@ -154,7 +156,7 @@ function formatarCNAE(cnae) {
     <div class="container">
       <h1>Finalize o cadastro da sua empresa</h1>
 
-      <form onsubmit="criptografarCamposSigilosos()" action="finalizarCadastro.php" method="POST">
+      <form onsubmit="return criptografarCamposSigilosos()" action="finalizarCadastro.php" method="POST">
 
         <div class="form-area">
           <div class="form-area-title">Dados da Empresa</div>
