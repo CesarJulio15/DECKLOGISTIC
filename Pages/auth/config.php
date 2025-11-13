@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Conta</title>
-    <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
+    <link rel="icon" href=" " type="image/x-icon" />
     <link rel="stylesheet" href="../../assets/config.css">
     <link rel="stylesheet" href="../../assets/sidebar.css"> 
     <style>
@@ -152,8 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
 </ul>
         <hr>
         <ul class="nav-list middle-section">
-          <li><a href="../dashboard/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+          <li><a href="../dashboard/tabelas/produtosmobile.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
           <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
         </ul>
       </div>
@@ -245,5 +244,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
         }
     }, 5000);
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const links = document.querySelectorAll('a[href*="produtos.php"], a[href*="produtosmobile.php"]');
+  const isMobile = window.innerWidth <= 768; // ajuste o breakpoint se quiser
+
+  links.forEach(link => {
+    // se for mobile, muda o href pro mobile
+    if (isMobile) {
+      link.href = "../dashboard/tabelas/produtosmobile.php";
+    } else {
+      link.href = "../dashboard/tabelas/produtos.php";
+    }
+  });
+});
+</script>
+
 </body>
 </html>
