@@ -86,11 +86,10 @@ if ($acao === 'adicionar_produto') {
             $stmtHist->close();
         }
 
-        // --- NOVO: Registrar movimentação de ENTRADA para a quantidade inicial ---
+        // --- REGISTRAR MOVIMENTAÇÃO DE ENTRADA para a quantidade inicial ---
         if ($estoque > 0) {
             $tipo = 'entrada';
             $data_mov = date('Y-m-d');
-            // custo_mov usamos o custo informado; se custo for zero, registra 0
             $custo_mov = $custo;
 
             $stmtMov = $conn->prepare("
@@ -98,10 +97,24 @@ if ($acao === 'adicionar_produto') {
                 VALUES (?, ?, ?, ?, ?, NOW(), ?)
             ");
             if ($stmtMov) {
-                // tipos: i (produto_id), s (tipo), i (quantidade), s (data), i (usuario_id), d (custo)
                 $stmtMov->bind_param("isisid", $idNovoProduto, $tipo, $estoque, $data_mov, $usuario_id_for_bind, $custo_mov);
                 $stmtMov->execute();
                 $stmtMov->close();
+            }
+
+            // --- NOVO: REGISTRAR TRANSAÇÃO FINANCEIRA DE DESPESA ---
+            $custo_total = $custo * $estoque;
+            if ($custo_total > 0) {
+                $stmtDesp = $conn->prepare("
+                    INSERT INTO transacoes_financeiras (loja_id, tipo, valor, descricao, data_transacao)
+                    VALUES (?, 'saida', ?, ?, ?)
+                ");
+                $descricao = "Cadastro inicial do produto $nome (x$estoque)";
+                if ($stmtDesp) {
+                    $stmtDesp->bind_param("idss", $lojaId, $custo_total, $descricao, $data_mov);
+                    $stmtDesp->execute();
+                    $stmtDesp->close();
+                }
             }
         }
 
