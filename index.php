@@ -408,10 +408,6 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                     <div class="stat-label">Disponibilidade</div>
                   </div>
                   <div class="stat-item">
-                    <div class="stat-number">50K+</div>
-                    <div class="stat-label">Usuários Ativos</div>
-                  </div>
-                  <div class="stat-item">
                     <div class="stat-number">24/7</div>
                     <div class="stat-label">Suporte</div>
                   </div>
@@ -522,10 +518,6 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                 <div class="feature-grid">
                   <div class="feature-item">
                     <i class="bi bi-check-circle-fill"></i>
-                    <span>Arquitetura em nuvem escalável</span>
-                  </div>
-                  <div class="feature-item">
-                    <i class="bi bi-check-circle-fill"></i>
                     <span>Otimização de consultas e relatórios</span>
                   </div>
                   <div class="feature-item">
@@ -546,10 +538,6 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                   <div class="stat-item">
                     <div class="stat-number">100%</div>
                     <div class="stat-label">Otimizado</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-number">CDN</div>
-                    <div class="stat-label">Global</div>
                   </div>
                 </div>
 
@@ -598,7 +586,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                   </div>
                   <div class="feature-item">
                     <i class="bi bi-check-circle-fill"></i>
-                    <span>Suporte via chat, e-mail e telefone</span>
+                    <span>Suporte via e-mail e telefone</span>
                   </div>
                   <div class="feature-item">
                     <i class="bi bi-check-circle-fill"></i>
@@ -610,14 +598,6 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                   <div class="stat-item">
                     <div class="stat-number">24/7</div>
                     <div class="stat-label">Disponível</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-number">2min</div>
-                    <div class="stat-label">Tempo Médio de Resposta</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-number">Especialistas</div>
-                    <div class="stat-label">Dedicados</div>
                   </div>
                 </div>
 
@@ -914,8 +894,9 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Arthur Filipe</h3>
-      <span>Designer de Produto</span>
-      <p>Responsável por criar interfaces intuitivas e garantir que a experiência do usuário no DeckLogistic seja simples, moderna e eficiente em qualquer dispositivo.</p>
+      <span>Quality Assurance</span>
+      <p>Testa o sistema, identifica erros e verifica se tudo está funcionando corretamente antes da entrega.
+</p>
     </div>
   </div>
 </div><!-- End slide item -->
@@ -931,8 +912,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Gabriel Prudente</h3>
-      <span>Desenvolvedor Líder</span>
-<p>Responsável pela arquitetura do sistema, integração com o banco de dados e implementação das principais funcionalidades de estoque e finanças.</p>    </div>
+      <span>UX/UI Designer</span>
+<p>Cria a interface do site, pensando na experiência do usuário, usabilidade e design visual.</p>    </div>
   </div>
 </div><!-- End slide item -->
 
@@ -946,8 +927,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Guilherme Aparecido</h3>
-       <span>Designer de Interface (UI/UX)</span>
-      <p>Responsável pelo design visual das telas e pela padronização da identidade do projeto, garantindo que a navegação seja agradável e funcional.</p> 
+       <span>Scrum Master</span>
+      <p>Organiza e acompanha o andamento do time, removendo obstáculos e garantindo que todos sigam os princípios do Scrum.</p> 
      </div>
   </div>
 </div><!-- End slide item -->
@@ -963,8 +944,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Júlio Cesar</h3>
-      <span>Gerente de Projeto</span>
-      <p>Coordena o desenvolvimento do DeckLogistic, organiza as etapas do cronograma e assegura que todas as metas técnicas e acadêmicas sejam cumpridas.</p>
+      <span>Product Owner</span>
+      <p>Define as funcionalidades do sistema e garante que o produto final atenda às necessidades do usuário e aos objetivos do projeto.</p>
     </div>
   </div>
 </div><!-- End slide item -->
@@ -980,8 +961,8 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
     </div>
     <div class="member-content">
       <h3>Rafael Oliveira</h3>
-       <span>Especialista em Marketing</span>
-      <p>Cuida da comunicação visual e divulgação do projeto, mostrando como o DeckLogistic pode transformar o gerenciamento logístico de pequenas e médias empresas.</p>
+       <span>Dev Team Leader</span>
+      <p>Coordena o desenvolvimento técnico, orientando o time de programadores e garantindo a qualidade do código.</p>
     </div>
   </div>
 </div><!-- End slide item -->
