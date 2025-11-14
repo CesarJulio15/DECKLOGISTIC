@@ -113,6 +113,9 @@ include __DIR__ . '/../../../session_check.php';
     <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
     </head>
+    <noscript>
+    <meta http-equiv="refresh" content="0; URL=../../../no-javascript.php">
+</noscript>
     <body>
 
     <style>

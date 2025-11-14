@@ -15,6 +15,11 @@ $lojaId = $_SESSION['loja_id'];
   
 </head>
 
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
+
+
 <!-- BLOQUEIO MOBILE -->
 <div id="mobile-lock">
   <div class="mobile-container">

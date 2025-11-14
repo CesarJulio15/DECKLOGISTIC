@@ -465,6 +465,9 @@ hr {
 </style>
 
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../../no-javascript.php">
+</noscript>
 <body>
     <!-- Navbar -->
     <div class="navbar">
