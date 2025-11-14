@@ -72,6 +72,9 @@ $totalLucro = array_sum($dadosLucro);
 <link rel="stylesheet" href="../../../assets/lucroB.css">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../../no-javascript.php">
+</noscript>
 <body>
 
     <style>

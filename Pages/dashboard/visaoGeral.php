@@ -52,7 +52,9 @@ $lojaId = $_SESSION['loja_id'];
     </div>
   </div>
 </div>
-
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 
 <div class="content">

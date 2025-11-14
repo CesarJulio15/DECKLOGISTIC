@@ -94,7 +94,10 @@ $mediaMargem = count($margens) > 0 ? array_sum($margens) / count($margens) : 0;
             background: #555;
         }
     </style>
-    
+    <noscript>
+    <meta http-equiv="refresh" content="0; URL=../../../no-javascript.php">
+</noscript>
+
 <body>
 
 <div class="content">

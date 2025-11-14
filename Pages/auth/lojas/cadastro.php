@@ -40,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../../no-javascript.php">
+</noscript>
 <body>
   <div class="container">
     <div class="left-side"></div>

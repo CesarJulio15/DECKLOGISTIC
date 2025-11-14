@@ -253,6 +253,9 @@ $stmt->close();
 }
 </style>
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 <aside class="sidebar">
     <div class="logo-area"><img src="../../img/logo2.svg" alt="Logo"></div>
