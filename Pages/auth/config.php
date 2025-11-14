@@ -152,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tipo_login === 'empresa') {
 </ul>
         <hr>
         <ul class="nav-list middle-section">
+          <li><a href="../dashboard/visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
           <li><a href="../dashboard/tabelas/produtosmobile.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
           <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
         </ul>
