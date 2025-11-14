@@ -15,6 +15,7 @@ $lojaId = $_SESSION['loja_id'];
   
 </head>
 
+
 <!-- BLOQUEIO MOBILE -->
 <div id="mobile-lock">
   <div class="mobile-container">
