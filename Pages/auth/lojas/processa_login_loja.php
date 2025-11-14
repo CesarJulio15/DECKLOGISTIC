@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 // ----- Configurações seguras de cookie de sessão -----
 // ATENÇÃO: execute ANTES de session_start()
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'); // true se HTTPS
