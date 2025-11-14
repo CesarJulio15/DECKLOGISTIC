@@ -1,4 +1,6 @@
 <?php
+ob_start();     
+
 include '../../../conexao.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -19,6 +21,7 @@ session_set_cookie_params([
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+ob_clean(); // Limpa qualquer saída acidental
 
 
 // Função utilitária simples para redirecionar com segurança
