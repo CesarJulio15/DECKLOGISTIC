@@ -284,6 +284,9 @@ if ($entradas > 0) {
     <link rel="stylesheet" href="../../assets/lucroB.css">
     <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 <div class="content">
   <aside class="sidebar">

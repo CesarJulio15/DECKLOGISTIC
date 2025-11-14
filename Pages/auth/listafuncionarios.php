@@ -62,6 +62,9 @@ $stmt->close();
     <link rel="stylesheet" href="../../assets/listafuncionarios.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 <div class="sidebar">
         <link rel="stylesheet" href="../../assets/sidebar.css">

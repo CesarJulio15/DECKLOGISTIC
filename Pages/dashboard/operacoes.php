@@ -424,6 +424,9 @@ a:focus, button:focus, input:focus {
 }
 </style>
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 
 

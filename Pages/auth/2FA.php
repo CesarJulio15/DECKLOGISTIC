@@ -144,6 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     window.onload = atualizarContador;
 </script>
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 <div class="conteudo">
     <h1>Redefinir Senha - Loja</h1>

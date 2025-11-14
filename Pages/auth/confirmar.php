@@ -10,6 +10,9 @@ include __DIR__ . '../../../session_check.php';
     <title>Document</title>
    <link rel="stylesheet" href="../../assets/confirmar.css">
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
   <div class="sidebar">
 <link rel="stylesheet" href="../../assets/sidebar.css">

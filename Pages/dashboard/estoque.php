@@ -24,6 +24,10 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
   <link rel="stylesheet" href="../../assets/sidebar.css">
 </head>
 
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
+
 <!-- BLOQUEIO MOBILE -->
 <div id="mobile-lock">
   <div class="mobile-container">

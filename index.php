@@ -38,7 +38,9 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
-
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=no-javascript.php">
+</noscript>
 <body class="index-page">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
@@ -459,10 +461,6 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
                   <div class="feature-item">
                     <i class="bi bi-check-circle-fill"></i>
                     <span>Conformidade com a LGPD</span>
-                  </div>
-                  <div class="feature-item">
-                    <i class="bi bi-check-circle-fill"></i>
-                    <span>Autenticação em múltiplos fatores</span>
                   </div>
                 </div>
 
@@ -988,7 +986,7 @@ Hoje, seguimos crescendo, criando soluções como sistemas de manutenção e age
               <p>Rua Antônio Fogaça de Almeida 355</p>
               <p>Jacareí, SP</p>
               <p class="mt-3"><strong>Telefone:</strong> <span>+55 (12) 97406-0982</span></p>
-              <p><strong>E-mail:</strong> <span>deckers@gmail.com</span></p>
+              <p><strong>E-mail:</strong> <span>rafaoliver5501@gmail.com</span></p>
             </div>
           </div>
 

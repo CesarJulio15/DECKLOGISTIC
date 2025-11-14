@@ -17,6 +17,9 @@ if (session_status() === PHP_SESSION_NONE) {
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../../no-javascript.php">
+</noscript>
 <body>
 <div class="container">
   <div class="left-side">

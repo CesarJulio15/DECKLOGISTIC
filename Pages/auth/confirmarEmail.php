@@ -6,6 +6,9 @@
     <title>Confirmar Email</title>
    <link rel="stylesheet" href="../../assets/confirmarEmail.css">
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 
   <div class="sidebar">

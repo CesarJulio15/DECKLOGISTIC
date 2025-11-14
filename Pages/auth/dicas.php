@@ -9,9 +9,10 @@ include __DIR__ . '../../../session_check.php';
   <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
   <link rel="stylesheet" href="../../assets/sidebar.css">
   <link rel="stylesheet" href="../../assets/dicas.css">
-
-  
 </head>
+<noscript>
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+</noscript>
 <body>
 <div class="content">
   <!-- Sidebar -->
