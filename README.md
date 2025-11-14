@@ -1,5 +1,6 @@
 # DECKLOGISTIC
-# 📦 Sistema de Estocagem e Gerenciamento com Controle Financeiro
+
+📦 Sistema de Estocagem e Gerenciamento com Controle Financeiro
 
 ## 📑 Sobre o Projeto (PT-BR)
 
@@ -28,9 +29,40 @@ Este é um sistema completo para gerenciamento de estoque com integração finan
    ```bash
    git clone https://github.com/CesarJulio15/DECKLOGISTIC.git
    ```
+
 2. Importe o arquivo `banco.sql` no seu MySQL.
+
 3. Configure o arquivo `conexao.php` com os dados do seu banco.
+
 4. Use um servidor local (ex: XAMPP ou WAMP) para rodar o projeto.
+
+5. Para rodar o ambiente Python (caso necessário para outras funcionalidades):
+
+   * Crie um ambiente virtual:
+
+     ```bash
+     python -m venv .venv
+     ```
+
+   * Ative o ambiente virtual:
+
+     **Windows**:
+
+     ```bash
+     .venv\Scripts\Activate
+     ```
+
+     **Linux/MacOS**:
+
+     ```bash
+     source .venv/bin/activate
+     ```
+
+   * Instale as dependências do projeto:
+
+     ```bash
+     pip install -r requirements.txt
+     ```
 
 ## 🤝 Contribuições
 
@@ -71,9 +103,40 @@ This is a complete system for inventory and financial management. It allows prod
    ```bash
    git clone https://github.com/CesarJulio15/DECKLOGISTIC.git
    ```
+
 2. Import `banco.sql` into your MySQL database.
+
 3. Configure the `conexao.php` file with your database credentials.
+
 4. Run the project on a local server (e.g., XAMPP or WAMP).
+
+5. To run the Python environment (if needed for additional features):
+
+   * Create a virtual environment:
+
+     ```bash
+     python -m venv .venv
+     ```
+
+   * Activate the virtual environment:
+
+     **Windows**:
+
+     ```bash
+     .venv\Scripts\Activate
+     ```
+
+     **Linux/MacOS**:
+
+     ```bash
+     source .venv/bin/activate
+     ```
+
+   * Install the project dependencies:
+
+     ```bash
+     pip install -r requirements.txt
+     ```
 
 ## 🤝 Contributions
 
@@ -82,8 +145,3 @@ Contributions are welcome! Feel free to open issues or submit pull requests.
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-python -m venv .venv
-.venv\Scripts\Activate
-pip install -r requirements.txt
-
