@@ -1,4 +1,5 @@
 <?php
+include '../../../conexao.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -19,7 +20,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include '../../../conexao.php';
 
 // Função utilitária simples para redirecionar com segurança
 function redirect($url) {
