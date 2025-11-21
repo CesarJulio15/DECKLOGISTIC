@@ -1,5 +1,5 @@
 <?php
-require_once '../conexao.php';
+require_once __DIR__ . '/../conexao.php';
 
 $loja_id = $_GET['loja_id'] ?? 1;
 $periodo = $_GET['periodo'] ?? 'mes';

@@ -462,8 +462,6 @@ a:focus, button:focus, input:focus {
 
 
 <main>
-<h1>Operações Recentes</h1>
-
 <?php if (!empty($msg)): ?>
     <div style="background:#d1ffd6; padding:10px; border-radius:6px; margin-bottom:10px; font-weight:600; color:#064e3b"><?= htmlspecialchars($msg) ?></div>
 <?php endif; ?>

@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /projetos/2025_dev/deckers/
+    
+    # Redirecionar requisições para o diretório correto
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>
+
+<Files "conexao.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>

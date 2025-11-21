@@ -9,25 +9,24 @@ $lojaId = $_SESSION['loja_id'];
   <meta charset="UTF-8">
   <title>Finanças - Decklogistic</title>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon"/>
-  <link rel="stylesheet" href="../../assets/financas.css">
-  <link rel="stylesheet" href="../../assets/sidebar.css">
-  
+  <link rel="icon" href="/projetos/2025_dev/deckers/img/logoDecklogistic.webp" type="image/x-icon"/>
+  <link rel="stylesheet" href="/projetos/2025_dev/deckers/assets/financas.css">
+  <link rel="stylesheet" href="/projetos/2025_dev/deckers/assets/sidebar.css">
 </head>
 
 <noscript>
-    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
+    <meta http-equiv="refresh" content="0; URL=/projetos/2025_dev/deckers/no-javascript.php">
 </noscript>
 
 
 <!-- BLOQUEIO MOBILE -->
 <div id="mobile-lock">
   <div class="mobile-container">
-    <img src="../../img/logoDecklogistic.webp" alt="Logo" class="mobile-logo">
+    <img src="/projetos/2025_dev/deckers/img/logoDecklogistic.webp" alt="Logo" class="mobile-logo">
     <h1>Versão Desktop Necessária</h1>
     <p>Essa área do sistema foi projetada para telas grandes.  
     Acesse pelo seu computador para visualizar o painel financeiro completo.</p>
-    <a href="../auth/config.php" class="mobile-btn">Acessar Configurações</a>
+    <a href="/projetos/2025_dev/deckers/Pages/auth/config.php" class="mobile-btn">Acessar Configurações</a>
     <div class="mobile-footer">
       <p>© Decklogistic 2025 — Sistema Financeiro Empresarial</p>
     </div>
@@ -37,26 +36,26 @@ $lojaId = $_SESSION['loja_id'];
 <body>
 
 <div class="sidebar">
-    <link rel="stylesheet" href="../../assets/sidebar.css">
+    <link rel="stylesheet" href="/projetos/2025_dev/deckers/assets/sidebar.css">
     <div class="logo-area">
-      <img src="../../img/logo2.svg" alt="Logo">
+      <img src="/projetos/2025_dev/deckers/img/logo2.svg" alt="Logo">
     </div>
     <nav class="nav-section">
       <div class="nav-menus">
        <ul class="nav-list top-section">
-    <li class="active"><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-    <li><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+    <li class="active"><a href="/projetos/2025_dev/deckers/Pages/dashboard/financas.php"><span><img src="/projetos/2025_dev/deckers/img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+    <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/estoque.php"><span><img src="/projetos/2025_dev/deckers/img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
 </ul>
         <hr>
         <ul class="nav-list middle-section">
-          <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
+          <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/visaoGeral.php"><span><img src="/projetos/2025_dev/deckers/img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+          <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/tabelas/produtos.php"><span><img src="/projetos/2025_dev/deckers/img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+          <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/operacoes.php"><span><img src="/projetos/2025_dev/deckers/img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
         </ul>
       </div>
       <div class="bottom-links">
-        <a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
-        <a href="../../Pages/auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+        <a href="/projetos/2025_dev/deckers/Pages/auth/config.php"><span><img src="/projetos/2025_dev/deckers/img/icon-config.svg" alt="Conta"></span> Conta</a>
+        <a href="/projetos/2025_dev/deckers/Pages/auth/dicas.php"><span><img src="/projetos/2025_dev/deckers/img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
       </div>
     </nav>
   </div>
@@ -255,7 +254,7 @@ $lojaId = $_SESSION['loja_id'];
   const lojaId = <?= $lojaId ?>;
 
   async function loadTopDespesas() {
-    const data = await fetch(`/DECKLOGISTIC/api/top5_despesas.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`/projetos/2025_dev/deckers/api/top5_despesas.php?loja_id=${lojaId}`).then(r => r.json());
     const tbody = document.querySelector("#topDespesas tbody");
     tbody.innerHTML = '';
 
@@ -277,8 +276,7 @@ $lojaId = $_SESSION['loja_id'];
   }
 
   async function loadCustoMedioProdutos() {
-    // Corrige para garantir que o parâmetro loja_id é enviado
-    const data = await fetch(`/DECKLOGISTIC/api/custo_medio_produto.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`/projetos/2025_dev/deckers/api/custo_medio_produto.php?loja_id=${lojaId}`).then(r => r.json());
     const tbody = document.querySelector("#custoMedioProdutos tbody");
     tbody.innerHTML = '';
 
@@ -301,9 +299,9 @@ $lojaId = $_SESSION['loja_id'];
     try {
       const periodo = 'mes';
       const [bruto, liquido, margem] = await Promise.all([
-        fetch(`/DECKLOGISTIC/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
-        fetch(`/DECKLOGISTIC/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
-        fetch(`/DECKLOGISTIC/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
+        fetch(`/projetos/2025_dev/deckers/api/lucro_bruto.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+        fetch(`/projetos/2025_dev/deckers/api/lucro_liquido.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json()),
+        fetch(`/projetos/2025_dev/deckers/api/margem_lucro.php?loja_id=${lojaId}&periodo=${periodo}`).then(r => r.json())
       ]);
 
       if (bruto.error || liquido.error || margem.error) {
@@ -361,7 +359,7 @@ $lojaId = $_SESSION['loja_id'];
   }
 
   async function loadReceitaDespesa() {
-    const data = await fetch(`/DECKLOGISTIC/api/receita_despesas.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`/projetos/2025_dev/deckers/api/receita_despesas.php?loja_id=${lojaId}`).then(r => r.json());
     const dias = [...new Set([...Object.keys(data.receita), ...Object.keys(data.despesa)])]
                   .map(d => new Date(d))
                   .sort((a,b)=>a-b)
@@ -384,13 +382,13 @@ $lojaId = $_SESSION['loja_id'];
 
   // Botões de redirecionamento
   document.getElementById('btnLucroLiquido').addEventListener('click', () => {
-      window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroL.php';
+      window.location.href = '/projetos/2025_dev/deckers/Pages/auth/lojas/lucroL.php';
   });
   document.getElementById('btnLucroBruto').addEventListener('click', () => {
-      window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/lucroB.php';
+      window.location.href = '/projetos/2025_dev/deckers/Pages/auth/lojas/lucroB.php';
   });
   document.getElementById('btnLucroMargem').addEventListener('click', () => {
-      window.location.href = '/DECKLOGISTIC/Pages/auth/lojas/margem.php';
+      window.location.href = '/projetos/2025_dev/deckers/Pages/auth/lojas/margem.php';
   });
 
   // Chamada inicial das funções

@@ -317,6 +317,7 @@ if ($acao === 'adicionar_produto') {
         $produto_id = intval($_POST['produto_id'] ?? 0);
         $quantidade = intval($_POST['quantidade'] ?? 0);
         $data_movimentacao = $_POST['data_movimentacao'] ?? date('Y-m-d');
+        $preco_customizado = isset($_POST['preco_customizado']) && $_POST['preco_customizado'] !== '' ? floatval($_POST['preco_customizado']) : null;
 
         if ($produto_id <= 0 || $quantidade <= 0) {
             echo json_encode(['success' => false, 'message' => '❌ Dados inválidos para venda.']);
@@ -358,8 +359,11 @@ if ($acao === 'adicionar_produto') {
         $stmtHist->execute();
         $stmtHist->close();
 
-        $valor_total = $prod['preco_unitario'] * $quantidade;
+        // Usa preço customizado se fornecido, senão usa o preço padrão do produto
+        $preco_venda = $preco_customizado !== null ? $preco_customizado : $prod['preco_unitario'];
+        $valor_total = $preco_venda * $quantidade;
         $custo_total = $prod['custo_unitario'] * $quantidade;
+        
         $stmtVenda = $conn->prepare("INSERT INTO vendas (loja_id, data_venda, valor_total, custo_total, usuario_id) VALUES (?, ?, ?, ?, ?)");
         $stmtVenda->bind_param("isddi", $lojaId, $data_movimentacao, $valor_total, $custo_total, $usuarioId);
         $stmtVenda->execute();
@@ -367,7 +371,7 @@ if ($acao === 'adicionar_produto') {
         $stmtVenda->close();
 
         $stmtItem = $conn->prepare("INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario, custo_unitario, data_venda) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $prod['preco_unitario'], $prod['custo_unitario'], $data_movimentacao);
+        $stmtItem->bind_param("iiidds", $venda_id, $produto_id, $quantidade, $preco_venda, $prod['custo_unitario'], $data_movimentacao);
         $stmtItem->execute();
         $stmtItem->close();
 
@@ -779,7 +783,8 @@ document.getElementById('btnAdicionarProduto').onclick = function() {
 <?php while ($produto = mysqli_fetch_assoc($result)): ?>
 <tr data-id="<?= $produto['id'] ?>" data-nome="<?= htmlspecialchars($produto['nome']) ?>" data-preco="<?= $produto['preco_unitario'] ?>" data-quantidade="<?= $produto['quantidade_estoque'] ?>">
     <td style="display:flex; align-items:center; gap:10px; position:relative;">
-        <!-- Botão de adicionar tag -->
+        <!-- Botão de adicionar tag - APENAS SE EXISTIREM TAGS -->
+        <?php if (count($tags) > 0): ?>
         <div class="add-tag-square" data-produto-id="<?= $produto['id'] ?>" tabindex="0" title="Adicionar tag">+</div>
         <!-- Dropdown de tags (inicialmente oculto) -->
         <div class="tag-dropdown" id="tag-dropdown-<?= $produto['id'] ?>">
@@ -793,6 +798,8 @@ document.getElementById('btnAdicionarProduto').onclick = function() {
                 </div>
             <?php endforeach; ?>
         </div>
+        <?php endif; ?>
+        
         <span class="tags-vinculadas" id="tags-produto-<?= $produto['id'] ?>" style="display:inline-flex; gap:5px; align-items:center;">
             <?php if (isset($produtoTags[$produto['id']])): ?>
                 <?php foreach ($produtoTags[$produto['id']] as $tag): ?>
@@ -937,6 +944,11 @@ a.active {
           <div class="mb-3">
             <label class="form-label">Quantidade</label>
             <input type="number" class="form-control" id="sell_quantidade" name="quantidade" min="1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Preço Unitário (R$)</label>
+            <input type="number" step="0.01" class="form-control" id="sell_preco" name="preco_customizado" placeholder="Deixe vazio para usar o preço padrão">
+            <small class="text-muted">Preço padrão: <span id="sell_preco_padrao">R$ 0,00</span></small>
           </div>
           <div class="mb-3">
             <label class="form-label">Data</label>
@@ -1085,8 +1097,17 @@ a.active {
                                                         
                                                         newRow.innerHTML = `
                                                             <td style="display:flex; align-items:center; gap:10px; position:relative;">
+                                                                ${<?= count($tags) > 0 ? 'true' : 'false' ?> ? `
                                                                 <div class="add-tag-square" data-produto-id="${produto.id}" tabindex="0" title="Adicionar tag">+</div>
-                                                                <div class="tag-dropdown" id="tag-dropdown-${produto.id}"></div>
+                                                                <div class="tag-dropdown" id="tag-dropdown-${produto.id}">
+                                                                    <?php foreach ($tags as $tag): ?>
+                                                                    <div class="tag-option" data-tag-id="<?= $tag['id'] ?>" data-produto-id="${produto.id}" style="display:flex; align-items:center; gap:6px;">
+                                                                        <i class="fa-solid <?= htmlspecialchars($tag['icone']) ?>" style="color: <?= htmlspecialchars($tag['cor']) ?>;"></i>
+                                                                        <?= htmlspecialchars($tag['nome']) ?>
+                                                                    </div>
+                                                                    <?php endforeach; ?>
+                                                                </div>
+                                                                ` : ''}
                                                                 <span class="tags-vinculadas" id="tags-produto-${produto.id}" style="display:inline-flex; gap:5px; align-items:center;"></span>
                                                                 <span>${produto.nome}</span>
                                                             </td>
@@ -1607,10 +1628,13 @@ document.addEventListener('click', function(e) {
         const row = e.target.closest('tr');
         const id = row.dataset.id;
         const nome = row.dataset.nome;
+        const preco = row.dataset.preco;
         
         document.getElementById('sell_produto_id').value = id;
         document.getElementById('sell_nome').value = nome;
         document.getElementById('sell_quantidade').value = 1;
+        document.getElementById('sell_preco').value = ''; // Limpa o campo de preço customizado
+        document.getElementById('sell_preco_padrao').textContent = `R$ ${parseFloat(preco).toFixed(2).replace('.', ',')}`;
         
         new bootstrap.Modal(document.getElementById('sellModal')).show();
     }
@@ -1813,26 +1837,27 @@ function resetFiltro() {
 
 // ========== BIND DROPDOWN DE TAGS ==========
 function bindTagDropdownEvents() {
-    // Botão de adicionar tag
-    document.querySelectorAll('.add-tag-square').forEach(btn => {
-        btn.onclick = function(e) {
-            e.stopPropagation();
-            // Fecha outros dropdowns
-            document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
-            // Abre o dropdown deste produto
-            const produtoId = this.dataset.produtoId;
-            const dropdown = document.getElementById('tag-dropdown-' + produtoId);
-            if (dropdown) {
-                // Usa position fixed e calcula posição em relação à viewport
-                const btnRect = this.getBoundingClientRect();
-                dropdown.style.display = 'block';
-                dropdown.style.position = 'fixed';
-                dropdown.style.left = (btnRect.right + 8) + 'px'; // 8px à direita do botão
-               
-                dropdown.style.top = btnRect.top + 'px';
-            }
-        };
-    });
+    // Botão de adicionar tag - verifica se existem tags antes de adicionar evento
+    const addTagButtons = document.querySelectorAll('.add-tag-square');
+    if (addTagButtons.length > 0) {
+        addTagButtons.forEach(btn => {
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                // Fecha outros dropdowns
+                document.querySelectorAll('.tag-dropdown').forEach(dd => dd.style.display = 'none');
+                // Abre o dropdown deste produto
+                const produtoId = this.dataset.produtoId;
+                const dropdown = document.getElementById('tag-dropdown-' + produtoId);
+                if (dropdown) {
+                    const btnRect = this.getBoundingClientRect();
+                    dropdown.style.display = 'block';
+                    dropdown.style.position = 'fixed';
+                    dropdown.style.left = (btnRect.right + 8) + 'px';
+                    dropdown.style.top = btnRect.top + 'px';
+                }
+            };
+        });
+    }
 
     // Ao clicar em uma tag do dropdown, faz o vínculo via AJAX
     document.querySelectorAll('.tag-dropdown .tag-option').forEach(opt => {
