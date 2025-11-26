@@ -5,20 +5,19 @@ from datetime import datetime
 import os
 
 print("Argumentos recebidos:", sys.argv)
-if len(sys.argv) > 1:
+
+# --- FLAGS ---
+forcar = "--forcar" in sys.argv
+
+# --- Loja ID ---
+if len(sys.argv) > 1 and sys.argv[1].isdigit():
     loja_id = int(sys.argv[1])
     print("Loja ID detectado:", loja_id)
 else:
     loja_id = 1
     print("Usando fallback:", loja_id)
 
-# Pega o ID da loja passado pelo PHP
-if len(sys.argv) > 1:
-    loja_id = int(sys.argv[1])
-else:
-    loja_id = 1  # fallback para testes
-
-# Conexão MySQL (senha com caractere especial esca  pado)
+# Conexão MySQL
 DB_URI = "mysql+pymysql://root:Home%40spSENAI2025!@localhost:3306/decklog_db"
 engine = sqlalchemy.create_engine(DB_URI)
 
@@ -44,7 +43,6 @@ def detectar_anomalias(df, janela=7, z_thresh=1):
     return df
 
 def salvar_anomalias(df, loja_id):
-    # Checa se já existe anomalia igual antes de inserir
     select_sql = """
         SELECT COUNT(*) FROM anomalias
         WHERE loja_id = :loja_id
@@ -83,7 +81,18 @@ def salvar_anomalias(df, loja_id):
 
 # --- Execução ---
 vendas = carregar_vendas(loja_id)
+
+# --- MODO DEMO: FORÇAR ANOMALIA ---
+if forcar:
+    print("⚠️ MODO DEMO: injetando anomalia artificial…")
+    ultimo_dia = vendas['data_venda'].max()
+    valor_fake = vendas['valor_dia'].mean() * 5
+    vendas.loc[len(vendas)] = [ultimo_dia, valor_fake]
+
 analisado = detectar_anomalias(vendas, janela=7, z_thresh=1)
 salvar_anomalias(analisado, loja_id)
 
 print(analisado.tail(10))
+
+
+

@@ -150,3 +150,10 @@
 [14-Nov-2025 13:52:03 America/Sao_Paulo] PHP Warning:  Undefined variable $tipo_login in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 285
 [14-Nov-2025 13:52:03 America/Sao_Paulo] PHP Warning:  Undefined variable $usuarioId in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 285
 [14-Nov-2025 13:52:03 America/Sao_Paulo] Importação finalizada: 1 produtos importados, 0 erros
+[26-Nov-2025 14:35:10 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[26-Nov-2025 14:35:10 America/Sao_Paulo] Valor original da data: 11/26/2025
+[26-Nov-2025 14:35:10 America/Sao_Paulo] Data processada: 2025-11-26
+[26-Nov-2025 14:35:10 America/Sao_Paulo] Tentando inserir produto: loja_id=30, nome=IA, lote=123
+[26-Nov-2025 14:35:10 America/Sao_Paulo] PHP Warning:  Undefined variable $tipo_login in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 285
+[26-Nov-2025 14:35:10 America/Sao_Paulo] PHP Warning:  Undefined variable $usuarioId in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 285
+[26-Nov-2025 14:35:10 America/Sao_Paulo] Importação finalizada: 0 produtos importados, 1 erros

@@ -1,1 +1,30 @@
-O sistema n∆o pode encontrar o caminho especificado.
+Importing plotly failed. Interactive plots will not work.
+15:12:33 - cmdstanpy - INFO - Chain [1] start processing
+15:12:33 - cmdstanpy - INFO - Chain [1] done processing
+15:12:33 - cmdstanpy - INFO - Chain [1] start processing
+15:12:33 - cmdstanpy - INFO - Chain [1] done processing
+15:12:33 - cmdstanpy - INFO - Chain [1] start processing
+15:12:33 - cmdstanpy - INFO - Chain [1] done processing
+15:12:33 - cmdstanpy - INFO - Chain [1] start processing
+15:12:33 - cmdstanpy - INFO - Chain [1] done processing
+15:12:34 - cmdstanpy - INFO - Chain [1] start processing
+15:12:34 - cmdstanpy - INFO - Chain [1] done processing
+15:12:34 - cmdstanpy - INFO - Chain [1] start processing
+15:12:34 - cmdstanpy - INFO - Chain [1] done processing
+Rodando previsao de reabastecimento...
+Produto 27: dados insuficientes para previsao.
+Produto 28: dados insuficientes para previsao.
+Produto 29: dados insuficientes para previsao.
+Produto 30 (teste): Reabasteca 180 unidades (demanda prevista: 185)
+Produto 31: dados insuficientes para previsao.
+Produto 32 (ad): Reabasteca 10611 unidades (demanda prevista: 10624)
+Produto 51: dados insuficientes para previsao.
+Produto 55: dados insuficientes para previsao.
+Produto 61: dados insuficientes para previsao.
+Produto 75 (A): Reabasteca 366 unidades (demanda prevista: 366)
+Produto 77: dados insuficientes para previsao.
+Produto 82 (Celular): Reabasteca 68 unidades (demanda prevista: 68)
+Produto 86: dados insuficientes para previsao.
+Produto 87 (ia2): Reabasteca 0 unidades (demanda prevista: -4283)
+Produto 88 (ia): Reabasteca 519357 unidades (demanda prevista: 519357)
+Produto 89: dados insuficientes para previsao.
