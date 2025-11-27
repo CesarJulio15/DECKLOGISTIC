@@ -150,3 +150,10 @@
 [14-Nov-2025 13:52:03 America/Sao_Paulo] PHP Warning:  Undefined variable $tipo_login in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 285
 [14-Nov-2025 13:52:03 America/Sao_Paulo] PHP Warning:  Undefined variable $usuarioId in C:\xampp\htdocs\DECKLOGISTIC\Pages\dashboard\tabelas\importacao.php on line 285
 [14-Nov-2025 13:52:03 America/Sao_Paulo] Importação finalizada: 1 produtos importados, 0 erros
+[26-Nov-2025 22:00:16 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[26-Nov-2025 22:00:20 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[26-Nov-2025 22:01:14 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[26-Nov-2025 22:02:31 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[26-Nov-2025 22:11:44 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[26-Nov-2025 22:17:43 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone
+[26-Nov-2025 22:24:36 America/Sao_Paulo] Conexão MySQL configurada com modo estrito e timezone

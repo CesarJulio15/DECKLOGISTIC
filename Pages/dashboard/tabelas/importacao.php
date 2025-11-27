@@ -1,8 +1,8 @@
 <?php
-// importacao.php (versão com validação de duplicatas)
+// importacao.php (versão corrigida com validação de duplicatas)
 
 // Primeiro limpa qualquer saída anterior
-ob_clean();
+if (ob_get_length()) ob_clean();
 
 // Força o PHP a mostrar erros como JSON em vez de HTML
 function exception_handler($e) {
@@ -25,6 +25,9 @@ date_default_timezone_set('America/Sao_Paulo');
 require './vendor/autoload.php';
 require '../../../conexao.php';
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+
 // Durante desenvolvimento, vamos exibir erros
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -34,16 +37,13 @@ error_reporting(E_ALL);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . '/importacao_error.log');
 
-// Configura timezone
+// Configura timezone (novamente para garantir)
 date_default_timezone_set('America/Sao_Paulo');
 
-// Força MySQL a usar o modo estrito de datas
+// Força MySQL a usar o modo estrito e timezone
 if (isset($conn)) {
     $conn->query("SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
-    
-    // Configura timezone do MySQL para combinar com PHP
     $conn->query("SET time_zone = '-03:00'");
-    
     error_log("Conexão MySQL configurada com modo estrito e timezone");
 }
 
@@ -52,23 +52,20 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Força cabeçalho JSON
-header('Content-Type: application/json; charset=utf-8');
-
 // Verifica login
 if (!isset($_SESSION['loja_id'])) {
-    // limpa qualquer saída acidental antes de retornar JSON limpo
     if (ob_get_length()) ob_clean();
     echo json_encode(['success' => false, 'message' => 'Você precisa estar logado para importar produtos.']);
     exit;
 }
 
-$lojaId = $_SESSION['loja_id'];
+$lojaId = (int) $_SESSION['loja_id'];
 
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
+// ===== NEW: pegando usuario_id e tipo_login da session com fallback =====
+$usuarioId = isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : 0;
+$tipo_login = isset($_SESSION['tipo_login']) ? $_SESSION['tipo_login'] : 'empresa';
+// =====================================================================
 
-// Verifica arquivo
 if (!isset($_FILES['excel_file']) || $_FILES['excel_file']['error'] != UPLOAD_ERR_OK) {
     if (ob_get_length()) ob_clean();
     echo json_encode(['success' => false, 'message' => 'Nenhum arquivo enviado ou erro no upload.']);
@@ -104,17 +101,15 @@ try {
     $imported = 0;
     $updated = 0;
     $importedData = [];
-    $updatedProducts = []; // Array para produtos atualizados/criados
+    $updatedProducts = [];
     $errors = [];
 
     foreach ($rows as $index => $row) {
-        // ignora linhas completamente vazias
         if (!is_array($row) || empty(array_filter($row))) continue;
 
-        // A linha do Excel visualmente '2' corresponde ao index+2 (se header removido)
-        $displayLine = $index + 2;
+        $displayLine = $index + 2; // linha visível no Excel
 
-        // verificar nome (coluna 0)
+        // Campos (ajuste índices conforme sua planilha)
         $nome = trim($row[0] ?? '');
         if ($nome === '') {
             $errors[] = "Linha {$displayLine}: Nome do produto é obrigatório";
@@ -123,105 +118,103 @@ try {
 
         $descricao = trim($row[1] ?? '');
         $lote = trim($row[2] ?? '');
-        $quantidade_estoque = intval($row[3] ?? 0);
-        // Para valores numéricos com vírgula/ponto no Excel, a leitura deve já vir como float
-        $preco_unitario = is_numeric($row[4]) ? floatval($row[4]) : floatval(str_replace(',', '.', str_replace('.', '', (string)($row[4] ?? 0))));
-        $custo_unitario = is_numeric($row[5]) ? floatval($row[5]) : floatval(str_replace(',', '.', str_replace('.', '', (string)($row[5] ?? 0))));
+        $quantidade_estoque = isset($row[3]) ? intval($row[3]) : 0;
+
+        // Preço / custo - tenta lidar com vírgula/ponto e strings
+        $preco_unitario = 0.0;
+        $custo_unitario = 0.0;
+        if (isset($row[4]) && $row[4] !== '') {
+            $preco_unitario = is_numeric($row[4]) ? floatval($row[4]) : floatval(str_replace(',', '.', str_replace('.', '', (string)$row[4])));
+        }
+        if (isset($row[5]) && $row[5] !== '') {
+            $custo_unitario = is_numeric($row[5]) ? floatval($row[5]) : floatval(str_replace(',', '.', str_replace('.', '', (string)$row[5])));
+        }
+
         $data_reabastecimento = $row[6] ?? null;
 
         // Processamento da data de reabastecimento
         try {
-            error_log("Valor original da data: " . print_r($data_reabastecimento, true));
-            
-            // Se for null ou vazio, usa a data atual
+            error_log("Valor original da data (linha {$displayLine}): " . print_r($data_reabastecimento, true));
+
             if (empty($data_reabastecimento)) {
                 $data_reabastecimento = date('Y-m-d');
-            }
-            // Se for apenas um ano
-            else if (is_numeric($data_reabastecimento) && strlen($data_reabastecimento) == 4) {
+            } else if (is_numeric($data_reabastecimento) && strlen((string)$data_reabastecimento) == 4) {
+                // somente ano
                 $data_reabastecimento = $data_reabastecimento . '-01-01';
-            }
-            // Se for um número serial do Excel
-            else if (is_numeric($data_reabastecimento)) {
+            } else if (is_numeric($data_reabastecimento)) {
+                // número serial do Excel
                 $dataObj = Date::excelToDateTimeObject($data_reabastecimento);
                 $data_reabastecimento = $dataObj ? $dataObj->format('Y-m-d') : date('Y-m-d');
-            }
-            // Se for uma string de data
-            else {
+            } else {
                 $timestamp = strtotime($data_reabastecimento);
                 if ($timestamp === false) {
                     throw new Exception("Formato de data inválido");
                 }
                 $data_reabastecimento = date('Y-m-d', $timestamp);
             }
-            
-            // Validação final
+
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_reabastecimento)) {
                 throw new Exception("Data não está no formato correto YYYY-MM-DD");
             }
-            
+
             $ano = (int)substr($data_reabastecimento, 0, 4);
             if ($ano < 2000 || $ano > 2100) {
                 throw new Exception("Ano fora do intervalo permitido (2000-2100)");
             }
-            
-            error_log("Data processada: $data_reabastecimento");
-            
+
+            error_log("Data processada (linha {$displayLine}): $data_reabastecimento");
         } catch (Exception $e) {
-            error_log("Erro ao processar data: " . $e->getMessage());
-            $data_reabastecimento = date('Y-m-d'); // usa data atual como fallback
+            error_log("Erro ao processar data (linha {$displayLine}): " . $e->getMessage());
+            $data_reabastecimento = date('Y-m-d'); // fallback
         }
 
-        // Prepara e executa insert
-        // Inicia transação para garantir consistência
+        // Validações básicas
+        if (!is_numeric($quantidade_estoque) || $quantidade_estoque < 0) {
+            $errors[] = "Linha {$displayLine}: Quantidade inválida: {$quantidade_estoque}";
+            continue;
+        }
+        if (!is_numeric($preco_unitario) || $preco_unitario < 0) {
+            $errors[] = "Linha {$displayLine}: Preço unitário inválido: {$preco_unitario}";
+            continue;
+        }
+        if (!is_numeric($custo_unitario) || $custo_unitario < 0) {
+            $errors[] = "Linha {$displayLine}: Custo unitário inválido: {$custo_unitario}";
+            continue;
+        }
+
+        // Inicia transação
         $conn->begin_transaction();
-        
         try {
-            // Insere o produto
-            error_log("Tentando inserir produto: loja_id=$lojaId, nome=$nome, lote=$lote");
-            
-            // Validações adicionais
-            if (!is_numeric($quantidade_estoque) || $quantidade_estoque < 0) {
-                throw new Exception("Quantidade inválida: $quantidade_estoque");
-            }
-            if (!is_numeric($preco_unitario) || $preco_unitario < 0) {
-                throw new Exception("Preço unitário inválido: $preco_unitario");
-            }
-            if (!is_numeric($custo_unitario) || $custo_unitario < 0) {
-                throw new Exception("Custo unitário inválido: $custo_unitario");
-            }
-            
-            // Verifica se o produto já existe
+            // Verifica se o produto já existe (por nome e loja)
             $stmtCheck = $conn->prepare("SELECT id, quantidade_estoque, custo_unitario, preco_unitario FROM produtos WHERE nome = ? AND loja_id = ?");
+            if (!$stmtCheck) {
+                throw new Exception("Erro ao preparar SELECT: " . $conn->error);
+            }
             $stmtCheck->bind_param("si", $nome, $lojaId);
             $stmtCheck->execute();
             $resultCheck = $stmtCheck->get_result();
-            
-            if ($resultCheck->num_rows > 0) {
-                // Produto existe - incrementa quantidade e atualiza custo médio ponderado
+
+            if ($resultCheck && $resultCheck->num_rows > 0) {
+                // Atualiza produto existente
                 $produtoExistente = $resultCheck->fetch_assoc();
-                $produtoId = $produtoExistente['id'];
+                $produtoId = (int)$produtoExistente['id'];
                 $estoqueAtual = floatval($produtoExistente['quantidade_estoque']);
                 $custoAtual = floatval($produtoExistente['custo_unitario']);
                 $precoAtual = floatval($produtoExistente['preco_unitario']);
-                
-                // Calcula novo estoque
+
                 $novoEstoque = $estoqueAtual + $quantidade_estoque;
-                
-                // Calcula custo médio ponderado
-                if ($quantidade_estoque > 0 && $custo_unitario > 0) {
-                    $novoCusto = (($custoAtual * $estoqueAtual) + ($custo_unitario * $quantidade_estoque)) / $novoEstoque;
-                } else {
+                // evita divisão por zero
+                if ($novoEstoque <= 0) {
                     $novoCusto = $custoAtual;
+                } else {
+                    if ($quantidade_estoque > 0 && $custo_unitario > 0) {
+                        $novoCusto = (($custoAtual * $estoqueAtual) + ($custo_unitario * $quantidade_estoque)) / $novoEstoque;
+                    } else {
+                        $novoCusto = $custoAtual;
+                    }
                 }
-                
-                // Usa o preço da planilha se for maior que 0, senão mantém o atual
                 $novoPreco = ($preco_unitario > 0) ? $preco_unitario : $precoAtual;
-                
-                // Atualiza produto existente
-                // Campos no UPDATE: quantidade_estoque, custo_unitario, preco_unitario, descricao, lote, data_reabastecimento (6 campos)
-                // WHERE: id, loja_id (2 campos)
-                // Total: 8 parâmetros
+
                 $stmtUpdate = $conn->prepare("
                     UPDATE produtos 
                     SET quantidade_estoque = ?, 
@@ -232,93 +225,140 @@ try {
                         data_reabastecimento = ?
                     WHERE id = ? AND loja_id = ?
                 ");
-                
-                // 8 parâmetros: i (quantidade), d (custo), d (preço), s (descrição), s (lote), s (data), i (id), i (loja_id)
-                $stmtUpdate->bind_param("iddsssii", 
-                    $novoEstoque,           // 1: i (int)
-                    $novoCusto,             // 2: d (double)
-                    $novoPreco,             // 3: d (double)
-                    $descricao,             // 4: s (string)
-                    $lote,                  // 5: s (string)
-                    $data_reabastecimento,  // 6: s (string/null)
-                    $produtoId,             // 7: i (int)
-                    $lojaId                 // 8: i (int)
+                if (!$stmtUpdate) {
+                    throw new Exception("Erro ao preparar UPDATE: " . $conn->error);
+                }
+
+                // Casts para tipos esperados
+                $stmtUpdate->bind_param(
+                    "iddsssii",
+                    $novoEstoque,           // int (quantidade) -> se precisar forçar int: (int)$novoEstoque
+                    $novoCusto,             // double
+                    $novoPreco,             // double
+                    $descricao,             // string
+                    $lote,                  // string
+                    $data_reabastecimento,  // string
+                    $produtoId,             // int
+                    $lojaId                 // int
                 );
                 $stmtUpdate->execute();
+                if ($stmtUpdate->error) {
+                    throw new Exception("Erro no UPDATE: " . $stmtUpdate->error);
+                }
                 $stmtUpdate->close();
-                
-                // Registra movimentação de entrada
+
+                // Registra movimentação de entrada (se houver quantidade > 0)
                 if ($quantidade_estoque > 0) {
                     $tipo = 'entrada';
                     $data_mov = date('Y-m-d');
-                    
+
                     $stmtMov = $conn->prepare("
                         INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario)
                         VALUES (?, ?, ?, ?, ?, NOW(), ?)
                     ");
+                    if (!$stmtMov) {
+                        throw new Exception("Erro ao preparar INSERT movimentacoes: " . $conn->error);
+                    }
                     $stmtMov->bind_param("isisid", $produtoId, $tipo, $quantidade_estoque, $data_mov, $usuarioId, $custo_unitario);
                     $stmtMov->execute();
+                    if ($stmtMov->error) {
+                        throw new Exception("Erro no INSERT movimentacoes: " . $stmtMov->error);
+                    }
                     $stmtMov->close();
                 }
-                
-                // Registra no histórico
+
+                // Registra histórico
                 $stmtHist = $conn->prepare("
                     INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
                     VALUES (?, ?, ?, 'importado/atualizado', ?, NOW())
                 ");
-                $stmtHist->bind_param("isii", $produtoId, $nome, $novoEstoque, $usuarioId);
+                if (!$stmtHist) {
+                    throw new Exception("Erro ao preparar INSERT historico: " . $conn->error);
+                }
+                $quantidadeParaHistorico = (int)$novoEstoque;
+                $stmtHist->bind_param("isii", $produtoId, $nome, $quantidadeParaHistorico, $usuarioId);
                 $stmtHist->execute();
+                if ($stmtHist->error) {
+                    throw new Exception("Erro no INSERT historico: " . $stmtHist->error);
+                }
                 $stmtHist->close();
-                
+
                 $updated++;
-                
-                // Adiciona produto atualizado ao array de retorno
                 $updatedProducts[] = [
                     'id' => $produtoId,
                     'nome' => $nome,
                     'preco_unitario' => $novoPreco,
                     'quantidade_estoque' => $novoEstoque
                 ];
-                
+
             } else {
-                // Produto não existe - cria novo
+                // Insere novo produto
                 $usuario_id_produto = ($tipo_login === 'empresa') ? 0 : $usuarioId;
-                
+
                 $stmt = $conn->prepare("
                     INSERT INTO produtos (nome, descricao, lote, quantidade_estoque, preco_unitario, custo_unitario, data_reabastecimento, loja_id, usuario_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
-                $stmt->bind_param("sssiddsii", $nome, $descricao, $lote, $quantidade_estoque, $preco, $custo, $data_reabastecimento, $lojaId, $usuario_id_produto);
+                if (!$stmt) {
+                    throw new Exception("Erro ao preparar INSERT produto: " . $conn->error);
+                }
+
+                // Bind com as variáveis corretas
+                $stmt->bind_param(
+                    "sssiddsii",
+                    $nome,                  // s
+                    $descricao,             // s
+                    $lote,                  // s
+                    $quantidade_estoque,    // i
+                    $preco_unitario,        // d
+                    $custo_unitario,        // d
+                    $data_reabastecimento,  // s
+                    $lojaId,                // i
+                    $usuario_id_produto     // i
+                );
                 $stmt->execute();
+                if ($stmt->error) {
+                    throw new Exception("Erro no INSERT produto: " . $stmt->error);
+                }
                 $produtoId = $stmt->insert_id;
                 $stmt->close();
-                
-                // Registra histórico de adição
+
+                // Histórico
                 $stmtHist = $conn->prepare("
                     INSERT INTO historico_produtos (produto_id, nome, quantidade, acao, usuario_id, criado_em)
                     VALUES (?, ?, ?, 'importado/adicionado', ?, NOW())
                 ");
+                if (!$stmtHist) {
+                    throw new Exception("Erro ao preparar INSERT historico: " . $conn->error);
+                }
                 $stmtHist->bind_param("isii", $produtoId, $nome, $quantidade_estoque, $usuarioId);
                 $stmtHist->execute();
+                if ($stmtHist->error) {
+                    throw new Exception("Erro no INSERT historico: " . $stmtHist->error);
+                }
                 $stmtHist->close();
-                
-                // Registra movimentação de entrada inicial
+
+                // Movimentação inicial (se houver)
                 if ($quantidade_estoque > 0) {
                     $tipo = 'entrada';
                     $data_mov = date('Y-m-d');
-                    
+
                     $stmtMov = $conn->prepare("
                         INSERT INTO movimentacoes_estoque (produto_id, tipo, quantidade, data_movimentacao, usuario_id, criado_em, custo_unitario)
                         VALUES (?, ?, ?, ?, ?, NOW(), ?)
                     ");
+                    if (!$stmtMov) {
+                        throw new Exception("Erro ao preparar INSERT movimentacoes: " . $conn->error);
+                    }
                     $stmtMov->bind_param("isisid", $produtoId, $tipo, $quantidade_estoque, $data_mov, $usuarioId, $custo_unitario);
                     $stmtMov->execute();
+                    if ($stmtMov->error) {
+                        throw new Exception("Erro no INSERT movimentacoes: " . $stmtMov->error);
+                    }
                     $stmtMov->close();
                 }
-                
+
                 $imported++;
-                
-                // Adiciona novo produto ao array de retorno
                 $updatedProducts[] = [
                     'id' => $produtoId,
                     'nome' => $nome,
@@ -326,10 +366,11 @@ try {
                     'quantidade_estoque' => $quantidade_estoque
                 ];
             }
-            
-            $stmtCheck->close();
-            
+
+            if (isset($stmtCheck) && $stmtCheck) $stmtCheck->close();
+
             $conn->commit();
+
             $importedData[] = [
                 'nome' => $nome,
                 'descricao' => $descricao,
@@ -340,31 +381,30 @@ try {
                 'data_reabastecimento' => $data_reabastecimento
             ];
         } catch (Exception $e) {
+            // Rollback e registro do erro
             $conn->rollback();
             $errors[] = "Linha {$displayLine}: " . $e->getMessage();
+            error_log("Erro processamento linha {$displayLine}: " . $e->getMessage());
         }
     }
 
-    // Log final dos resultados
-    error_log("Importação finalizada: $imported produtos importados, " . count($errors) . " erros");
-    
-    // Garante que não há saída anterior
+    error_log("Importação finalizada: {$imported} produtos importados, {$updated} produtos atualizados, " . count($errors) . " erros");
+
     if (ob_get_length()) ob_clean();
-    
+
     $response = [
-        'success' => $imported > 0 || $updated > 0,
+        'success' => ($imported + $updated) > 0,
         'imported' => $imported + $updated,
         'new' => $imported,
         'updated' => $updated,
-        'message' => "$imported produtos adicionados, $updated produtos atualizados",
+        'message' => "{$imported} produtos adicionados, {$updated} produtos atualizados",
         'data' => $importedData,
-        'updated_products' => $updatedProducts, // Adiciona produtos atualizados
+        'updated_products' => $updatedProducts,
         'errors' => $errors
     ];
-    
+
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-
     exit;
 
 } catch (Exception $e) {

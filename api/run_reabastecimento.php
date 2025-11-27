@@ -8,8 +8,8 @@ if (!isset($_SESSION['loja_id'])) {
 }
 
 $lojaId = $_SESSION['loja_id'];
-$python = '"C:\\xampp\\htdocs\\DECKLOGISTIC\\venv\\Scripts\\python.exe"';
-$script = __DIR__ . '/../ml/run_reabastecimento.py';
+$python = "C:\\xampp\\htdocs\\DECKLOGISTIC\\.venv\\Scripts\\python.exe";
+$script = "C:\\xampp\\htdocs\\DECKLOGISTIC\\ml\\run_reabastecimento.py";
 
 // Passando loja_id e capturando stdout + stderr
 $cmd = "$python $script $lojaId 2>&1";
