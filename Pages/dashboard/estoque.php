@@ -19,23 +19,23 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
   <meta charset="UTF-8">
   <title>Estoque - Decklogistic</title>
   <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-  <link rel="icon" href="/projetos/2025_dev/deckers/img/logoDecklogistic.webp" type="image/x-icon" />
-  <link rel="stylesheet" href="/projetos/2025_dev/deckers/assets/estoque.css">
-  <link rel="stylesheet" href="/projetos/2025_dev/deckers/assets/sidebar.css">
+  <link rel="icon" href="../../img/logoDecklogistic.webp" type="image/x-icon" />
+  <link rel="stylesheet" href="../../assets/estoque.css">
+  <link rel="stylesheet" href="../../assets/sidebar.css">
 </head>
 
 <noscript>
-    <meta http-equiv="refresh" content="0; URL=/projetos/2025_dev/deckers/no-javascript.php">
+    <meta http-equiv="refresh" content="0; URL=../../no-javascript.php">
 </noscript>
 
 <!-- BLOQUEIO MOBILE -->
 <div id="mobile-lock">
   <div class="mobile-container">
-    <img src="/projetos/2025_dev/deckers/img/logoDecklogistic.webp" alt="Logo" class="mobile-logo">
+    <img src="../../img/logoDecklogistic.webp" alt="Logo" class="mobile-logo">
     <h1>Versão Desktop Necessária</h1>
     <p>Essa área do sistema foi projetada para telas grandes.  
     Acesse pelo seu computador para visualizar o painel financeiro completo.</p>
-    <a href="/projetos/2025_dev/deckers/Pages/auth/config.php" class="mobile-btn">Acessar Configurações</a>
+    <a href="../auth/config.php" class="mobile-btn">Acessar Configurações</a>
     <div class="mobile-footer">
       <p>© Decklogistic 2025 — Sistema Financeiro Empresarial</p>
     </div>
@@ -49,24 +49,24 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="logo-area">
-      <img src="/projetos/2025_dev/deckers/img/logo2.svg" alt="Logo">
+      <img src="../../img/logo2.svg" alt="Logo">
     </div>
     <nav class="nav-section">
       <div class="nav-menus">
         <ul class="nav-list top-section">
-          <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/financas.php"><span><img src="/projetos/2025_dev/deckers/img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
-          <li class="active"><a href="/projetos/2025_dev/deckers/Pages/dashboard/estoque.php"><span><img src="/projetos/2025_dev/deckers/img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
+          <li><a href="financas.php"><span><img src="../../img/icon-finan.svg" alt="Financeiro"></span> Financeiro</a></li>
+          <li class="active"><a href="estoque.php"><span><img src="../../img/icon-estoque.svg" alt="Estoque"></span> Estoque</a></li>
         </ul>
         <hr>
         <ul class="nav-list middle-section">
-          <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/visaoGeral.php"><span><img src="/projetos/2025_dev/deckers/img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
-          <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/tabelas/produtos.php"><span><img src="/projetos/2025_dev/deckers/img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
-          <li><a href="/projetos/2025_dev/deckers/Pages/dashboard/operacoes.php"><span><img src="/projetos/2025_dev/deckers/img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
+          <li><a href="visaoGeral.php"><span><img src="../../img/icon-visao.svg" alt="Visão Geral"></span> Visão Geral</a></li>
+          <li><a href="../dashboard/tabelas/produtos.php"><span><img src="../../img/icon-produtos.svg" alt="Produtos"></span> Produtos</a></li>
+          <li><a href="../dashboard/operacoes.php"><span><img src="../../img/icon-operacoes.svg" alt="Histórico"></span> Histórico</a></li>
         </ul>
       </div>
       <div class="bottom-links">
-        <a href="/projetos/2025_dev/deckers/Pages/auth/config.php"><span><img src="/projetos/2025_dev/deckers/img/icon-config.svg" alt="Conta"></span> Conta</a>
-        <a href="/projetos/2025_dev/deckers/Pages/auth/dicas.php"><span><img src="/projetos/2025_dev/deckers/img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
+        <a href="../auth/config.php"><span><img src="../../img/icon-config.svg" alt="Conta"></span> Conta</a>
+        <a href="../../Pages/auth/dicas.php"><span><img src="../../img/icon-dicas.svg" alt="Dicas"></span> Dicas</a>
       </div>
     </nav>
   </div>
@@ -88,7 +88,7 @@ $lojaId = $_SESSION['tipo_login'] === 'empresa'
       ">Ver histórico 6 meses</button>
 
       <!-- Botão Giro -->
-      <button id="btnGiro" class="btn-modern" onclick="window.location.href='/projetos/2025_dev/deckers/Pages/dashboard/giroEstoque.php'">
+      <button id="btnGiro" class="btn-modern" onclick="window.location.href='giroEstoque.php'">
         Ver Giro de Estoque
       </button>
     </div>
@@ -159,7 +159,7 @@ const lojaId = <?= $lojaId ?>;
 // ---------- Total Estoque ----------
 async function loadEstoqueTotal() {
   try {
-    const data = await fetch(`/projetos/2025_dev/deckers/api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`../../api/total_estoque.php?loja_id=${lojaId}`).then(r => r.json());
     document.querySelector("#estoque").textContent = parseFloat(data.total || 0).toFixed();
   } catch (e) { console.error(e); }
 }
@@ -168,7 +168,7 @@ async function loadEstoqueTotal() {
 async function loadProdutosFalta() {
   const tabela = document.querySelector("#tabelaProdutosFalta");
   try {
-    const data = await fetch(`/projetos/2025_dev/deckers/api/produtos_falta.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`/DECKLOGISTIC/api/produtos_falta.php?loja_id=${lojaId}`).then(r => r.json());
     if (!Array.isArray(data) || !data.length) {
       tabela.innerHTML = "<p>Nenhum produto em falta.</p>";
       return;
@@ -187,7 +187,7 @@ async function loadProdutosFalta() {
 async function loadEstoqueProdutos() {
   const container = document.querySelector("#chartEstoqueParado");
   try {
-    const data = await fetch(`/projetos/2025_dev/deckers/api/produtos_parados.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`/DECKLOGISTIC/api/produtos_parados.php?loja_id=${lojaId}`).then(r => r.json());
     if (!Array.isArray(data) || !data.length) {
       container.innerHTML = "<p>Nenhum produto parado.</p>";
       return;
@@ -203,7 +203,7 @@ async function loadEstoqueProdutos() {
 async function loadEntradaSaidaProdutos() {
   const container = document.querySelector("#chartEntradaSaida");
   try {
-    const response = await fetch(`/projetos/2025_dev/deckers/api/entrada_saida.php?loja_id=${lojaId}`);
+    const response = await fetch(`/DECKLOGISTIC/api/entrada_saida.php?loja_id=${lojaId}`);
     const json = await response.json();
     
     const data = json.data; // <-- acessa o array correto
@@ -237,7 +237,7 @@ async function loadEntradaSaidaProdutos() {
 // ---------- Histórico Estoque ----------
 async function loadHistoricoEstoque() {
   try {
-    const data = await fetch(`/projetos/2025_dev/deckers/api/historico_estoque_6meses.php?loja_id=${lojaId}`).then(r => r.json());
+    const data = await fetch(`../../api/historico_estoque_6meses.php?loja_id=${lojaId}`).then(r => r.json());
     if (!Array.isArray(data.series)) return;
 
     const chart = new CanvasJS.Chart("chartHistorico", {
@@ -266,7 +266,7 @@ async function loadProdutosReabastecidos() {
   const pesquisa = document.getElementById("filtroReabastecidos").value.trim();
   const filtro = document.getElementById("selectFiltro") ? document.getElementById("selectFiltro").value : "data_recente";
   try {
-    const url = `/projetos/2025_dev/deckers/api/produtos_reabastecidos.php?loja_id=${lojaId}&pesquisa=${encodeURIComponent(pesquisa)}&filtro=${filtro}`;
+    const url = `/DECKLOGISTIC/api/produtos_reabastecidos.php?loja_id=${lojaId}&pesquisa=${encodeURIComponent(pesquisa)}&filtro=${filtro}`;
     const data = await fetch(url).then(r => r.json());
     if (!Array.isArray(data) || !data.length) {
       tabela.innerHTML = "<p>Nenhum produto reabastecido recentemente.</p>";

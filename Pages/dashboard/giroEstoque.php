@@ -1,16 +1,11 @@
 <?php
 // giroEstoque.php - versão que detecta relacionamento com loja automaticamente
-
-// ⚠️ IMPORTANTE: header() deve vir ANTES de qualquer output
-header('Content-Type: text/html; charset=utf-8');
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
 require_once __DIR__ . '/../../session_check.php';
-
 // include seguro (ajuste o caminho se necessário)
 $path = __DIR__ . '/../../conexao.php';
 if (!file_exists($path)) {
@@ -55,7 +50,8 @@ if ($tipoLogin === 'empresa') {
     $stmt->close();
 }
 
-// Charset da conexão
+// Charset da página / conexão
+header('Content-Type: text/html; charset=utf-8');
 $conn->set_charset('utf8mb4');
 
 // debug via GET (ex.: ?debug=1)
